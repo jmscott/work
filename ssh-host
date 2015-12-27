@@ -1,0 +1,166 @@
+#
+#  Synopsis:
+#	ssh into a host, setting title as user@remote-host.
+#  Usage:
+#	ln -s bin/ssh_host bin/abchost;  bin/abchost [-l host_user]
+#  Description:
+#	Login to a host, deriving the host name from the name
+#	of the script.  This script is never invoked directly.
+#	Instead, a link to this script is made, where the link 
+#	file name is the remote ssh host, and the linked
+#	script is invoked from the command.
+#
+#	Prior to invoking ssh the remote host name is set as the
+#	"title" of the terminal by sending the ANSI escape sequence.
+#	This might fail on non ANSI complient terminals, like sunterm.
+#  Options:
+#	-l  login_user
+#	-n  no strict host checking
+#	-p  port
+#	-h  remote_host
+#	-X  X11 forwarding
+#	-c  remote command
+#	-t  title of terminal
+#  Blame:
+#	jmscott@setspace.com
+#  Subversion Repo:
+#	svn://svn.setspace.com/jmscott/ssh-host
+#  Depends:
+#	svn://svn.setspace.com/jmscott/xtitle
+#	hostname
+#  Note:
+#	Added a --help option, you dope.
+#
+PROG=$(basename $0)
+HOST=$PROG
+SSH_ARGS=''
+tty >/dev/null
+IS_TTY=$?
+
+LOGIN_USER=$USER
+
+#
+#  Reset the title to this value after ssh exits.
+#  Would be nice to query the xterm for the current title value.
+#
+LOCAL_TITLE="$USER@$(hostname | sed 's/\..*$//')"
+
+log()
+{
+	#
+	#  Log to standard error, in case redirecting stdoutput output
+	#  of remote shell command
+	#
+	echo "$PROG: $@" >&2
+}
+
+die()
+{
+	echo "ERROR: $PROG: $@" >&2
+	exit 1
+}
+
+#
+#  Process the command arguments.
+#
+#	-l  login_user
+#	-n  no strict host checking
+#	-p  port
+#	-h  remote_host
+#	-X  X11 forwarding
+#	-c  remote command
+#	-t  title of terminal
+#
+while [ -n "$1" ];  do
+	case "$1" in
+	-p|--port)
+		shift
+		case "$1" in
+		'')
+			die "missing port number for option -p"
+			;;
+		[1-9]*)
+			log "connecting on port #$1"
+			SSH_ARGS="$SSH_ARGS -p $1"
+			;;
+		*)
+			die "funny port number for option -p: $1"
+			;;
+		esac
+		;;
+	-n|--no-strict)
+		log "no strict host key check, ignore possible warning"
+		SSH_ARGS="$SSH_ARGS \
+			-o UserKnownHostsFile=/dev/null \
+			-o StrictHostKeyChecking=no"
+		;;
+	-l|--login)
+		shift
+		case "$1" in
+		'')
+			die "-l option missing user login name"
+			;;
+		*)
+			LOGIN_USER=$1
+			log "logging in as user $LOGIN_USER"
+			SSH_ARGS="$SSH_ARGS -l $LOGIN_USER"
+			;;
+		esac
+		;;
+	-h|--host)
+		shift
+		case "$1" in
+		'')
+			die "-h missing host name"
+			;;
+		[a-zA-Z0-9]*)
+			log "remote host is $1"
+			;;
+		*)
+			die "option -h: unexpected host name: $1"
+		esac
+		;;
+	-X|--X11-forward)
+		log "X11 forwarding enabled"
+		SSH_ARGS="$SSH_ARGS -X"
+		;;
+	#
+	#  Remain arguments comprose remote ssh command.
+	#
+	-c|--command)
+		shift
+		#
+		#
+		#
+		while [ -n "$1" ];  do
+			SSH_REMOTE_COMMAND="$SSH_REMOTE_COMMAND $1"
+			shift
+		done
+		log "remote ssh command:$SSH_REMOTE_COMMAND"
+		break
+		;;
+	-t)
+		shift
+		TITLE="$1"
+		;;
+	*)
+		die "unknown option: $1"
+		;;
+	esac
+	shift
+done
+
+TITLE=${TITLE:="$LOGIN_USER@$HOST"}
+
+#
+#  Write directly to the tty in case we are redirecting the
+#  output of a remote command.
+#
+test $IS_TTY = 0 && xtitle "$TITLE" >/dev/tty
+ssh $SSH_ARGS $HOST $SSH_REMOTE_COMMAND
+
+#
+#  Reset the terminal title.
+#  Would be nice to reset to previous value by querying the terminal.
+#
+test $IS_TTY = 0 && xtitle "$LOCAL_TITLE"
