@@ -1,0 +1,255 @@
+#/!bin/bash
+#
+#  Synopsis:
+#	Push precious files to user@host.rsync.net:sunk/host/$(hostname)/root
+#  Description:
+#  	Rsync precious, stable files/directories to an off site server and send
+#  	daily status email.  Files that change during the sync will generate
+#  	an error.
+# 
+#  	Files are sunk to remote:sunk/host/$(hostname). Stale files on the
+#  	remote server are deleted.  An itemized summary of all sunk files
+#  	is mailed to those who want to know.
+#
+#  	Directory level filter rules in .rsunk-filter are observed.
+#	Remember, paths in .rsunk-filter are relative to directory
+#	containing the .rsunk-filer file .  In other words, absolute paths 
+#	are meaningless.
+#
+#  	Obviously, the script assumes the remote server supports an rsync.net
+#  	like environment;  i.e, certain programs can be run on the remote
+#  	server,	like du, mkdir, find.
+#
+#	For more pedestrian file-system level rsync backups, see
+#	svn://svn.setspace.com/jmscott/rsync-fs
+#  Usage:
+#	rsunk --notify jmscott --source /home/svn --ssh-auth jmscott
+#	rsunk --notify jmscott --source /home/jmscott/backup 		\
+#		--ssh-auth jmscott --itemize
+#  Blame:
+#	jmscott@setspace.com
+#  Note:
+#	WTF: Not clear to me (jmscott) how to properly pass quoted arguments to
+#	command line invocations. For example, try to get the following bash
+#	script to output 4.
+#
+#	X='
+#		--arg1 "abc efg"
+#		--arg2 hij
+#	'
+#
+#	f()
+#	{
+#		echo "$#"
+#	}
+#
+#	You'd think after 30 years of using bournce shell like languages,
+#	I'd have that one licked.  A solution is worth dinner.
+#
+#	Also, should --source really be --source-dir ?
+#
+
+PROG=$(basename $0)
+SOURCE=
+TARGET=
+SSH_AUTH=
+DU=
+RSYNC_ARGS='
+	--relative
+	--numeric-ids
+	--verbose
+	--exclude tmp/
+	--archive
+	--delete
+	--delete-excluded
+	--itemize-changes
+	--human-readable
+'
+TARGET_PATH=sunk/host/$(hostname)/root
+RSYNC_OUT=
+RSYNC_TEE=cat
+ITEMIZE=no
+
+log()
+{
+	echo "$(date +'%Y/%m/%d %H:%M:%S'): $@"
+}
+
+leave()
+{
+	rm -f $RSYNC_OUT
+	log 'good bye, cruel world'
+}
+
+do_mail()
+{
+	SUBJECT="$1"
+
+	if [ -z "$NOTIFY" ];  then
+		log 'ERROR: do_mail: --option notify required' >&2
+		exit 1
+	fi
+	(
+		cat
+		cat <<END
+
+Begin Process:
+
+       Script Path: $0
+	Start Time: $RSYNC_START_TIME
+	  End Time: $(date)
+	  SSH Auth: $SSH_AUTH
+	    Source: $SOURCE
+	    Target: $TARGET
+	Rsync Args: $RSYNC_ARGS
+END
+	#
+	#  Tack on disk usage, start end times
+	#
+	test -n "$DU" && echo "	Disk Usage: $DU"
+	#
+	#  Concatenate rsync output. 
+	# 
+	if [ -s $RSYNC_OUT ];  then
+		cat <<END
+
+	Begin rsync stdout/err:
+
+END
+		cat $RSYNC_OUT
+		cat <<END
+
+	  End rsync stdout/err:
+END
+	fi
+
+	#
+	#  Process environment
+	#
+	cat <<END
+
+	Begin Environment:
+END
+		env
+		cat <<END
+	  End Environment:
+
+END Process:
+END
+	) | tr -d '\r' | mail -s "$SUBJECT" $NOTIFY
+}
+
+die()
+{
+	log $@ >&2
+
+	#
+	#
+	#
+	do_mail "ERROR: $PROG: $@" <<END
+In process $PROG#$$ the following error occured:
+
+    $@
+
+For more details, see the output of standard error of this script log file,
+probably defined in a crontab for the user $USER.
+
+-$USER
+END
+	exit 1
+}
+
+trap leave EXIT
+
+while [ "$1" ];  do
+	ARG="$1"
+	case "$ARG" in
+	--notify)
+		shift
+		N="$1"
+		test -n "$N" || die 'option --notify: missing user@host'
+		NOTIFY="$NOTIFY $N"
+		;;
+	--ssh-auth)				# user@host
+		test -z "$SSH_AUTH" ||
+				die 'option --ssh-auth: given more than once'
+		shift 
+		SSH_AUTH="$1"
+		test -n "$SSH_AUTH" ||
+				die 'option --ssh-auth: missing user@host'
+		;;
+	--source)		#  file path
+		shift
+		S="$1"
+		test -n "$S" || die 'option --source: missing /file/path'
+		#
+		#  Build source list.
+		#
+		#  Note:
+		#	I (jmscott) am having troubles passing the unescaped
+		#	--source file pattern to rsync.  In other words, doing
+		#
+		#		--source '*.sql'
+		#
+		#	will still be expanded before calling rsync.
+		#
+		SOURCE="$SOURCE $S"
+		;;
+	--itemize)
+		ITEMIZE=yes
+		RSYNC_OUT=${TMPDIR:=/tmp}/$PROG.$$
+		RSYNC_TEE="tee $RSYNC_OUT"
+		;;
+	esac
+	shift
+done
+
+log 'hello, world'
+
+test -n "$NOTIFY" || die 'missing option --notify'
+log "notify: $NOTIFY"
+
+test -n "$SSH_AUTH" || die 'missing option --ssh-auth'
+log "ssh auth: $SSH_AUTH"
+log "rsync args: $RSYNC_ARGS"
+
+test -n "$SOURCE" || die 'missing option: --source'
+log "local source: $SOURCE"
+log "rsync source: $SOURCE"
+log "itemize: $ITEMIZE"
+
+log "target path: $TARGET_PATH"
+TARGET="$SSH_AUTH:$TARGET_PATH"
+log "rsync target: $TARGET"
+log 'starting rsync ...'
+
+RSYNC_START_TIME=$(date)
+set -x
+#
+#  Call rsync.
+#
+#  Note:
+#	Notice the explicit adding of the command line argument
+#
+#		--filter='dir-merge /.rsunk-filter'
+#
+#	See gripe at top of file.
+#
+env time rsync --filter='dir-merge /.rsunk-filter' 			\
+	$RSYNC_ARGS $SOURCE $TARGET 2>&1 | $RSYNC_TEE
+STATUS="${PIPESTATUS[*]}"
+set +x
+case $STATUS in
+'0 0')
+	log 'done, no errors in rsync'
+	;;
+*)
+	die "rsync failed: exit status=$STATUS"
+	;;
+esac
+
+log 'calculating disk usage'
+DU=$(ssh $SSH_AUTH du -sh $TARGET_PATH)
+log "disk usage: $DU"
+
+echo 'Done. No Errors.' | do_mail "OK: $PROG: disk usage: $DU"
