@@ -9,7 +9,7 @@
 # 
 #  	Files are sunk to remote:sunk/host/$(hostname). Stale files on the
 #  	remote server are deleted.  An itemized summary of all sunk files
-#  	is mailed to those who want to know.
+#  	is mailed to those who want to know (see option --notify).
 #
 #  	Directory level filter rules in .rsunk-filter are observed.
 #	Remember, paths in .rsunk-filter are relative to directory
@@ -26,27 +26,11 @@
 #	rsunk --notify jmscott --source /home/svn --ssh-auth jmscott
 #	rsunk --notify jmscott --source /home/jmscott/backup 		\
 #		--ssh-auth jmscott --itemize
-#  Blame:
-#	jmscott@setspace.com
+#  See:
+#	https://github.com/jmscott/work/rsunk
+#	https://rsync.net
 #  Note:
-#	WTF: Not clear to me (jmscott) how to properly pass quoted arguments to
-#	command line invocations. For example, try to get the following bash
-#	script to output 4.
-#
-#	X='
-#		--arg1 "abc efg"
-#		--arg2 hij
-#	'
-#
-#	f()
-#	{
-#		echo "$#"
-#	}
-#
-#	You'd think after 30 years of using bournce shell like languages,
-#	I'd have that one licked.  A solution is worth dinner.
-#
-#	Also, should --source really be --source-dir ?
+#	Should --source really be --source-dir ?
 #
 
 PROG=$(basename $0)
