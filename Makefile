@@ -4,7 +4,7 @@
 #  See:
 #	https://github.com/jmscott/work
 #
-COMPILED=idiff istext
+COMPILED=idiff istext halloc.o
 
 all: $(COMPILED)
 
@@ -16,3 +16,6 @@ idiff: idiff.c
 
 istext: istext.c
 	cc -Wall -Wextra -o istext istext.c
+
+halloc.o: halloc.c
+	cc -Wall -Wextra -c halloc.c
