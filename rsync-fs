@@ -1,0 +1,285 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	rsync an entire file system to /<sunk>/$(hostname)/root/<mount>
+#  Description:
+#  	Create a full rsunk snapshot of a single file system to a local
+#
+#	  	/<sunk>/$(hostname)/root/<mount>
+#
+#	Typically the file system <mount> directory is / or /var and the
+#	<sunk> directory is /backup/sunk or /sunk.
+#
+#	The sunk root and mount directories MUST be both full paths and point
+#	to existing directories.  However, the final, target sunk directory will
+#	be created, if needed.  The options --mount-point and --sunk-root
+#	are required.
+#
+#	The rsync arguments are:
+#
+#		--numeric-ids
+#		--filter=<mount>/.rsync-filter
+#		'--exclude=<sunk-root>/*'
+#		--archive
+#		--delete
+#		--delete-excluded
+#		--human-readable
+#		--itemize-changes
+#		--one-file-system
+#		--exclude /backup/sunk/$(hostname)/root/<fs>
+#
+#	When an error occurs, the --fault <path> option indicates the error
+#	message will be appended to the <path> file, allowing for easy
+#	snmp monitoring of process failures.
+#
+#	rsync-fs MUST be run as root user.
+#
+#	Files that disappear during the rsync will generate a fault, since
+#	rsync exits with code 24.  To ignore such rsync errors (and not fault)
+#	add the command line option --ignore-24.
+#  Usage:
+#	LOG=/var/local/log/rsync-fs-root.log
+#	FAULT=/var/log/rsync-fs-var.fault
+#
+#	rsync-fs --sunk-root /sunk --mount-point / >$LOG
+#	rsync-fs --mount-point /var --sunk-root /backup/sunk
+#	rsync-fs --mount-point /var --fault $FAULT --sunk-root /sunk
+#	rsync-fs --mount-point /var --ignore-24 --sunk-root /sunk
+#
+#	#  Or for daily snapshots with faults in /var/run
+#	LOG=/var/log/rsync-fs
+#	FAULT=/var/run/rsync-root.fault
+#	
+#	mkdir -p $LOG || exit
+#	rsync-fs --mount-point /var --sunk-root /backup/sunk --fault $FAULT \
+#		>$LOG/rsync-var-`%a`.log
+#  Exit Status:
+#	0	rsync exited 0
+#	127	failure (not rsync error)
+#  See:
+#  	svn://svn.setspace.com/jmscott/rsync-fs
+#  	rsync manpage for --filter option
+#	GNU dirname command
+#  Blame:
+#	jmscott@setspace.com
+#  Note:
+#	Need to insure the fault directory path is writable.
+#
+#	I (jmscott) have issues with the proper application of any filter file
+#	other than the <mount>/.rsync-filter.
+#	Need to investigate.
+#
+#	Why the strict requirment to run as user root?
+#
+#	Sometime the Mac OS rsync -x includes files outside of the /Root file
+#	systems.
+#
+#	Why not exit with rsync's error code?
+#
+PROG=$(basename $0)
+HOST=$(hostname)
+MOUNT_POINT=
+SUNK_ROOT=
+FAULT=
+SUNK=
+IGNORE_24=no
+LOG_GOODBYE=no
+
+#
+#  Burp the comments section above and exit.
+#
+help()
+{
+	#
+        #  Sorry about using perl for the absolute path derivation.
+        #  The Mac OSX 10.7/bds readlink is different than
+	#  the gnu readlink.
+        #
+        ABSPATH=$(perl -MCwd=realpath -e "print realpath '$0'")
+        awk '
+                !/^ *#/ {
+                        exit
+                }
+                !/^# *!/
+        ' $ABSPATH | sed 's/^# *//'
+        exit 0
+}
+
+log()
+{
+	echo "$(date +'%Y-%m-%d %H:%M:%S'): $PROG#$$: $@"
+}
+
+warn()
+{
+	log "WARN: $@"
+}
+
+die()
+{
+	#
+	#  Fire a fault by appending error message to file $FAULT.
+	#
+	MSG="ERROR: $@"
+
+	#
+	#  Caller requested that we append error to fault file.
+	#
+	if [ -n "$FAULT" ];  then
+		log "appending error to fault file: $FAULT"
+		if [ -e "$FAULT" ];  then
+			warn "fault file exists: $FAULT"
+			warn 'an older fault may not have been cleared'
+		fi
+		log $MSG >>$FAULT || log "append to fault file failed: $FAULT"
+	fi
+	log $MSG >&2
+	log "try '$PROG --help'"
+	exit 127
+}
+
+leave()
+{
+	test $LOG_GOODBYE = yes && log 'good bye, cruel world'
+}
+
+test "$1" = '--help' && help
+test $# -lt 4 && die 'wrong number of arguments'
+
+test $USER = root || die "user is not root: $USER"
+
+while [ "$1" ];  do
+	ARG=$1
+	shift
+	case $ARG in
+	--help)
+		help
+		;;
+	--inplace)
+		test -z "$INPLACE" || die 'option --inplace set again'
+		INPACE='--inplace'
+		;;
+	--mount-point)
+		test -z "$MOUNT_POINT" || die 'option --mount-point redefined'
+		MOUNT_POINT=$1;  shift
+
+		case $MOUNT_POINT in
+		'')
+			die 'option --mount-point: missing path'
+			;;
+		/*)
+			test -d $MOUNT_POINT ||
+				   die "option --mount-point:" 		\
+					   "not a directory: $MOUNT_POINT"
+			;;
+		*)
+			die 'mount point directory must start with /'
+			;;
+		esac
+		;;
+	--sunk-root)
+		test -z "$SUNK_ROOT" || die 'option --sunk-root redefined'
+		SUNK_ROOT="$1";  shift
+
+		case $SUNK_ROOT in
+		'')
+			die 'option --mount-point: missing path'
+			;;
+		/*)
+			test -d $SUNK_ROOT ||
+				   die "option --sunk-root:" 		\
+					   "not a directory: $SUNK_ROOT"
+			;;
+		*)
+			die 'sunk root directory must start with /'
+			;;
+		esac
+		;;
+	--fault)
+		test -z "$FAULT" || die 'option --fault redefined'
+		FAULT="$1";  shift
+		test -n "$FAULT" || die 'option --fault: missing file path'
+		if [ -e "$FAULT" ];  then
+			warn "fault file exists: $FAULT"
+			warn "contents fault file: $(cat $FAULT)"
+		fi
+		;;
+	--ignore-24)
+		IGNORE_24=yes
+		;;
+	--*)
+		die "unknown command line option: $ARG"
+		;;
+	*)
+		die "unknown command line argument: $ARG"
+		;;
+	esac
+done
+test -z "$MOUNT_POINT" && die 'missing required option: --mount-point'
+test -z "$SUNK_ROOT" && die 'missing required option: --sunk-root'
+
+LOG_GOODBYE=yes
+trap leave INT QUIT TERM EXIT
+log 'hello, world'
+
+if [ -z "$FAULT" ];  then
+	log "fault file: $FAULT"
+else
+	log 'no fault file given (ok): see option --fault'
+fi
+log "hostname: $HOST"
+log "sunk root: $SUNK_ROOT"
+log "source file system mount directory: $MOUNT_POINT"
+log "ignore rsync error 24 (files vanished): $IGNORE_24"
+
+#
+#  Build the rsync-filter path and target sunk directory path from the
+#  hostname, sunk root path and mount point.
+#
+case $MOUNT_POINT in
+/)
+	SUNK=$SUNK_ROOT/$HOST/root
+	FILTER='dir-merge /.rsync-filter'
+	;;
+/*)
+	SUNK=$(dirname $SUNK_ROOT/$HOST/root/$MOUNT_POINT)
+	FILTER="dir-merge $MOUNT_POINT/.rsync-filter"
+	;;
+*)
+	die "PANIC: first char not / in mount directory: $MOUNT_POINT"
+	;;
+esac
+
+if [ ! -d $SUNK ];  then
+	log "creating target sunk directory: $SUNK"
+	mkdir -p $SUNK || die "mkdir $SUNK failed"
+fi
+
+log "target backup sunk directory: $SUNK"
+log "rsync filter: $FILTER"
+
+log 'starting rsync ...'
+time rsync $INPLACE							\
+	--numeric-ids							\
+	--filter="$FILTER"						\
+	"--exclude=$SUNK_ROOT/*"					\
+	--archive 							\
+	--delete							\
+	--delete-excluded						\
+	--human-readable 						\
+	--itemize-changes						\
+	--one-file-system						\
+	--exclude $SUNK							\
+	$MOUNT_POINT $SUNK
+STATUS=$?
+log "rsync exit status: $STATUS"
+
+if [ $STATUS -ne 0 ];  then
+	if [ $STATUS -eq 24 -a $IGNORE_24 = yes ];  then
+		warn 'rsync exit of 24 and --ignore-24 requested'
+		warn 'ignoring rsync error code'
+	else
+		die "rsync failed: exit status=$STATUS"
+	fi
+fi
+exit 0
