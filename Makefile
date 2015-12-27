@@ -4,7 +4,7 @@
 #  See:
 #	https://github.com/jmscott/work
 #
-COMPILED=idiff
+COMPILED=idiff istext
 
 all: $(COMPILED)
 
@@ -13,3 +13,6 @@ clean:
 
 idiff: idiff.c
 	cc -Wall -Wextra -o idiff idiff.c
+
+istext: istext.c
+	cc -Wall -Wextra -o istext istext.c
