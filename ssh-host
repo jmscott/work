@@ -2,7 +2,8 @@
 #  Synopsis:
 #	ssh into a host, setting title as user@remote-host.
 #  Usage:
-#	ln -s bin/ssh_host bin/abchost;  bin/abchost [-l host_user]
+#	ln -s bin/ssh_host bin/abchost
+#	bin/abchost [-l host_user]
 #  Description:
 #	Login to a host, deriving the host name from the name
 #	of the script.  This script is never invoked directly.
@@ -22,14 +23,15 @@
 #	-c  remote command
 #	-t  title of terminal
 #  Blame:
-#	jmscott@setspace.com
-#  Subversion Repo:
-#	svn://svn.setspace.com/jmscott/ssh-host
+#	https://github.com/jmscott
 #  Depends:
-#	svn://svn.setspace.com/jmscott/xtitle
-#	hostname
+#	https://github.com/jmscott/work/xtitle
+#	GNU or BSD hostname
 #  Note:
-#	Added a --help option, you dope.
+#	Would be nice to reset to previous value of title by somehow querying
+#	the terminal.
+#
+#	Add a --help option, dear god.
 #
 PROG=$(basename $0)
 HOST=$PROG
