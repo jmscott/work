@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+#
+#  Synopsis:
+#	String dos style carriage return/newline sequences.
+#  Usage:
+#	strip-cr <quarterly.csv | overwrite quarterly.csv
+#  See:
+#	https://github.com/jmscott/work/strip-cr
+#
+
+$/ = "\r\n";
+
+while (<STDIN>) {
+	chomp;  
+	print;
+	print "\n";
+}
