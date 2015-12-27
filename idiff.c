@@ -1,6 +1,6 @@
 /*
  *  Synopsis:
- *	Interactive diff of 2 US_ASCII text files.
+ *	Interactive diff of two US_ASCII text files.
  *  Usage:
  *	idiff [-c diffcmd] [-o output] file1 file2
  *  History:
@@ -13,6 +13,7 @@
  *	https://github.com/jmscott/work
  *  Notes:
  *	The prompt doesn't appear to echo to terminal under Mac OSX 10.10.5.
+ *	UTF-8 is not supported.
  *	The pain never ends.
  */
 
