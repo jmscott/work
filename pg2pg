@@ -1,0 +1,253 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	Upgrade a postgres cluster via either pg_upgrade or pg_dump
+#  Usage:
+#  	pg2pg [dump|upgrade] <config file>
+#	pg2pg template >pg2pg.conf
+#  Checklist:
+#	upgrade:
+#  		Fresh initdb run against $NEW_PGHOME
+#		Copy files $OLD_PGDATA/{postgresql,pg_hba}.conf to $NEW_PGDATA
+#  		In $OLD_PGDATA/postgresql.conf, 'port' GUC set to $OLD_PGPORT
+#  		In $NEW_PGDATA/postgresql.conf, 'port' GUC set to $NEW_PGPORT
+#		Hand inspect the postgresql.conf for changes in GUC variables
+#  		All contrib modules in $OLD_PGHOME compiled into $NEW_PGHOME!
+#			Pay attention to failures that complain about modules
+#			that appear to be table names, like pg_stat_statements.
+#	  	Both old and new servers not running
+#	dump:
+#		Old server is running, new server is NOT running
+#  See:
+#	https://github.com/jmscott/work/pg2pg
+#  Note:
+#  	Ought to convert the checklist to an actions
+#
+#  		pg2pg checklist
+#
+#  	Also ought run analyze_new_cluster.sh at end of upgrade
+#
+PROG=pg2pg
+
+log()
+{
+	echo "$(date +'%Y/%m/%d %H:%M:%S'): $@"
+}
+
+die()
+{
+	log "ERROR: $@" >&2
+	exit 1
+}
+
+leave()
+{
+	log 'good bye, cruel world'
+}
+
+case $# in
+1)
+	test $1 = 'template' || die "unexpected action: $1"
+	cat <<END
+#
+#  Explicitly set variables for old and new versions of PG variables.
+#  Although dumps are over network, PGDATA set for pg_ctl
+#
+OLD_PGHOME=/opt/local/postgres/pgsql-9.5beta2
+OLD_PGDATA=\$OLD_PGHOME/data
+OLD_PGHOST=/tmp
+#
+#  OLD_PGPORT must match 'port' guc in $OLD_PGDATA/postgresql.conf
+#
+OLD_PGPORT=50432
+
+NEW_PGHOME=/opt/local/postgres/pgsql-9.5rc1
+NEW_PGDATA=\$NEW_PGHOME/data
+NEW_PGHOST=/tmp
+#
+#  NEW_PGPORT must match 'port' guc in $NEW_PGDATA/postgresql.conf
+#
+NEW_PGPORT=5433
+END
+	exit 0
+	;;
+2)
+	ACTION=$1
+	CONF=$2
+	;;
+*)
+	die 'wrong number of arguments'
+	;;
+esac
+
+log 'hello, world'
+trap leave EXIT
+test -e $CONF || die "config file does not exist: $CONF" 
+test -r $CONF || die "can not read config file: $CONF"
+. $CONF
+
+export PGUSER=postgres
+
+#
+#  pg_upgrade parallel jobs
+#
+JOBS=4
+
+#
+#  'dump' pause while new server starts.
+#  Not used in 'upgrade' action.
+#
+NEW_START_PAUSE=10
+
+
+test $# -eq 1 || die "wrong number of arguments: $#"
+
+log "OLD_PGHOME=$OLD_PGHOME"
+log "OLD_PGDATA=$OLD_PGDATA"
+log "OLD_PGHOST=$OLD_PGHOST"
+log "OLD_PGPORT=$OLD_PGPORT"
+
+log "NEW_PGHOME=$NEW_PGHOME"
+log "NEW_PGDATA=$NEW_PGDATA"
+log "NEW_PGHOST=$NEW_PGHOST"
+log "NEW_PGPORT=$NEW_PGPORT"
+
+log "parallel jobs: $JOBS"
+
+#  sanity tests
+test -e $OLD_PGHOME || die "directory OLD_PGHOME does not exist: $OLD_PGHOME"
+test -d $OLD_PGHOME || die "OLD_PGHOME is not a directory: $OLD_PGHOME"
+test -e $NEW_PGHOME || die "directory NEW_PGHOME does not exist: $NEW_PGHOME"
+test -d $NEW_PGHOME || die "NEW_PGHOME is not a directory: $NEW_PGHOME"
+test $OLD_PGHOST = $NEW_PGHOST -a $OLD_PGPORT = $NEW_PGPORT &&
+	die "old and new have same host:port: $OLD_PGHOST:$OLD_PGPORT"
+
+case "$ACTION" in
+upgrade)
+	rm -f pg_upgrade_*.{log,custom,sql} || exit
+	#
+	#  Note:
+	#	Is unset needed?
+	#
+	unset PGDATA PGHOME  PGHOST  PGPORT  PGUSER  PGDATABASE  PGPASSWORD
+	#
+	#  Both databases must NOT be running for an upgrade.
+	#
+	export PGDATAOLD=$OLD_PGDATA
+	export PGDATANEW=$NEW_PGDATA
+
+	export PGBINOLD=$OLD_PGHOME/bin
+	export PGBINNEW=$NEW_PGHOME/bin
+
+	export PGPORTOLD=$OLD_PGPORT
+	export PGPORTNEW=$NEW_PGPORT
+
+	PG_UPGRADE=$PGBINNEW/pg_upgrade
+	test -x $PG_UPGRADE || die "pg_upgrade: no executable: $PG_UPGRADE"
+
+	log "version: $($PG_UPGRADE --version)"
+
+	$PG_UPGRADE --verbose --jobs=$JOBS
+	STATUS=$?
+	test $STATUS -eq 0 ||
+			die "ERROR: pg_upgrade failed: exit status=$STATUS"
+	;;
+dump)
+	#
+	#  Only the old cluster must be running.  The new cluster
+	#  must be shutdown.  The old cluster is shutdown after dumping
+	#  and the the new cluster started before resotring the dump.
+	#
+	export PGHOME=$OLD_PGHOME
+	log "reset PGHOME: $PGHOME"
+
+	export PGDATA=$OLD_PGDATA
+	log "reset PGDATA: $PGDATA"
+
+	export PGHOST=$OLD_PGHOST
+	log "reset PGHOST: $PGHOST"
+
+	export PGPORT=$OLD_PGPORT
+	log "reset PGPORT: $PGPORT"
+
+	PATH=$PGHOME/bin:$PATH
+	log "reset PATH: $PATH"
+
+	#
+	#  use old pg_dumpall to avoid catalog conflicts
+	#
+	PG_DUMPALL=$OLD_PGHOME/bin/pg_dumpall
+	test -x $PG_DUMPALL || die "pg_dumpall: no executable: $PG_DUMPALL"
+
+	#
+	#  Dump the cluster
+	#
+	log "version of pg_dumpall: $($PG_DUMPALL --version)"
+	DUMP_SQL_FILE=$(hostname | sed 's/\..*//')-$(date +'%Y%m%d_%H%M').sql
+	log "starting dump to sql file: $DUMP_SQL_FILE"
+	$PG_DUMPALL >$DUMP_SQL_FILE
+	STATUS=$?
+	test $STATUS -eq 0 || die "pg_dumpall failed: exit status=$STATUS"
+	test -s $DUMP_SQL_FILE ||
+			die "empty psql dump file: $DUMP_SQL_FILE"
+	log "size of dump file $DUMP_SQL_FILE: $(du -sh $DUMP_SQL_FILE)"
+
+	#
+	#  Shutdown the old cluster
+	#
+	PG_CTL=$OLD_PGHOME/bin/pg_ctl
+	test -x $PG_CTL || die "pg_ctl: no executable: $PG_CTL"
+	log "stopping postgres cluster on port $PGPORT"
+	log "which pg_ctl: $(which $PG_CTL)"
+	log "version of pg_ctl: $($PG_CTL --version)"
+	$PG_CTL stop
+	STATUS=$?
+	test $STATUS -eq 0 || die "pg_ctl failed: exit status=$STATUS"
+
+	#
+	#  Use new version to restore.
+	#
+	export PGHOME=$NEW_PGHOME
+	log "reset PGHOME: $PGHOME"
+
+	export PGDATA=$NEW_PGDATA
+	log "reset PGDATA: $PGDATA"
+
+	export PGHOST=$NEW_PGHOST
+	log "reset PGHOST: PGHOST"
+
+	export PGPORT=$NEW_PGPORT
+	log "reset PGPORT: PGPORT"
+
+	PATH=$PGHOME/bin:$PATH
+	log "reset PATH: $PATH"
+
+	#
+	#  Start the new cluster
+	#
+	PG_CTL=$NEW_PGHOME/bin/pg_ctl
+	test -x $PG_CTL || die "pg_ctl: no executable: $PG_CTL"
+	log "starting postgres cluster on port $PGPORT"
+	log "which pg_ctl: $(which $PG_CTL)"
+	log "version of pg_ctl: $($PG_CTL --version)"
+	$PG_CTL start
+	STATUS=$?
+	test $STATUS -eq 0 || die "pg_ctl failed: exit status=$STATUS"
+
+	log "sleeping $NEW_START_PAUSE seconds while new cluster starts"
+	sleep $NEW_START_PAUSE
+
+	log "loading $DUMP_SQL_FILE into new cluster ..."
+	psql -f $DUMP_SQL_FILE
+	STATUS=$?
+	test $STATUS -eq 0 ||
+		die "pgsql -f $DUMP_SQL_FILE failed: exit status=$STATUS"
+	log 'vacuum/analyzing all databases ...'
+	vacuumdb --all --verbose --analyze
+	STATUS=$?
+	test $STATUS -eq 0 || die "vacuumdb --all failed: exit status=$STATUS"
+	;;
+*)
+	die "unknown action: $ACTION"
+	;;
+esac
