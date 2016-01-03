@@ -10,7 +10,7 @@
  *	Well known unix diff program
  *  Blame:
  *	jmscott@setspace.com
- *	https://github.com/jmscott/work
+ *	https://github.com/jmscott
  *  Notes:
  *	The prompt doesn't appear to echo to terminal under Mac OSX 10.10.5.
  *	UTF-8 is not supported.
