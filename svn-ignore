@@ -1,0 +1,16 @@
+#
+#  Synopsis:
+#	Set 'ignore' property in current subversion directory.
+#  Usage:
+#	cd $HOME/dev/work/trunk
+#	svn-ignore
+#  See:
+#	https://github.com/jmscott/work
+#
+if [ -r .svn-ignore ];  then
+	svn propset svn:ignore -F .svn-ignore .
+else
+	echo "$0: can't read file ./.svn-ignore" >&2
+	exit 1;
+fi
+exit 0
