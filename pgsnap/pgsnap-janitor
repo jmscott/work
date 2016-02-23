@@ -1,0 +1,135 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	Clear out various stale log and spool files produced by pgsnap program.
+#
+
+PROG=$(basename $0)
+
+log()
+{
+	echo "$(date +'%Y/%m/%d %H:%M:%S'): $PROG#$$: $@"
+}
+
+die()
+{
+	log "ERROR: $@" >&2
+	exit 1
+}
+
+leave()
+{
+	STATUS=$?
+	_STATUS=
+	if [ -n "$LOCK" ];  then
+		if rm $LOCK;  then
+			true
+		else
+			_STATUS=1
+			log "ERROR: rm $LOCK failed" >&2
+			log "ERROR: PANIC: $PROG may not restart"
+		fi
+	fi
+	test -n "$_STATUS" && STATUS=$_STATUS
+	log 'good bye, cruel world'
+	exit $STATUS
+}
+
+log 'hello, world'
+trap leave EXIT
+
+case "$PGSNAP_ROOT" in
+'')
+	die "environment variable PGSNAP_ROOT not defined"
+	;;
+*)
+	cd $PGSNAP_ROOT || die "cd $PGSNAP_ROOT failed"
+	log "cd to $PGSNAP_ROOT"
+	;;
+esac
+
+#
+#  Insure an older snapshot not running against the same target.
+#
+_LOCK=run/$PROG.pid
+if [ -f $_LOCK ];  then
+	PID=$(cat $_LOCK)
+	die "is another $PROG running at pid #$PID (else remove $(pwd)/$_LOCK)?"
+fi
+#
+#  Put pid in lock file.
+#
+echo $$ >$_LOCK || die "PANIC: error creating $(pwd)/$_LOCK"
+LOCK=$_LOCK
+
+#
+#  Set up the environment.
+#
+test -r etc/profile || die "can't read $(pwd)/etc/profile"
+. etc/profile
+
+test -n "$PGSNAP_SPOOL_AGE" ||
+		die "env variable PGSNAP_SPOOL_AGE not defined in etc/profile"
+log "PGSNAP_SPOOL_AGE=$PGSNAP_SPOOL_AGE"
+
+test -n "$PGSNAP_ARCHIVE_AGE" ||
+		die "env variable PGSNAP_ARCHIVE_AGE not defined in etc/profile"
+log "PGSNAP_ARCHIVE_AGE=$PGSNAP_ARCHIVE_AGE"
+
+#
+#  Tar up spool files in archive directory.
+#
+mkdir -p archive || die "mkdir $(pwd)/archive failed"
+log "archiving spool/pgsnap-* directories older than $PGSNAP_SPOOL_AGE minutes"
+find spool \
+	-maxdepth 1				\
+	-follow 				\
+	-type d					\
+	-name 'pgsnap-*'			\
+	-mmin +$PGSNAP_SPOOL_AGE		\
+	-print |
+  while read D;  do
+  	log "archiving $D"
+	TAR="archive/$(basename $D).tar.bz2"
+	test -f $TAR && die "won't overwrite existing archive: $TAR"
+	log "tar file is $TAR"
+	log "starting bzip2 --best $D ..."
+
+	#
+	#  Tar up spool directory in the archive directory.
+	#
+	tar cf - $D | bzip2 --best >$TAR
+
+	#
+	#  Older bashes have broken ${PIPESTATUS[]}
+	#  Rich get richer.
+	#
+	STATUS=${PIPESTATUS[*]}
+	TAR_EXIT=$(echo $STATUS | awk '{print $1}')
+	BZIP2_EXIT=$(echo $STATUS | awk '{print $2}')
+
+	test $TAR_EXIT != 0 && die "tar exited with non-zero: $TAR_EXIT"
+	test $BZIP2_EXIT != 0 && die "bzip2 exited with non-zero: $BZIP2_EXIT"
+
+	#
+	#  Remove the spool directory.
+	#
+	log "removing $D"
+	rm -r $D || die "'rm -r $D' failed"
+ done
+
+#
+#  Remove any archive files older than PGSNAP_ARCHIVE_AGE minutes
+#
+log "removing archive files older than $PGSNAP_ARCHIVE_AGE minutes"
+find archive \
+	-type f					\
+	-follow					\
+	-mmin +$PGSNAP_ARCHIVE_AGE		\
+	-print |
+  while read F;  do
+  	log "removing archive $F"
+	rm $F || die "'rm $F' failed"
+  done
+
+exit 0

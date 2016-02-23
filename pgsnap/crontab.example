@@ -1,0 +1,89 @@
+#
+#  What:
+#	Dump entire PG9.0 database server and compress backup
+#  When:
+#	3:07am, every night
+#  Note:
+#	Expect the database to be quieted at 3am, till 4am,
+#	including backups of omegalx, myaird, xmap2.
+#
+PGSNAP_ROOT=/var/local/pgsnap
+PGDUMP_LOG=/var/lib/pgsql/9.0/backups/cron-pg_dumpall.log
+
+7 3 * * * /usr/local/bin/cron-pg_dumpall >>$PGDUMP_LOG 2>&1
+
+#
+#  What:
+#	Clear the log file $PGDUMP_LOG
+#  When:
+#	First day of the month at 2:56am
+#
+56 2 1 * * echo "$(date): cleared by cron" >$PGDUMP_LOG 2>&1
+
+#
+#  What:
+#	Snapshot of omegalx database on 10.214.34.28
+#  When:
+#	12 minutes after the hour of 2am, 6am, 10am, 2pm, 6pm, 10pm
+#	Every 4 hours.
+#
+12 2,6,10,14,18,22 * * * $PGSNAP_ROOT/bin/pgsnap omegalx28 omegalx28_snap >>$PGSNAP_ROOT/log/pgsnap-omegalx28_snap.log 2>&1
+
+#
+#  What:
+#	Clear log file named pgsnap-omegalx28_snap.log
+#  When:
+#	Every Sunday morning at 7:49am
+#
+49 7 * * Sun echo "$(date): cleared by cron" >$PGSNAP_ROOT/log/pgsnap-omegalx28_snap.log 2>&1
+
+#
+#  What:
+#	Snapshot of xmap2 database on 10.214.34.28
+#  When:
+#	37 minutes after the hour of 5am, 11am, 15pm, 22pm
+#
+37 5,11,15,22 * * * $PGSNAP_ROOT/bin/pgsnap xmap228 xmap228_snap >>$PGSNAP_ROOT/log/pgsnap-xmap228_snap.log 2>&1
+
+#
+#  What:
+#	Clear log file named pgsnap-xmap2_snap.log
+#  When:
+#	Every Sunday morning at 7:45am
+#
+45 7 * * Sun echo "$(date): cleared by cron" >$PGSNAP_ROOT/log/pgsnap-xmap228_snap.log 2>&1
+
+#
+#  What:
+#	Snapshot of myaird session database on 10.214.34.28
+#  When:
+#	Twice per day, 5am, 8pm
+#
+5 2,6,10,14,18,22 * * * $PGSNAP_ROOT/bin/pgsnap myaird28 myaird28_snap >>$PGSNAP_ROOT/log/pgsnap-myaird28_snap.log 2>&1
+
+#
+#  What:
+#	Clear log file named pgsnap-myaird_snap.log
+#  When:
+#	Every Sunday morning at 4:16am
+#
+16 4 * * Sun echo "$(date): cleared by cron" >$PGSNAP_ROOT/log/pgsnap-myaird28_snap.log 2>&1
+
+#
+#  What:
+#	Clean up stale backup archives and spool directory
+#  When:
+#	44 minutes after the hours of 1am, 5am, 10am, 3pm, 8pm
+#	Every 5 hours.
+#
+44 1,5,10,15,20 * * * $PGSNAP_ROOT/bin/pgsnap-janitor >>$PGSNAP_ROOT/log/pgsnap-janitor.log 2>&1
+
+#
+#  When:
+#	Clear log file pgsnap-janitor.log
+#  When:
+#	Every Sunday at 07:54am
+#
+54 7 * * Sun "$(date): cleared by cron" >$PGSNAP_ROOT/log/pgsnap-janitor.log 2>&1
+
+@reboot rm /opt/local/pgsql-9.1/data/*.pid

@@ -1,0 +1,77 @@
+#
+#  Synopsis:
+#	Configuration file for pgsnap and pgsnap-janitor
+#
+
+#
+#  Default recipients of email notifications.
+#
+#  Note:
+#	Address MUST be on the same line, comma separated
+#
+export PGSNAP_NOTIFY='john.scott@americanmessaging.net,stan.robinson@americanmessaging.net'
+
+#
+#  Define notify mail lists, typical database specific.
+#
+#  Format is
+#
+#	tag1:email1,email2,...
+#	tag2:email3,email4,...
+#
+#  The mail list tag is referenced by the database defined in the PGROOT_DB
+#  variable below and overrides the default list defined by PGSNAP_NOTIFY. 
+#
+#  Email addresses can not reference other list tags (not recursive).
+#
+export PGSNAP_NOTIFY_LIST="
+	omgmail:Lyle.Baker@americanmessaging.net,$PGSNAP_NOTIFY
+"
+
+#
+#  The list of all known databases connections.  Both source and
+#  target databases MUST be defined in this list.
+#
+#	tag:host:port:dbname:dbuser:dbpassword:email1,email2,email3
+#
+#  The tag is used to reference the service in other variables.
+#  pgsnap references tags from the command line, like
+#
+#	pgsnap omegalx29 omegalx28_29
+#
+#  By the way, the PGSNAP_DBs are NOT all active.  To actually backup, pg_snap
+#  must be explicitly passed the db tag from the command line.
+#
+#  Note:
+#	Unfortunatly the fields of PGSNAP_DB must be exact, otherwise crypt
+#	error messages occur, like 'source db tag not found in ...', since the
+#	awk field split fails.  Need to	make the algorithm/erros more robust.
+#
+export PGSNAP_DB="
+	xmap250:10.214.34.50:5432:xmap2:postgres::
+	xmap250_snap:nocdb:5432:xmap2:postgres::
+	myaird50:10.214.34.50:5432:myaird:postgres::
+	myaird50_snap:nocdb:5432:myaird:postgres::
+	mpa70:10.200.2.70:5432:mpa:postgres::
+	mpa70_snap:nocdb:5432:mpa:postgres::
+	sso70:10.200.2.70:5432:sso:postgres::
+	sso70_snap:nocdb:5432:sso:postgres::
+	omg50:10.214.34.50:5432:omegalx:omega::omgmail
+	omg50_snap:nocdb:5432:omegalx:omega::omgmail
+"
+
+#
+#  Maximum age before spool/pgsnap-* directories are moved
+#  as compressed tar files to $PGSNAP_ROOT/archive.
+#  Units are minutes, so 1440 represents 24 hours.
+#
+PGSNAP_SPOOL_AGE=1440
+
+#
+#  Maximum age before archive/pgsnap-* tar files are kept.
+#  Units are minutes, so 10080 represents 7 * 24 hours.
+#
+PGSNAP_ARCHIVE_AGE=10080
+
+export PGHOME=/opt/local/postgres/pgsql
+export PATH="$PGSNAP_ROOT/bin:$PGHOME/bin:$PATH"

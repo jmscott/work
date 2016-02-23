@@ -1,0 +1,381 @@
+#!/bin/bash
+HELP=$(cat <<'END'
+
+Synopsis:
+	Safely snapshot a source postgres database to a target database.
+Usage:
+	export PGSNAP_ROOT=/var/local/pgsnap
+	pgsnap src1 tgt1
+	pgsnap --help
+Description:
+	Take a coherent snapshot of a remote postgresql database
+	via pg_dump nd and completely rebuild that database on
+	a different, usually local, server.  The target database is 
+	dropped and rebuilt completely from a successfull source dump file. 
+	A decent effort is made not to write a source database onto itself.
+
+	The databases connection parameters are defined in
+	$PGSNAP_ROOT/etc/profile in the environment variable PGSNAP_DB. 
+	Each line in the value of PGSNAP_DB describes a database in a simple
+	tagged format with fields separated by tabs.  The first field is the
+	tag that is referenced from the command line.  See the file
+	$PGSNAP_ROOT/etc/profile for examples.
+
+	The database dump files are stored in
+
+		$PGSNAP_ROOT/spool/pgsnap-src1-tgt1-YYYYMMDD-HHmmSS
+
+	The spool files are purged regularly by pgsnap-janitor.
+	Typically we keep 3 days on line.
+See Also:
+	$PGSNAP_ROOT/etc/profile to add database connections or email notify
+Environment:
+	PGSNAP_ROOT		# location of spool/etc/log directories.
+	PGSNAP_DB		# list of all known dbs, defined in etc/profile
+Blame:
+	john.scott@americanmessaging.net
+	jmscott@setspace.com
+Note:
+	Tis a sad fact that the global users must already exist in the 
+	target database.  In other words, the global users must have been 
+	manually installed via
+
+		pg_dumpall --globals-only
+
+	Of course, this implies the global users do not change often.
+
+	A lock file is created in $PGSNAP_ROOT/log/pgsnap-TGT.pid.
+	pgsnap will not run if the pgsnap-TGT.pid file exists.
+END
+)
+
+PROG=$(basename $0)
+LOCK=
+START_DATE=$(date)
+
+log()
+{
+	echo "$(date +'%Y/%m/%d %H:%M:%S'): $PROG#$$: $@"
+}
+
+die()
+{
+	log "ERROR: $@" >&2
+
+	#
+	#  Mail ERROR.
+	#
+	#  Note:
+	#	Time to refactor this code.  mail needs to be in single routine.
+	#
+	if [ -n "$PGSNAP_NOTIFY" ];  then
+		log "mailing ERROR to $PGSNAP_NOTIFY"
+		if [ -n "$SRC" -a -n "$TGT" ];  then
+			WHO="$SRC -> $TGT"
+		else
+			WHO="$(hostname)"
+		fi
+
+		(
+			cat <<END
+Hostname: $(hostname)
+Error: $@
+
+END
+			email_preamble
+		) 2>&1 | mail -s "ERROR: pgsnap: $WHO" $PGSNAP_NOTIFY
+	fi
+
+	exit 1
+}
+
+leave()
+{
+	STATUS=$?
+	_STATUS=
+	if [ -n "$LOCK" ];  then
+		if rm $LOCK;  then
+			true
+		else
+			_STATUS=1
+			log "ERROR: rm $LOCK failed" >&2
+			log "ERROR: PANIC: $PROG may not restart"
+		fi
+	fi
+	test -n "$_STATUS" && STATUS=$_STATUS
+	log 'good bye, cruel world'
+	exit $STATUS
+}
+
+#
+#  Find a particular database row in PGSNAP_DB environment variable
+#  and write row to standard out.
+#
+find_DB()
+{
+	cat <<END | sed 's/[ 	]*//g' | awk -F ':' "\$1 == \"$1\""
+$PGSNAP_DB
+END
+}
+
+#
+#  Find a particular mail list row in PGSNAP_NOTIFY_LIST environment variable
+#  and write second field, the mail list, to standard out.
+#
+find_MAIL_NOTIFY()
+{
+	cat <<END | sed 's/[ 	]*//g' | awk -F ':' "\$1 == \"$1\" {print \$2}"
+$PGSNAP_NOTIFY_LIST
+END
+}
+
+#
+#  Set the PGHOST/PGPORT ... environment variables by parsing a comma
+#  separated record that looks like
+#
+#	tag:host:port:dbname:dbuser:dbpassword
+#
+#  See the enviroment variable PGSNAP_DB.
+#
+export_PG()
+{
+	ROW=$(find_DB $1)
+	test "$ROW" = '' && die "can't find DB tagged $1"
+
+	export PGHOST=$(echo "$ROW" | awk -F ':' '{print $2}')
+	log "PGHOST=$PGHOST"
+
+	export PGPORT=$(echo "$ROW" | awk -F ':' '{print $3}')
+	log "PGPORT=$PGPORT"
+
+	export PGDATABASE=$(echo "$ROW" | awk -F ':' '{print $4}')
+	log "PGDATABASE=$PGDATABASE"
+
+	export PGUSER=$(echo "$ROW" | awk -F ':' '{print $5}')
+	log "PGUSER=$PGUSER"
+
+	export PGPASSWORD=$(echo "$ROW" | awk -F ':' '{print $6}')
+	log "PGPASSWORD=$PGPASSWORD"
+
+	#
+	#  Rewrite the variable PGSNAP_NOTIFY if a particular mail list
+	#  exists for the target database.
+	#
+	ML=$(echo "$ROW" | awk -F ':' '{print $7}')
+	if [ -n "$ML" ];  then
+		N=$(find_MAIL_NOTIFY $ML)
+		test -n "$N" ||
+			die "list not defined in PGSNAP_NOTIFY_LIST: $ML"
+		log "reset PGSNAP_NOTIFY to $N"
+		PGSNAP_NOTIFY=$N
+	else
+		log "no mail list for database: $1"
+		log "using default PGSNAP_NOTIFY: $PGSNAP_NOTIFY"
+	fi
+}
+
+#
+#  Set the source and target database, checking for 
+#
+set_database()
+{
+	SRC="$1"
+	TGT="$2"
+
+	test "$SRC" || die "source db tag is empty"
+	log "source db tag is $SRC"
+
+	test "$TGT" || die "target db tag is empty"
+	log "target db tag is $TGT"
+
+	#
+	#  Insure the source is not the target.
+	#
+	test $SRC = $TGT && die "source and target db tags are equal"
+
+	#
+	#  Insure source and target are defined in the profile.
+	#
+	test -z "$(find_DB $SRC)" &&
+		die "source db tag not found in $PGSNAP_ROOT/etc/profile: $SRC"
+	test -z "$(find_DB $TGT)" &&
+		die "target db tag not found in $PGSNAP_ROOT/etc/profile: $TGT"
+	#
+	#  Insure source and target attributes are not the same.
+	#  This test is not %100, since we could be using different
+	#  dns host names that point to same database.
+	#
+	SRC_ATT=$(find_DB $SRC | sed 's/^[a-zA-Z0-9_-]://')
+	TGT_ATT=$(find_DB $TGT | sed 's/^[a-zA-Z0-9_-]://')
+	if [ "$SRC_ATT" = "$TGT_ATT" ];  then
+		log "ERROR: source ($SRC) and target $(TGT) dbs seem the same"
+		die "see $SRC or $TGT in PGSNAP_DB in $(pwd)/etc/profile"
+	fi
+}
+
+email_preamble()
+{
+	ETH0_IP=$(
+		ifconfig eth0						|
+		grep -w inet						|
+		awk '{print $2}'					|
+		sed 's/addr://'						|
+		grep .
+	)
+
+	cat <<END
+Start Date: $START_DATE
+  End Date: $(date)
+
+         Hostname: $(hostname)
+  Eth0 IP Address: $ETH0_IP
+
+  Source Database: $(find_DB $SRC)
+  Target Database: $(find_DB $TGT)
+Working Directory: $(pwd)
+
+Start Unix Process Environment:
+
+END
+	env
+	echo 
+	echo "End Unix Process Environment"
+}
+
+catch_sig()
+{
+	log 'signal caught'
+	leave 0
+}
+
+test "$1" = '--help' && echo "$HELP" && exit 0
+
+log 'hello, world'
+trap leave EXIT
+trap catch_sig QUIT TERM
+
+case "$PGSNAP_ROOT" in
+'')
+	die "environment variable PGSNAP_ROOT not defined"
+	;;
+*)
+	log "PGSNAP_ROOT=$PGSNAP_ROOT"
+	cd $PGSNAP_ROOT || die "cd $PGSNAP_ROOT failed"
+	;;
+esac
+test -d log || die "expected directory $PGSNAP_ROOT/log"
+
+#
+#  Set up the environment
+#
+test -r etc/profile || die "can't read $(pwd)/etc/profile"
+log "sourcing $(pwd)/etc/profile"
+. etc/profile
+
+log "PGSNAP_NOTIFY=$PGSNAP_NOTIFY"
+log "PGSNAP_DB=$PGSNAP_DB"
+
+#
+#  Parse the command line arguments.  $1 is the source database, $2 the target.
+#
+test $# -ne 2 && die "wrong number of arguments: expected 2, got $#"
+set_database "$1" "$2"
+
+#
+#  Insure an older snapshot not running against the same target.
+#
+_LOCK=$(pwd)/run/$PROG-$TGT.pid
+if [ -f $_LOCK ];  then
+	PID=$(cat $_LOCK)
+	die "is another $PROG running at pid #$PID (else remove $(pwd)/$_LOCK)?"
+fi
+#
+#  Put pid in lock file.
+#
+echo $$ >$_LOCK || die "PANIC: error creating $_LOCK"
+LOCK=$_LOCK
+log "lock file: $LOCK"
+
+log "setting PG variables for source=$SRC"
+export_PG $SRC
+
+SPOOL="spool/$PROG-$SRC-$TGT-$(date +'%Y%m%d-%H%M%S')_$$"
+log "spool directory $SPOOL"
+mkdir -p $SPOOL || die "mkdir $SPOOL failed"
+cd $SPOOL || die "cd $SPOOL failed"
+
+log "which pg_dump: $(which pg_dump)"
+
+DUMP="pg-$PGDATABASE-$(date +'%Y%m%d-%H%M%S').sql"
+
+#
+#  Dump the source database into the spool file.
+#
+log "dumping $PGDATABASE to $DUMP ..."
+echo '\timing' >$DUMP
+pg_dump $PGDATABASE >>$DUMP 
+
+#
+#  We dont' trust ${PIPESTATUS[1]} due to old bugs.
+#  Just check more reliable ${PIPESTATUS[*]}
+#
+STATUS=$?
+case "$STATUS" in
+0)
+	;;
+*)
+	die "pg_dump failed: status=$STATUS"
+	;;
+esac
+
+test -s $DUMP || die "empty dump file: $DUMP"
+SIZE=$(ls -lh $DUMP | awk '{print $5}')
+log "$SIZE bytes in $DUMP"
+
+log "setting PG variables for target=$TGT"
+export_PG $TGT
+
+log "drop db $PGDATABASE@$PGHOST:$PGPORT as user postgres"
+psql -U postgres -c "drop database if exists $PGDATABASE;" postgres ||
+	die "psql drop $PGDATABASE failed"
+
+log "create db $PGDATABASE@$PGHOST:$PGPORT owned by $PGUSER by user postgres"
+psql -U postgres -c "create database $PGDATABASE with owner $PGUSER" postgres ||
+		die "psql create $PGDATABASE failed"
+#
+#  Restore the target database database.
+#
+(
+	log "rebuilding snapshot of $SRC to $PGDATABASE@$PGHOST:$PGPORT"
+	psql -f $DUMP && (
+		log "analyze of $PGDATABASE ..."
+		echo 'analyze;' | psql $PGDATABASE
+	)
+) 2>psql.err
+
+#
+#  Notify the hordes about any errors with copious detail
+#  about the environment of the err.
+#
+if [ -n "$PGSNAP_NOTIFY" -a -s 'psql.err' ];  then
+(
+	log "emailing error output to $PGSNAP_NOTIFY"
+	email_preamble
+	echo "Start PSql Error Output:"
+	cat psql.err
+	echo "End PSql Error Output:"
+) |	mail -s "ERROR: pgsnap: $SRC->$TGT: $(hostname)" $PGSNAP_NOTIFY
+	#
+	#  Disable remailing the error.
+	#
+	PGSNAP_NOTIFY=
+	die "psql failed: see $(pwd)/psql.err"
+fi
+
+#
+#  Successful dump, so mail the interested parties, with copious detail.
+#
+log "dump successfull: notify email list: $PGSNAP_NOTIFY"
+test -n "$PGSNAP_NOTIFY" && (
+	email_preamble
+) | mail -s "OK: pgsnap: $SRC->$TGT: $(hostname): $SIZE" $PGSNAP_NOTIFY
