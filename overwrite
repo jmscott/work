@@ -15,7 +15,7 @@ Description:
 	the target file.
 
   	This script is derived from an example in the mighty fine book
-	title "The Unix Programming Environment" by Rob Pike and Brian
+	titled "The Unix Programming Environment" by Rob Pike and Brian
 	Kernighan.
 Environment:
 	TMPDIR, where the spool files are kept before overwriting.
