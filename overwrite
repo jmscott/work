@@ -3,7 +3,7 @@
 help() {
 	cat <<END
 Synopsis:
-	Safely overwrite a file with contents of standard input.
+	Safely overwrite a file with contents from standard input.
 Usage:
   	$USAGE
 Description:
