@@ -32,15 +32,13 @@ main(int argc, char **argv)
 	while (i++ < 100000) {
 
 		pid = fork();
-		if (pid < 0) {
-			perror("fork() failed");
-			_exit(1);
-		}
-
 		if (pid == 0) {
-			//  extra NULL eilinates wierd 
 			execl(path, path, NULL);
 			perror(path);
+			_exit(1);
+		}
+		if (pid < 0) {
+			perror("fork() failed");
 			_exit(1);
 		}
 
