@@ -61,12 +61,12 @@ case $# in
 #
 #  Checklist:
 #	upgrade:
-#  		Fresh initdb run against $NEW_PGHOME
-#		Copy files $OLD_PGDATA/{postgresql,pg_hba}.conf to $NEW_PGDATA
-#  		In $OLD_PGDATA/postgresql.conf, 'port' GUC set to $OLD_PGPORT
-#  		In $NEW_PGDATA/postgresql.conf, 'port' GUC set to $NEW_PGPORT
+#  		Fresh initdb run against \$NEW_PGHOME
+#		Copy files \$OLD_PGDATA/{postgresql,pg_hba}.conf to \$NEW_PGDATA
+#  		In \$OLD_PGDATA/postgresql.conf, 'port' GUC set to \$OLD_PGPORT
+#  		In \$NEW_PGDATA/postgresql.conf, 'port' GUC set to \$NEW_PGPORT
 #		Hand inspect the postgresql.conf for changes in GUC variables
-#  		All contrib modules in $OLD_PGHOME compiled into $NEW_PGHOME!
+#  		All contrib modules in \$OLD_PGHOME compiled into \$NEW_PGHOME!
 #			Pay attention to failures that complain about modules
 #			that appear to be table names, like pg_stat_statements.
 #	  	Both old and new servers not running
@@ -77,7 +77,7 @@ case $# in
 
 #  Must change at least OLD_PGHOME
 
-OLD_PGHOME=/opt/local/postgres/pgsql-9.5beta2
+OLD_PGHOME=/usr/local/postgres/pgsql-9.5.2
 OLD_PGDATA=\$OLD_PGHOME/data
 OLD_PGHOST=/tmp
 #
@@ -87,7 +87,7 @@ OLD_PGPORT=50432
 
 #  Must change at least NEW_PGHOME
 
-NEW_PGHOME=/opt/local/postgres/pgsql-9.5rc1
+NEW_PGHOME=/usr/local/postgres/pgsql-9.6beta1
 NEW_PGDATA=\$NEW_PGHOME/data
 NEW_PGHOST=/tmp
 #
