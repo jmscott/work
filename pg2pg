@@ -34,9 +34,15 @@ log()
 	echo "$(date +'%Y/%m/%d %H:%M:%S'): $@"
 }
 
+usage()
+{
+	log "usage: $PROG [dump|upgrade|template] <upgrade.conf>"
+}
+
 die()
 {
 	log "ERROR: $@" >&2
+	usage
 	exit 1
 }
 
@@ -53,6 +59,9 @@ case $# in
 #  Explicitly set variables for old and new versions of PG variables.
 #  Although dumps are over network, PGDATA set for pg_ctl
 #
+
+#  Must change at least OLD_PGHOME
+
 OLD_PGHOME=/opt/local/postgres/pgsql-9.5beta2
 OLD_PGDATA=\$OLD_PGHOME/data
 OLD_PGHOST=/tmp
@@ -60,6 +69,8 @@ OLD_PGHOST=/tmp
 #  OLD_PGPORT must match 'port' guc in $OLD_PGDATA/postgresql.conf
 #
 OLD_PGPORT=50432
+
+#  Must change at least NEW_PGHOME
 
 NEW_PGHOME=/opt/local/postgres/pgsql-9.5rc1
 NEW_PGDATA=\$NEW_PGHOME/data
@@ -99,6 +110,8 @@ JOBS=4
 #
 NEW_START_PAUSE=10
 
+test $# -eq 1 || die "wrong number of arguments: $#"
+
 log "OLD_PGHOME=$OLD_PGHOME"
 log "OLD_PGDATA=$OLD_PGDATA"
 log "OLD_PGHOST=$OLD_PGHOST"
@@ -120,6 +133,10 @@ test $OLD_PGHOST = $NEW_PGHOST -a $OLD_PGPORT = $NEW_PGPORT &&
 	die "old and new have same host:port: $OLD_PGHOST:$OLD_PGPORT"
 
 case "$ACTION" in
+
+help|--help)
+	usage
+	;;
 upgrade)
 	rm -f pg_upgrade_*.{log,custom,sql} || exit
 	#
