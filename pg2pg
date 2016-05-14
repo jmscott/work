@@ -18,6 +18,7 @@
 #	  	Both old and new servers not running
 #	dump:
 #		Old server is running, new server is NOT running
+#		New is bootable (initdb) but not running
 #  See:
 #	https://github.com/jmscott/work/pg2pg
 #  Note:
@@ -56,8 +57,22 @@ case $# in
 	test $1 = 'template' || die "unexpected action: $1"
 	cat <<END
 #
-#  Explicitly set variables for old and new versions of PG variables.
-#  Although dumps are over network, PGDATA set for pg_ctl
+#  pg2pg configuration generated $(date)
+#
+#  Checklist:
+#	upgrade:
+#  		Fresh initdb run against $NEW_PGHOME
+#		Copy files $OLD_PGDATA/{postgresql,pg_hba}.conf to $NEW_PGDATA
+#  		In $OLD_PGDATA/postgresql.conf, 'port' GUC set to $OLD_PGPORT
+#  		In $NEW_PGDATA/postgresql.conf, 'port' GUC set to $NEW_PGPORT
+#		Hand inspect the postgresql.conf for changes in GUC variables
+#  		All contrib modules in $OLD_PGHOME compiled into $NEW_PGHOME!
+#			Pay attention to failures that complain about modules
+#			that appear to be table names, like pg_stat_statements.
+#	  	Both old and new servers not running
+#	dump:
+#		Old server is running, new server is NOT running
+#		New is bootable (initdb) but not running
 #
 
 #  Must change at least OLD_PGHOME
