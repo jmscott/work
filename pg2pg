@@ -125,8 +125,6 @@ JOBS=4
 #
 NEW_START_PAUSE=10
 
-test $# -eq 1 || die "wrong number of arguments: $#"
-
 log "OLD_PGHOME=$OLD_PGHOME"
 log "OLD_PGDATA=$OLD_PGDATA"
 log "OLD_PGHOST=$OLD_PGHOST"
