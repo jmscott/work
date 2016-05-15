@@ -134,6 +134,7 @@ log "NEW_PGHOME=$NEW_PGHOME"
 log "NEW_PGDATA=$NEW_PGDATA"
 log "NEW_PGHOST=$NEW_PGHOST"
 log "NEW_PGPORT=$NEW_PGPORT"
+log "LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
 
 log "parallel jobs: $JOBS"
 
@@ -169,7 +170,11 @@ upgrade)
 	export PGPORTOLD=$OLD_PGPORT
 	export PGPORTNEW=$NEW_PGPORT
 
+	export LD_LIBRARY_PATH=$NEW_PGHOME/lib:$LD_LIBRARY_PATH
+	log "reset LD_LIBRARY_PATH to $LD_LIBRARY_PATH"
+
 	PG_UPGRADE=$PGBINNEW/pg_upgrade
+
 	test -x $PG_UPGRADE || die "pg_upgrade: no executable: $PG_UPGRADE"
 
 	log "version: $($PG_UPGRADE --version)"
