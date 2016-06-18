@@ -1,8 +1,10 @@
 /*
- * Synopsis:
+ *  Synopsis:
  *   	Trivial benchmark test of fork/exec.
  *  Usage:
  *	time fork-bench /usr/bin/true
+ *  Github Repo:
+ *	https://github.com/jmscott/work
  */
 #include <sys/wait.h>
 
