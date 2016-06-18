@@ -10,6 +10,7 @@ Description:
   	Safely replace the contents of a target file with the entire contents 
 	of standard input.  All of standard input is read before overwriting
 	the target file.  Overwrite will fail if standard input is empty.
+	The copy of standard input is located in $TMPDIR.
 	
 	Signals HUP, QUIT and TERM are disabled at the start of overwriting 
 	the target file.
@@ -17,10 +18,10 @@ Description:
   	This script is derived from an example in the mighty fine book
 	titled "The Unix Programming Environment" by Rob Pike and Brian
 	Kernighan.
-Environment:
-	TMPDIR, where the spool files are kept before overwriting.
+	
+Github:
+	https://github.com/jmscott/work
 See:
-	https://github.com/jmscott/work/overwrite
 	http://www.amazon.com/Unix-Programming-Environment-Prentice-Hall-Software/dp/013937681X
 END
 }
