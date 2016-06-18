@@ -3,7 +3,7 @@
  *   	Trivial benchmark test of fork/exec.
  *  Usage:
  *	time fork-bench /usr/bin/true
- *  Github Repo:
+ *  Github:
  *	https://github.com/jmscott/work
  */
 #include <sys/wait.h>
