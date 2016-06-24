@@ -206,6 +206,19 @@ HTDOCs="
 
 SRCs="
 "
+
+ETC="
+"
+
+SPOOL="
+"
+
+RUN="
+"
+
+LOG="
+"
+
 END
 	exit 0
 	;;
