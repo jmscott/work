@@ -75,7 +75,7 @@ case $# in
 #		New is bootable (initdb) but not running
 #
 
-#  Must change at least OLD_PGHOME
+#  Must change OLD_PGHOME and NEW_PGHOME
 
 OLD_PGHOME=/usr/local/postgres/pgsql-9.5.2
 OLD_PGDATA=\$OLD_PGHOME/data
@@ -85,7 +85,7 @@ OLD_PGHOST=/tmp
 #
 OLD_PGPORT=50432
 
-#  Must change at least NEW_PGHOME
+#  Must change NEW_PGHOME
 
 NEW_PGHOME=/usr/local/postgres/pgsql-9.6beta1
 NEW_PGDATA=\$NEW_PGHOME/data
