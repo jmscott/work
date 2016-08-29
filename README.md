@@ -1,32 +1,45 @@
-# Trivial scripts used by customers of jmscott
+#  Trivial scripts used by customers of jmscott
 
 ##  Shell scripts
 
-### pgsnap
+###  pgsnap
 	Snaphot postgresql database and notify the hordes
-### pg2pg
+
+###  pg2pg
 	Upgrade a postgresql database via pg_upgrade or pg_dump
-### make-dist
+
+###  make-dist
 	Build a tar distributions using a simple config file
-### ssh-host
+
+###  ssh-host
 	ssh to host based upon symbolic link name
-### rsunk
+
+###  rsunk
 	Push files to rsync.net service and notify hordes
-### rsync-fs
+
+###  rsync-fs
 	rsync a whole file system, notify hordes
-### overwrite
+
+###  overwrite
 	Safely overwrite files (based on rob & bwk script)
-### strswap
+
+###  strswap
 	Swap string in files (based on rob & bwk script)
-### strip-cr
+
+###  strip-cr
 	String dos style carriage return/newline sequences
-### xtitle
+
+###  xtitle
 	Set title of XTerm session
-### svn-ignore
+
+###  svn-ignore
 	Set "ignore" properties of subversion repo
 
 ##  C Programs
-	idiff.c		Interactive diff (based on rob & bwk code)
-	istext.c	Is a file ascii text?
+
+###  idiff.c
+	Interactive diff (based on rob & bwk code)
+
+###  istext.c	Is a file ascii text?
 	halloc.c	Hierarchial memory allocator, a'la malloc()
 	fork-bench.c	Benchmark sequential fork/exec speed
