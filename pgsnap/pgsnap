@@ -17,8 +17,8 @@ Description:
 	The databases connection parameters are defined in
 	$PGSNAP_ROOT/etc/profile in the environment variable PGSNAP_DB. 
 	Each line in the value of PGSNAP_DB describes a database in a simple
-	tagged format with fields separated by tabs.  The first field is the
-	tag that is referenced from the command line.  See the file
+	tagged format with fields separated by tabs.  The first field is the tag
+	that is referneced from the command line.  See the file
 	$PGSNAP_ROOT/etc/profile for examples.
 
 	The database dump files are stored in
@@ -46,12 +46,17 @@ Note:
 
 	A lock file is created in $PGSNAP_ROOT/log/pgsnap-TGT.pid.
 	pgsnap will not run if the pgsnap-TGT.pid file exists.
+
+	Need to automagically create directory $PGSNAP_ROOT/run.
 END
 )
 
 PROG=$(basename $0)
 LOCK=
 START_DATE=$(date)
+
+#  used by email_reamble for header Eth0 IP Address
+PATH=$PATH:/sbin:/usr/sbin
 
 log()
 {
@@ -337,11 +342,11 @@ export_PG $TGT
 
 log "drop db $PGDATABASE@$PGHOST:$PGPORT as user postgres"
 psql -U postgres -c "drop database if exists $PGDATABASE;" postgres ||
-	die "psql drop $PGDATABASE failed"
+	die "psql drop db $PGDATABASE failed"
 
 log "create db $PGDATABASE@$PGHOST:$PGPORT owned by $PGUSER by user postgres"
 psql -U postgres -c "create database $PGDATABASE with owner $PGUSER" postgres ||
-		die "psql create $PGDATABASE failed"
+		die "psql create db $PGDATABASE failed"
 #
 #  Restore the target database database.
 #
