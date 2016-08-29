@@ -1,9 +1,11 @@
 #  Trivial scripts used by customers of jmscott
 
-##  Shell scripts
+##  Packages
 
 ###  pgsnap
 	Snaphot postgresql database and notify the hordes
+
+## Shell Scripts
 
 ###  pg2pg
 	Upgrade a postgresql database via pg_upgrade or pg_dump
