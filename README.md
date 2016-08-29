@@ -40,6 +40,11 @@
 ###  idiff.c
 	Interactive diff (based on rob & bwk code)
 
-###  istext.c	Is a file ascii text?
-	halloc.c	Hierarchial memory allocator, a'la malloc()
-	fork-bench.c	Benchmark sequential fork/exec speed
+###  istext.c
+	Is a file ascii text?
+
+###  halloc.c
+	Hierarchial memory allocator, a'la malloc()
+
+###  fork-bench.c
+	Benchmark sequential fork/exec speed
