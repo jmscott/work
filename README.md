@@ -2,17 +2,28 @@
 
 ##  Shell scripts
 
-	pgsnap		Snaphot postgresql database and notify the hordes
-	pg2pg		Upgrade a postgresql database via pg_upgrade or pg_dump
-	make-dist	Build a tar distributions using a simple config file
-	ssh-host	ssh to host based upon symbolic link name
-	rsunk		Push files to rsync.net service and notify hordes
-	rsync-fs	rsync a whole file system, notify hordes
-	overwrite	Safely overwrite files (based on rob & bwk script)
-	strswap		Swap string in files (based on rob & bwk script)
-	strip-cr	String dos style carriage return/newline sequences
-	xtitle		Set title of XTerm session
-	svn-ignore	Set "ignore" properties of subversion repo
+### pgsnap
+	Snaphot postgresql database and notify the hordes
+### pg2pg
+	Upgrade a postgresql database via pg_upgrade or pg_dump
+### make-dist
+	Build a tar distributions using a simple config file
+### ssh-host
+	ssh to host based upon symbolic link name
+### rsunk
+	Push files to rsync.net service and notify hordes
+### rsync-fs
+	rsync a whole file system, notify hordes
+### overwrite
+	Safely overwrite files (based on rob & bwk script)
+### strswap
+	Swap string in files (based on rob & bwk script)
+### strip-cr
+	String dos style carriage return/newline sequences
+### xtitle
+	Set title of XTerm session
+### svn-ignore
+	Set "ignore" properties of subversion repo
 
 ##  C Programs
 	idiff.c		Interactive diff (based on rob & bwk code)
