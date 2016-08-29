@@ -1,4 +1,4 @@
-#  Trivial scripts used by customers of jmscott
+#  Code Used by Customers of John Scott
 
 ##  Packages
 
