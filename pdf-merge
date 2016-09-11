@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	Merge pdf files into single document
+#  Usage:
+#	pdf-merge chapter1.pdf chapter1.pdf ... book.pdf
+#  Environment:
+#	PDFBOX_APP_JAR
+#
+PROG=$(basename $0)
+
+die()
+{
+	echo "$PROG: ERROR: $@" >&2
+	echo "usage: $PROG chapter1.pdf chapter2.pdf ... book.pdf" >&2
+	exit 1
+}
+
+test $# -gt 2 || die 'wrong number of arguments'
+test -z "$PDFBOX_APP_JAR" || die 'environment not set: PDFBOX_APP_JAR'
+test -r "$PDFBOX_APP_JAR" || die "can't read jar: $PDFBOX_APP_JAR"
+
+exec java -jar "$PDFBOX_APP_JAR" PDFMerger $@
