@@ -3,8 +3,9 @@
 #  Synopsis:
 #	Upgrade a postgres cluster via either pg_upgrade or pg_dump
 #  Usage:
-#  	pg2pg [dump|upgrade] <config file>
-#	pg2pg template >pg2pg.conf
+#  	pg2pg [upgrade|dump|template] <config file>
+#	pg2pg upgrade 9.6beta4.conf
+#	pg2pg template >9.6rc1.conf
 #  Checklist:
 #	upgrade:
 #  		Fresh initdb run against $NEW_PGHOME
