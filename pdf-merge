@@ -1,11 +1,12 @@
 #!/bin/bash
 #
 #  Synopsis:
-#	Merge pdf files into single document
+#	Merge pdf files into single document using pdfbox.apache.org classes
 #  Usage:
 #	pdf-merge chapter1.pdf chapter1.pdf ... book.pdf
 #  Environment:
-#	PDFBOX_APP_JAR
+#	#  Location of jar file pdfbox-app-2.jar from pdfbox.apache.org
+#	export PDFBOX_APP_JAR=/usr/local/lib/pdfbox-app-2.jar
 #
 PROG=$(basename $0)
 
@@ -17,7 +18,7 @@ die()
 }
 
 test $# -gt 2 || die 'wrong number of arguments'
-test -z "$PDFBOX_APP_JAR" || die 'environment not set: PDFBOX_APP_JAR'
+test -n "$PDFBOX_APP_JAR" || die 'environment not set: PDFBOX_APP_JAR'
 test -r "$PDFBOX_APP_JAR" || die "can't read jar: $PDFBOX_APP_JAR"
 
 exec java -jar "$PDFBOX_APP_JAR" PDFMerger $@
