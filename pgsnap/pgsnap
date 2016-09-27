@@ -292,7 +292,7 @@ set_database "$1" "$2"
 _LOCK=$(pwd)/run/$PROG-$TGT.pid
 if [ -f $_LOCK ];  then
 	PID=$(cat $_LOCK)
-	die "is another $PROG running at pid #$PID (else remove $(pwd)/$_LOCK)?"
+	die "is another $PROG running at pid #$PID (else remove $_LOCK)?"
 fi
 #
 #  Put pid in lock file.
