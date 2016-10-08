@@ -1,0 +1,99 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	Notify users of an svn commit
+#  Usage:
+#	#  typical called by the script <repo>/repos/hooks/post-commit
+#
+#	PATH=/usr/local/bin:/usr/bin:/bin
+#	svn-commit-notify repo rev [--notify email@adress.com]+
+#	svn-commit-notify repo rev					\
+#		--notify jmscott@setspace.com				\
+#		--notify stan.robinson@americanmessaging.net
+#  See:
+#	https://github.com/jmscott/work/svn-commit-notify
+#  Note:
+#	Unfortunatly, the option --notify only accepts fully qualified email
+#	SMTP addresses.  Local address are not allowed (like root).
+#
+
+PROG=$(basename $0)
+USAGE="usage: $PROG repo rev [--notify email@adress.com]+"
+
+LOOK_OUT=${TMPDIR:=/tmp}/$PROGNAME.$$
+trap "rm -f $SVNLOOK_OUT" EXIT
+
+die()
+{
+	echo "$PROG: ERROR: $@" >&2
+	echo $USAGE
+	exit 1
+}
+
+case $# in
+0|1|2|*[13579])					# only even number args > 2
+	die 'wrong number of arguments'
+	;;
+esac
+
+REPOS="$1";
+REV="$2";
+
+shift;  shift
+
+while [ "$1" ];  do
+	ARG="$1";  shift
+	case "$ARG" in
+	--notify)
+		N=$1
+		shift
+
+		case "$N" in
+		'')
+			die 'option --notify: missing email address'
+			;;
+		*@*)
+			NOTIFY="$NOTIFY $N"
+			;;
+		*)
+			die "option --notify; unexpected email address: $N"
+			;;
+		esac
+		;;
+	--*)
+		die "unknown option: $ARG"
+		;;
+	*)
+		die "unknown command line argument: $ARG"
+		;;
+	esac
+done
+
+R=$(basename $REPOS)
+svnlook info $REPOS -r $REV >$LOOK_OUT 2>&1
+STATUS=$?
+if [ $STATUS != 0 ];  then
+	(
+		echo "svnlook $REPOS/$REV failed: exit status: $STATUS"
+		echo
+		echo "svnlook output follows:"
+		cat $LOOK_OUT
+	) | mail -x "ERROR: $REPOS/$REV: svnlook failed"
+	die "$REPOS/$REV: svnlook failed"
+fi
+#
+#  Fourth line has comment
+#
+SUBJECT="COMMIT: $R: $(awk 'NR == 4' $LOOK_OUT)"
+(
+	cat <<END
+       SVN Host: $(hostname)
+  SVN Repo Path: $REPOS
+    SVN User Id: $(id)
+           PATH: $PATH
+SVN Commit Hook: $(which $0)
+
+SVN Look Output:
+END
+	cat $LOOK_OUT
+) | mail -s "$SUBJECT" $NOTIFY <$LOOK_OUT
