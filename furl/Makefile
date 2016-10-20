@@ -1,3 +1,9 @@
+#
+#  Synopsis:
+#	Makefile development of furl code
+#  See:
+#	https://github.com/jmscott/work/tree/master/furl
+#
 
 dev-links:
 	test -e state || ln -s . state
