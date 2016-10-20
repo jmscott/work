@@ -5,6 +5,9 @@
 ###  pgsnap
 	Snaphot postgresql database and notify the hordes
 
+###  furl
+	Fault a failed URL fetch and alert once, clearing fault manually.
+
 ## Shell Scripts
 
 ###  pg2pg
