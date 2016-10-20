@@ -13,7 +13,11 @@
  *	https://github.com/jmscott
  *  Notes:
  *	The prompt doesn't appear to echo to terminal under Mac OSX 10.10.5.
+ *
  *	UTF-8 is not supported.
+ *
+ *	Need to change deprecated mktemp() function to mkstemp() or mkdtemp().
+ *
  *	The pain never ends.
  */
 
