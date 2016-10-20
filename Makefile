@@ -4,7 +4,7 @@
 #  See:
 #	https://github.com/jmscott/work
 #
-COMPILED=fork-bench halloc.o idiff istext
+COMPILED=fork-me halloc.o idiff istext
 
 all: $(COMPILED)
 
@@ -20,5 +20,5 @@ istext: istext.c
 halloc.o: halloc.c
 	cc -Wall -Wextra -c halloc.c
 
-fork-bench: fork-bench.c
-	cc -Wall -Wextra -o fork-bench fork-bench.c
+fork-me: fork-me.c
+	cc -Wall -Wextra -o fork-me fork-me.c

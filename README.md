@@ -51,5 +51,5 @@
 ###  halloc.c
 	Hierarchial memory allocator, a'la malloc().  Free a parent and you free the kids.
 
-###  fork-bench.c
-	Benchmark sequential fork/exec speed
+###  fork-me.c
+	Measure sequential fork/exec of a program

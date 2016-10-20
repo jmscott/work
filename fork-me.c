@@ -1,10 +1,13 @@
 /*
  *  Synopsis:
- *   	Trivial benchmark test of fork/exec.
+ *   	Simple measurement of sequential fork/execs.
  *  Usage:
- *	time fork-bench /usr/bin/true
- *  Github:
+ *	time fork-me /usr/bin/true
+ *  See:
  *	https://github.com/jmscott/work
+ *  Note:
+ *	Need to require number of forks/execs from command line.
+ *	Currently value is static 100000.
  */
 #include <sys/wait.h>
 
@@ -18,8 +21,8 @@ main(int argc, char **argv)
 	pid_t pid;
 	int status;
 	char *path;
-	static char blurb[] = "fork-bench: starting 100000 fork/execs ...\n";
-	static char done[] = "fork-bench: done\n";
+	static char blurb[] = "fork-me: starting 100000 fork/execs ...\n";
+	static char done[] = "fork-me: done\n";
 
 	if (argc != 2) {
 		static char badargc[] = "ERROR: wrong number of arguments\n";
