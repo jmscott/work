@@ -10,6 +10,8 @@
 #		--notify jmscott@setspace.com			\
 #		--notify 2147701797@txt.att.net
 #		--data
+#  See:
+#	https://github.com/jmscott/work
 #  Note:
 #	Need to max curl status code on english, based on curl manual page.
 #
