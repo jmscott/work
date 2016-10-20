@@ -1,9 +1,9 @@
 #
 #  Synopsis:
-#	ssh into a host, setting title as user@remote-host.
+#	ssh into a host derived from symbolic link to ssh-host
 #  Usage:
-#	ln -s bin/ssh_host bin/abchost
-#	bin/abchost [-l host_user]
+#	ln -s /usr/local/bin/ssh-host bin/skytel
+#	bin/skytel [-l host_user] [-e <remote exec>]
 #  Description:
 #	Login to a host, deriving the host name from the name
 #	of the script.  This script is never invoked directly.
@@ -20,11 +20,11 @@
 #	-p  port
 #	-h  remote_host
 #	-X  X11 forwarding
-#	-c  remote command
+#	-e  remote exec argv
 #	-t  title of terminal
 #  Blame:
 #	https://github.com/jmscott
-#  Depends:
+#  See:
 #	https://github.com/jmscott/work/xtitle
 #	GNU or BSD hostname
 #  Note:
@@ -50,8 +50,8 @@ LOCAL_TITLE="$USER@$(hostname | sed 's/\..*$//')"
 log()
 {
 	#
-	#  Log to standard error, in case redirecting stdoutput output
-	#  of remote shell command
+	#  Log to standard error, in case redirecting standard output
+	#  of remote shell exec
 	#
 	echo "$PROG: $@" >&2
 }
@@ -70,7 +70,7 @@ die()
 #	-p  port
 #	-h  remote_host
 #	-X  X11 forwarding
-#	-c  remote command
+#	-e  remote exec
 #	-t  title of terminal
 #
 while [ -n "$1" ];  do
@@ -127,18 +127,18 @@ while [ -n "$1" ];  do
 		SSH_ARGS="$SSH_ARGS -X"
 		;;
 	#
-	#  Remain arguments comprose remote ssh command.
+	#  Remain arguments are remote ssh execution.
 	#
-	-c|--command)
+	-e|--exec)
 		shift
 		#
 		#
 		#
 		while [ -n "$1" ];  do
-			SSH_REMOTE_COMMAND="$SSH_REMOTE_COMMAND $1"
+			SSH_REMOTE_EXEC="$SSH_REMOTE_EXEC $1"
 			shift
 		done
-		log "remote ssh command:$SSH_REMOTE_COMMAND"
+		log "remote ssh exec:$SSH_REMOTE_EXEC"
 		break
 		;;
 	-t)
@@ -156,10 +156,10 @@ TITLE=${TITLE:="$LOGIN_USER@$HOST"}
 
 #
 #  Write directly to the tty in case we are redirecting the
-#  output of a remote command.
+#  output of a remote execution.
 #
 test $IS_TTY = 0 && xtitle "$TITLE" >/dev/tty
-ssh $SSH_ARGS $HOST $SSH_REMOTE_COMMAND
+ssh $SSH_ARGS $HOST $SSH_REMOTE_EXEC
 
 #
 #  Reset the terminal title.
