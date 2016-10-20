@@ -134,7 +134,7 @@ halloc_adopt(void *parent, void *p)
  *  Note:
  *	halloc'ed chunk may not be aligned on a boundary that is
  *	conducive to fast loads from ram.  alternative would be
- *	toput memory header at tail of memory chunk.
+ *	move memory header at tail of memory chunk.
  */
 void *
 halloc(void *parent, size_t size)
