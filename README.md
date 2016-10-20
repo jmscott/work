@@ -17,7 +17,7 @@
 	Build a tar distributions using a simple config file
 
 ###  ssh-host
-	ssh to host, where host name is derived from symbolic link to ssh-host
+	SSH to host, where host name is derived from symbolic link to ssh-host
 
 ###  rsunk
 	Push files to rsync.net service and notify hordes
