@@ -8,7 +8,7 @@
 ###  furl
 	Fault a failed URL fetch and alert once, clearing fault manually.
 
-## Shell Scripts
+## Standalone Shell Scripts
 
 ###  pg2pg
 	Upgrade a postgresql database via pg_upgrade or pg_dump
@@ -40,7 +40,7 @@
 ###  svn-ignore
 	Set "ignore" properties of subversion repo
 
-##  C Programs
+##  Standalone C Programs
 
 ###  idiff.c
 	Interactive diff (based on rob & bwk code)
