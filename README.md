@@ -49,7 +49,7 @@
 	Is a file ascii text?
 
 ###  halloc.c
-	Hierarchial memory allocator, a'la malloc()
+	Hierarchial memory allocator, a'la malloc().  Free a parent and you free the kids.
 
 ###  fork-bench.c
 	Benchmark sequential fork/exec speed
