@@ -1,6 +1,6 @@
 #  Code Used by Customers of John Scott
 
-##  Tarbal Packages
+##  Tarballable Packages
 
 ###  pgsnap
 	Snaphot postgresql database and notify the hordes
