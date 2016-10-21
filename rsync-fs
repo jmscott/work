@@ -84,7 +84,7 @@ FAULT=
 SUNK=
 IGNORE_24=no
 LOG_GOODBYE=no
-USER=${USER:=LOGNAME}
+USER=${USER:=$LOGNAME}
 
 #
 #  Burp the comments section above and exit.
