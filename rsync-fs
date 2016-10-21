@@ -84,6 +84,7 @@ FAULT=
 SUNK=
 IGNORE_24=no
 LOG_GOODBYE=no
+USER=${USER:=LOGNAME}
 
 #
 #  Burp the comments section above and exit.
@@ -146,7 +147,16 @@ leave()
 test "$1" = '--help' && help
 test $# -lt 4 && die 'wrong number of arguments'
 
-test $USER = root || die "user is not root: $USER"
+case "$USER" in
+'')
+	die 'environment vars not defined: LOGNAME and USER'
+	;;
+root)
+	;;
+*)
+	die "user is not root: $USER"
+	;;
+esac
 
 while [ "$1" ];  do
 	ARG=$1
