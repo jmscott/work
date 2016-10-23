@@ -5,7 +5,7 @@
 	Both http and ssl are support with basic authentifcation.
 	Logging is to standard error.
 ## Usage:
-	#  Install lib/pq, the pure postgresql package
+	**#  Install lib/pq, the pure postgresql package**
 	GOPATH=/usr/local /usr/local/go/bin/go get -u github.com/lib/pq
 
 	#  Build new rasqld program.
