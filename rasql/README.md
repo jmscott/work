@@ -6,7 +6,7 @@
 	Both http and ssl are supported, as well as anonymous and basic authentifcation.
 
 	Logging is to standard error.
-## Build and Test
+## Build and Test in Unix Environment
 	#  Install lib/pq, the pure postgresql package
 
 	GOPATH=/usr/local /usr/local/go/bin/go get -u github.com/lib/pq
