@@ -3,7 +3,7 @@
 ## Synopsis
 	Build a simple REST server by parsing PostgreSQL query files.
 
-	Both http and ssl are supported as well as anonymous and basic
+	Both http and ssl are supported, as well as anonymous and basic
 	authentifcation.
 
 	Logging is to standard error.
