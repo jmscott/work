@@ -14,34 +14,34 @@
 ## Standalone Shell Scripts
 
 ###  pg2pg
-	Upgrade a postgresql database via pg_upgrade or pg_dump
+	Upgrade a postgresql database via pg_upgrade or pg_dump.
 
 ###  make-dist
-	Build a tar distributions using a simple config file
+	Build a tar distribution using a simple config file.
 
 ###  ssh-host
-	SSH to host, where host name is derived from symbolic link to ssh-host
+	SSH to host, where host name is derived from symbolic link to ssh-host.
 
 ###  rsunk
-	Push files to rsync.net service and notify hordes
+	Push files to rsync.net public service and notify hordes.
 
 ###  rsync-fs
-	rsync a whole file system, notify hordes
+	rsync a whole file system, notify hordes.
 
 ###  overwrite
-	Safely overwrite files (based on rob & bwk script)
+	Safely overwrite files (based on rob & bwk script).
 
 ###  strswap
-	Swap string in files (based on rob & bwk script)
+	Swap string in files (based on rob & bwk script).
 
 ###  strip-cr
 	String dos style carriage return/newline sequences
 
 ###  xtitle
-	Set title of XTerm session
+	Set title of XTerm session.
 
 ###  svn-ignore
-	Set "ignore" properties of subversion repo
+	Set "ignore" properties of subversion repo.
 
 ##  Standalone C Programs
 
