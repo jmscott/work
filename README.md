@@ -6,7 +6,7 @@
 	REST API for SQL - a simple REST server built by parsing PostgreSQL query files
 
 ###  pgsnap
-	Snaphot postgresql database and notify the hordes
+	Snapshot postgresql database with pg_dump and notify the hordes.
 
 ###  furl
 	Fault a failed URL fetch and alert the hordes on fault|clear state change.
