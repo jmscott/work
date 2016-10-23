@@ -9,7 +9,7 @@
 	Snaphot postgresql database and notify the hordes
 
 ###  furl
-	Fault a failed URL fetch and alert once, clearing fault manually.
+	Fault a failed URL fetch and alert the hordes on state change.
 
 ## Standalone Shell Scripts
 
