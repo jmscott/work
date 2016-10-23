@@ -2,7 +2,10 @@
 
 ## Synopsis
 	Build a simple REST server by parsing PostgreSQL query files.
-	Both http and ssl are support with basic authentifcation.
+
+	Both http and ssl are supported with both anonymous and basic
+	authentifcation.
+
 	Logging is to standard error.
 ## Usage:
 	#  Install lib/pq, the pure postgresql package
