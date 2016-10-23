@@ -9,7 +9,7 @@
 	Snaphot postgresql database and notify the hordes
 
 ###  furl
-	Cron driven fault of a failed URL fetch that alert the hordes on state change.
+	Fault of a failed URL fetch that alerts the hordes on state change.
 
 ## Standalone Shell Scripts
 
