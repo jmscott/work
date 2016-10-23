@@ -1,4 +1,4 @@
-//  rest service damon built from postgresql query files and raml configs
+//  rest service damon built from postgresql query files and json config
 
 package main
 
