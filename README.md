@@ -3,7 +3,7 @@
 ##  Tarballable Packages
 
 ### rasql
-	Rest API for SQL - a simple REST server built by parsing PostgreSQL query files
+	REST API for SQL - a simple REST server built by parsing PostgreSQL query files
 
 ###  pgsnap
 	Snaphot postgresql database and notify the hordes
