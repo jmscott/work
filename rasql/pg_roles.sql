@@ -1,6 +1,6 @@
 /*
  *  Synopsis:
- *	Fetch all roles in the pg_rols view
+ *	Fetch all roles in the pg_roles view
  *
  *  Command Line Variables:
  *
