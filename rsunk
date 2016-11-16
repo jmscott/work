@@ -1,4 +1,4 @@
-#/!bin/bash
+#!/bin/bash
 #
 #  Synopsis:
 #	Push precious files to user@host.rsync.net:sunk/host/$(hostname)/root
@@ -38,6 +38,10 @@ SOURCE=
 TARGET=
 SSH_AUTH=
 DU=
+
+#  ignore exit status 24 (some files changed)
+IGNORE_24=no
+
 RSYNC_ARGS='
 	--relative
 	--numeric-ids
@@ -179,10 +183,22 @@ while [ "$1" ];  do
 		#
 		SOURCE="$SOURCE $S"
 		;;
+	--one-file-system)
+		RSYNC_ARGS="$RSYNC_ARGS --one-file-system"
+		;;
+	--ignore-24)
+		IGNORE_24=yes
+		;;
 	--itemize)
 		ITEMIZE=yes
 		RSYNC_OUT=${TMPDIR:=/tmp}/$PROG.$$
 		RSYNC_TEE="tee $RSYNC_OUT"
+		;;
+	--*)
+		die "unknown option: $ARG"
+		;;
+	*)
+		die "unknown argument: $ARG"
 		;;
 	esac
 	shift
@@ -196,6 +212,7 @@ log "notify: $NOTIFY"
 test -n "$SSH_AUTH" || die 'missing option --ssh-auth'
 log "ssh auth: $SSH_AUTH"
 log "rsync args: $RSYNC_ARGS"
+log "ignore exit status 24: $IGNORE_24"
 
 test -n "$SOURCE" || die 'missing option: --source'
 log "local source: $SOURCE"
@@ -226,6 +243,13 @@ set +x
 case $STATUS in
 '0 0')
 	log 'done, no errors in rsync'
+	;;
+'24 0')
+	if [ $IGNORE_24 = yes ];  then
+		log "WARN: some files changed during transfer (ok)"
+	else
+		die "rsync: some files changed during transfer"
+	fi
 	;;
 *)
 	die "rsync failed: exit status=$STATUS"
