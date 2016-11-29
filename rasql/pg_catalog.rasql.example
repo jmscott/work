@@ -22,6 +22,9 @@
 		},
 		"pg_roles":	{
 			"source-path":	"pg_roles.sql"
+		},
+		"pg_stat_activity-slow-count":	{
+			"source-path":	"pg_stat_activity-slow-count.sql"
 		}
 	},
 
@@ -29,6 +32,10 @@
 		"name" : {
 			"matches": "^.{1,63}$",
 			"sql-alias": "nspname"
+		},
+		"dur" : {
+			"matches": "^.{1,63}$",
+			"sql-alias": "duration"
 		}
 	},
 
