@@ -1,11 +1,11 @@
 /*
  *  Synopsis:
- *	Select all tuples from pg_stat_activity
+ *	Select all queries in table pg_stat_activity.
  *
  *  Command Line Variables:
  *
  *  Usage:
- *	psql -f pg_stat_activity.sql	
+ *	psql -f pg_stat_activity-count.sql
  */
 
 SELECT

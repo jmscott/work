@@ -1,6 +1,6 @@
 /*
  *  Synopsis:
- *	Select all tuples from pg_stat_activity
+ *	Select count of queries slower than a certain duration.
  *
  *  Command Line Variables:
  *	duration text

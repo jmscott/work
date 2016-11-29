@@ -25,6 +25,12 @@
 		},
 		"pg_stat_activity-slow-count":	{
 			"source-path":	"pg_stat_activity-slow-count.sql"
+		},
+		"pg_stat_activity-count":	{
+			"source-path":	"pg_stat_activity-count.sql"
+		},
+		"pg_stat_activity-state-count":	{
+			"source-path":	"pg_stat_activity-state-count.sql"
 		}
 	},
 
@@ -36,6 +42,9 @@
 		"dur" : {
 			"matches": "^.{1,63}$",
 			"sql-alias": "duration"
+		},
+		"state" : {
+			"matches": "^[a-z]{1,32}$"
 		}
 	},
 
