@@ -1,0 +1,258 @@
+/*
+ *  Synopsis:
+ *	Simple startup css for typical desktop screen.
+ */
+body
+{
+	font:	normal 100% "Veranda", "Arial", sans-serif;
+}
+
+a
+{
+	text-decoration:	none;
+}
+
+p.error
+{
+	color:			#c00;
+	background-color:	white;
+	width:			75%;
+	margin-left:		12.5%;
+	padding:		1em;
+	text-align:		center;
+	border:			2px dashed #f99;
+}
+
+table
+{
+	font:	normal 100% "Veranda", "Arial", sans-serif;
+	caption-side:	top;
+	border-width: 5px 5px 5px 5px;
+	border-spacing: 2px;
+	border-style: double double double double;
+	border-color: gray gray gray gray;
+	border-collapse: collapse;
+	background-color: white;
+}
+
+th
+{
+	font-variant:		small-caps;
+	border-width:		1px 1px 1px 1px;
+	padding:		8px;
+	padding-bottom:		4px;
+	padding-top:		4px;
+	background-color:	rgb(250, 240, 230);
+	border-right:		1px dashed #000;
+}
+
+td
+{
+	border-width: 1px 1px 1px 1px;
+	padding: 3px 3px 3px 3px;
+}
+
+th.action
+{
+	font-family:		fixed;
+	font-weight:		bold;
+	text-decoration:	underline;
+	background-color:	black;
+	background-color:	#efe;
+}
+
+td.action
+{
+	font-family:		fixed;
+	font-size:		smaller;
+	border-right:		1px dashed #000;
+}
+
+td.action a
+{
+	text-decoration:	underline;
+}
+
+h1
+{
+	color:			white;
+	background-color:	#021786;
+	text-align:		center;
+}
+
+p.svn
+{
+	width:		100%;
+	text-align:	center;
+	font-size:	10px;
+}
+
+dt
+{
+	font-weight:	bold;
+}
+
+caption
+{
+	font-weight:		bold;
+	font-size:		120%;
+	padding-top:		0.5em;
+	padding-bottom:		0.5em;
+	border-top:		2px solid #999;
+	border-right:		2px solid #999;
+	border-left:		2px solid #999;
+	background-color:	#eee;
+	color:			#000;
+}
+
+caption h1
+{
+	font-size:	120%;
+	font-weight:	bold;
+	margin:		0;
+}
+
+caption h2
+{
+	font-size:      80%;
+	font-weight:	normal;
+	margin:		0;
+}
+caption h2 span.qual
+{
+	font-weight:	bold;
+}
+
+caption h3
+{
+	font-size:      70%;
+	font-weight:	normal;
+	margin:		0;
+}
+
+tr.mod2-0
+{
+	background-color:	#eee;
+	color:			black;
+}
+
+tr.mod2-1
+{
+	background-color:	white;
+	color:			black;
+}
+
+form dl dt
+{
+	font-weight:	bold;
+	font-size:	120%;
+}
+
+form dl dd input.field
+{
+	width:		30em;
+}
+
+form input.submit
+{
+	font-weight:		bold;
+	font-size:		120%;
+	background-color:	#E5FFE5;
+}
+
+#header
+{
+	color:			lightgreen;
+	background-color:	black;
+	position:		absolute;
+	top:			2em;
+	right:			2em;
+	padding:		1em;
+	font-weight:		bold;
+}
+
+#footer p
+{
+	background-color:	black;
+	color:			yellow;
+	font-size:		10pt;
+	margin:			2em;
+	margin-top:		6em;
+	padding:		1em;
+}
+
+/*
+ *  The centering of the footer technique was derived from
+ *
+ *	http://matthewjamestaylor.com/blog/beautiful-css-centered-menus-no-hacks-full-cross-browser-support#
+ *
+ *  I (jmscott) recommend reading carefully.
+ */
+#footer
+{
+	float:			left;
+	width:			98%;
+	background:		#fff;
+	border-top:		4px solid #000;
+	overflow:		hidden;
+	position:		relative;
+}
+#footer ul
+{
+	clear:			left;
+	float:			left;
+	list-style:		none;
+	margin:			0;
+	padding:		0;
+	position:		relative;
+	left:			50%;
+	text-align:		center;
+}
+#footer ul li
+{
+	display:		block;
+	float:			left;
+	list-style:		none;
+	margin:			0;
+	padding:		0;
+	position:		relative;
+	right:			50%;
+}
+#footer ul li a
+{
+	display:		block;
+	margin:			0 0 0 1px;
+	padding:		3px 10px;
+	background:		#ddd;
+	color:			#000;
+	text-decoration:	none;
+	line-height:		1.3em;
+}
+
+#footer ul li a.passive
+{
+	background:		#fff;
+}
+
+#footer ul li a.active:hover
+{
+	color:			#fff;
+	background:		#021786;
+}
+
+#footer ul li a.active
+{
+	color:			#000;
+	background:		#ddd;
+}
+
+form input.submit
+{
+  	margin-left:	33%;
+	margin-top:	1em;
+}
+
+h2
+{
+  	text-align:	center;
+}

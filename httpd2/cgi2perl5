@@ -1,0 +1,852 @@
+#!/usr/bin/env perl
+#
+#  Synopsis:
+#	Convert xml.cgi files to executable cgi scripts callable from apache.
+#  Description:
+#	cgi2perl5 converts a description of a cgi process written in xml into
+#	executable perl scripts.  See cgi2perl --help for more details.
+#  Usage:
+#	cgi2perl5 [--help] [--<option>] --source-path xml1.cgi
+#  See Also:
+#	cgi2perl5 --help
+#  Depends:
+#	Perl modules XML::Parser
+#  Note:
+#	the name of the required SERVER_ROOT environment variable ought to be
+#	overridden in the xml file or the apache environment.
+#
+
+use XML::Parser;
+
+my $PROG  ='cgi2perl5';
+
+my (
+	$perl_path,
+	$cgi_bin_dir,
+	$cgi_lib_dir,
+	$source_sha1,
+	@CGI,
+	$source_path,
+	$SOURCE
+) = (
+	'/usr/bin/env perl',
+	'.',
+	'.',
+	'No SHA1 Calculated'
+);
+
+my $USAGE = "$PROG [--help] [--<option>] --source-path xml1.cgi";
+
+$SIG{__DIE__} = sub
+{
+	chop(my $msg = join('', @_));
+	#
+	#  Strip off trailing ' at ./file.pl line 123.'
+	#
+	$msg =~ s/ at [\w\/.-]+ line \d+\.$//;
+	print STDERR "$PROG: $msg\n";
+	print STDERR "usage: $USAGE\n";
+	exit 1;
+};
+
+sub help
+{
+	print <<END;
+Synopsis:
+	Generate cgi scripts from a canonical description in xml.
+Usage:
+	$USAGE
+Options:
+	--source-path	location of xml.cgi file that describes the script
+	--source-sha1	SHA1 Digest of xml file that generated this script.
+	--cgi-bin-dir	Directory where main cgi-bin script will be built.
+			  Defaults to .
+	--cgi-lib-dir	Directory for support cgi-lib directory/files to 
+			  be built, like help.pl.  The support cgi files
+			  are built in a cgi-lib/product.d directory.
+			  Currently, the subdirectory is always built.
+			  Defaults to .
+	--perl5-path	Path to perl5 put at head of generated main scripts.
+			  Defaults to '/usr/bin/env perl'
+	--help		Generate this message.
+Description:
+	Automatically build perl5 scripts from a canonical xml file.
+	The first argument, output file type, determines which cgi files
+	are built from the xml script.  The output type 'main' builds the
+	cgi-bin script called directly by the client, usually
+	residing in the cgi-bin directory.  The output type 'help'
+	just builds the help.pl file, usually residing in the directory
+	lib/cgi-bin/<name>.d.  The output type 'all' builds both help
+	and main files.
+
+	Various "variables" are set by this script and passed to the xslt
+	scripts that do the transformations into perl5 code.
+
+	source-path:	xml source file path that generated the script,
+	perl5-path:	the #!path-to-perl5 at header of script
+				default is '/usr/bin/env perl'
+Depends:
+	XML::Parse
+Notes:
+	Unfortunately, no DTD exists for the xml.cgi schema, so the
+	vocabulary is subject to sudden change.
+
+	Partially built files are left around after an error,
+	which confuses make and is not good.
+Blame:
+	jmscott\@setspace.com
+END
+}
+
+#
+#  Search for the first child XML element in an array of XML children.
+#
+sub find_kid
+{
+	my %arg = @_;
+	my (
+		$tag,
+		$kids,
+		$required,
+		$what
+	) = (
+		$arg{tag},
+		$arg{kids},
+		$arg{required},
+		$arg{what}
+	);
+
+	die 'find_kid: missing element tag' unless $tag;
+
+	for (my $i = 1;  defined $kids->[$i];  $i += 2) {
+		return $kids->[$i + 1] if $kids->[$i] eq $tag;
+	}
+	if ($required eq 'yes') {
+		$what = 'child' unless $what;
+		die "$what: can't find element $tag" if $required eq 'yes';
+	}
+	return undef;
+}
+
+sub encode_html_entities
+{
+	my $h = $_[0];
+
+	$h =~ s/&/\&#38;/g;
+	$h =~ s/</\&#60;/g;
+	$h =~ s/>/\&#62;/g;
+	$h =~ s/"/\&#34;/g;
+	$h =~ s/'/\&#39;/g;
+
+	return $h;
+}
+
+sub escape_apos
+{
+	$_[0] =~ s/'/\\'/g;
+	return $_[0];
+}
+
+sub put_query_args
+{
+	my %arg = @_;
+
+	my $root = $arg{root};
+	return unless defined $root;
+
+	my $path = $arg{path};
+	my $xpath = $arg{xpath};
+
+	#
+	#  Put the standard id/class query arguments.
+	#
+	#  What about the 'help' query argument?
+	#
+	print MAIN <<END;
+
+#
+#  BEGIN: $xpath/query-args
+#
+END
+	print MAIN <<END if $arg{put_default} eq 'yes';
+${path}->{'query-args'}->{arg}->{id} = {
+	perl5_re	=>	'\\w[\\w-]{0,32}'
+};
+${path}->{'query-args'}->{arg}->{class} = {
+	perl5_re	=>	'\\w[\\w-]{0,32}'
+};
+END
+	my $query_args = &find_kid(
+				tag	=>	'query-args',
+				kids	=>	$root
+			);
+	return unless defined $query_args;
+	#
+	#  Write out /*/query-args/arg
+	#
+	for (my $i = 1;  defined $query_args->[$i];  $i += 2) {
+		next unless $query_args->[$i] eq 'arg';
+
+		my $arg = $query_args->[$i + 1];
+		my $n = $arg->[0]->{name};
+		my $v;
+
+		die "$xpath: missing name for <arg>" if $n =~ /^\s*$/;
+
+		#
+		#  Write out the attributes: perl5_re, default and required.
+		#
+		print MAIN <<END;
+${path}->{'query-args'}->{arg}->{$n} = {
+END
+		print MAIN <<END if $v = escape_apos($arg->[0]->{perl5_re});
+	perl5_re	=>	'$v',
+END
+		print MAIN <<END if $v = escape_apos($arg->[0]->{default});
+	default	=>	'$v',
+END
+		print MAIN <<END if $v = $arg->[0]->{required};
+	required	=>	'$v',
+END
+		print MAIN <<END;
+};
+END
+	}
+	print MAIN <<END;
+#
+#  END: $xpath/query-args
+#
+
+END
+}
+
+sub put_vars
+{
+	my %arg = @_;
+
+	my $root = $arg{root};
+	return unless defined $root;
+
+	my $path = $arg{path};
+	my $vars = &find_kid(
+				tag	=>	'vars',
+				kids	=>	$root
+			);
+	return unless defined $vars;
+
+	my $xpath = $arg{xpath};
+
+	#
+	#  Write the /*/vars
+	#
+	for (my $i = 1;  defined $vars->[$i];  $i += 2) {
+		next unless $vars->[$i] eq 'var';
+
+		my $arg = $vars->[$i + 1];
+		my $n = $arg->[0]->{name};
+		my $v;
+
+		#
+		#  Write out the attributes: perl5_re, default and required.
+		#
+		print MAIN <<END;
+${path}->{vars}->{var}->{$n} = {
+END
+		print MAIN <<END if $v = escape_apos($arg->[0]->{perl5_re});
+	perl5_re	=>	'$v',
+END
+		print MAIN <<END if $v = $arg->[0]->{required};
+	required	=>	'$v',
+END
+		print MAIN <<END;
+};
+END
+	}
+	print MAIN <<END;
+#
+#  END: $xpath/vars
+#
+
+END
+}
+
+sub put_POST
+{
+	my $POST = $_[0];
+	return unless defined $POST;
+
+	my $in = &find_kid(
+			tag	=>	'in',
+			kids	=>	$POST
+		);
+	#
+	#  Write out the /cgi/POST/in/putter script definitions.
+	#
+	for (my $i = 1;  defined $in->[$i];  $i += 2) {
+		next unless $in->[$i] eq 'putter';
+
+		my $putter = $in->[$i + 1];
+		my $name = $putter->[0]->{name};
+		print MAIN <<END;
+
+#
+#  BEGIN: /cgi/POST/in/putter[\@name='$name']
+#
+\$CGI{POST}->{in}->{putter}->{'$name'}->{name} = '$name';
+END
+		&put_vars(
+			root	=>	$putter,
+			xpath	=>	"/cgi/POST/in/putter[\@name=$name]",
+			path	=>     "\$CGI{POST}->{in}->{putter}->{'$name'}",
+		);
+		print MAIN <<END;
+#
+#  END: /cgi/POST/in/putter[\@name='$name']
+#
+
+END
+	}
+}
+
+sub find_text
+{
+	my $node = $_[0];
+	my $text;
+
+	for (my $i = 1;  defined $node->[$i];  $i += 2) {
+		next unless $node->[$i] == 0;
+		$text .= $node->[$i + 1];
+	}
+	#
+	#  Strip leading and trailing text.
+	#
+	$text =~ s/^\s*|\s*$//g;
+
+	return &encode_html_entities($text);
+}
+
+sub put_HELP_dl_item
+{
+	my %arg = @_;
+
+	my $dd = find_text(
+			find_kid(
+				tag	=>	$arg{element},
+				kids	=>	$arg{root}
+			));
+	return unless $dd;
+
+	print HELP <<END;
+<dt>$arg{dt}</dt>
+<dd>$dd</dd>
+END
+}
+
+sub put_GET
+{
+	my $GET = $_[0];
+
+	return unless defined $GET;
+
+	my $out = &find_kid(
+				tag	=>	'out',
+				kids	=>	$GET,
+				required=>	'yes',
+				what	=>	'MAIN: /GET'
+			);
+	if (defined $out->[0]->{'content-type'}) {
+		print MAIN <<END;
+#
+#  Default content type for all elements.
+#
+\$CGI{GET}->{out}->{'content-type'} = '$out->[0]->{'content-type'}';
+END
+	}
+
+	#
+	#  Write the default /cgi/GET/query-args
+	#
+	&put_query_args(
+		root =>		$out,
+		path =>		'$CGI{GET}->{out}',
+		xpath =>	'/cgi/GET/out',
+		put_default =>	'yes',
+	);
+
+	#
+	#  Write 'out' variable regular expression.
+	#
+	my $out_re;
+	for (my $i = 1;  defined $out->[$i];  $i += 2) {
+		if ($out->[$i] eq 'putter') {
+			my $name = $out->[$i + 1]->[0]->{name};
+			$name =~ s/\./[.]/g;
+			my ($open_paren, $close_paren);
+			#
+			#  Complex regular expressions are surrounded by
+			#  (? paraens )
+			#
+			unless ($name =~ /^\w+$/) {
+				$open_paren = '(?:';
+				$close_paren = ')';
+			}
+			$out_re .= sprintf('%s%s%s%s',
+					$out_re ? '|' : '',
+					$open_paren,
+					$name,
+					$close_paren
+				);
+		}
+	}
+	$out_re = sprintf('%s%shelp', $out_re, $out_re ? '|' : '');
+	print MAIN <<END;
+#
+#  'out' query argument must match one of the out putter names.
+#
+\$CGI{GET}->{out}->{'query-args'}->{arg}->{out} = {
+	perl5_re	=> 	'$out_re',
+	default		=>	'help',
+};
+END
+	#
+	#  Write out the /cgi/GET/out/putter script definitions.
+	#
+	for (my $i = 1;  defined $out->[$i];  $i += 2) {
+		next unless $out->[$i] eq 'putter';
+
+		my $putter = $out->[$i + 1];
+		my $name = $putter->[0]->{name};
+		print MAIN <<END;
+#
+#  BEGIN: /cgi/GET/out/putter[\@name='$name']
+#
+\$CGI{GET}->{out}->{putter}->{'$name'}->{name} = '$name';
+END
+		#
+		#  Write the content type specific to this putter.
+		#
+		if (my $ct = $putter->[0]->{'content-type'}) {
+			print MAIN <<END;
+\$CGI{GET}->{out}->{putter}->{'$name'}->{'content-type'} = '$ct';
+END
+		}
+		&put_query_args(
+			root	=>	$putter,
+			xpath	=>	"/cgi/GET/out/putter[\@name=$name]",
+			path	=>     "\$CGI{GET}->{out}->{putter}->{'$name'}",
+		);
+		print MAIN <<END;
+#
+#  END: /cgi/GET/out/putter[\@name='$name']
+#
+
+END
+	}
+}
+
+sub put_HELP_examples
+{
+	my %arg = @_;
+
+	my $examples = &find_kid(
+				tag	=>	'examples',
+				kids	=>	$arg{root}
+			);
+	return unless defined $examples;
+
+	my $name = $arg{name};
+
+	print HELP <<END;
+<div class="examples">
+ <h3>Examples</h3>
+ <dl>
+END
+
+	#
+	#  Write each example, with a link to the example.
+	#
+	for (my $i = 1;  defined $examples->[$i];  $i += 2) {
+		next unless $examples->[$i] eq 'example';
+
+		my $example = $examples->[$i + 1];
+		my $query = $example->[0]->{query};
+		my $dd_text = &find_text($example);
+		my $href = "/cgi-bin/$name?$query";
+		my $a_text = &encode_html_entities($href);
+		print HELP <<END;
+   <dt><a href="/cgi-bin/$name?$query">$a_text</a></dt>
+   <dd>$dd_text</dd>
+END
+	}
+	print HELP <<END;
+ </dl>
+</div>
+END
+}
+
+sub put_HELP_query_args_div
+{
+	my %arg = @_;
+
+	my $query_args = &find_kid(
+				tag	=>	'query-args',
+				kids	=>	$arg{root}
+			);
+	return unless $query_args;
+
+	print HELP <<END;
+<div class="$arg{class}">
+ <$arg{headline_tag}>$arg{headline}</$arg{headline_tag}>
+ <dl>
+END
+	for (my $i = 1;  defined $query_args->[$i];  $i += 2) {
+		next unless $query_args->[$i] eq 'arg';
+
+		my $arg = $query_args->[$i + 1];
+		my $name = $arg->[0]->{name};
+		my $title = &find_text(
+				&find_kid(
+					tag	=>	'title',
+					kids	=>	$arg,
+					required=>	'no',
+					what	=>	'HELP /*/query-args/' .
+						            "arg[\@name=$name]"
+				));
+		$title = " - $title" if $title;
+		print HELP <<END;
+  <dt>$arg->[0]->{name}$title</dt>
+  <dd>
+   <ul>
+END
+		#
+		#  Write the attributes.
+		#
+		for my $att (sort keys %{$arg->[0]}) {
+			next if $att eq 'name';
+			my $val = $arg->[0]->{$att};
+			print HELP <<END;
+    <li><code>$att:</code> $val</li>
+END
+		}
+		print HELP <<END
+   </ul>
+  </dd>
+END
+	}
+	print HELP <<END;
+  </dl>
+</div>
+END
+}
+
+#
+#  Parse the arguments.
+#
+while (my $arg = shift @ARGV) {
+	if ($arg eq '--perl5-path') {
+		die "option --perl5-path missing path"
+				unless $perl_path = shift @ARGV;
+	} elsif ($arg eq '--help') {
+		help();
+		exit 0;
+	} elsif ($arg eq '--cgi-bin-dir') {
+		die "option --cgi-bin-dir missing path"
+					unless $cgi_bin_dir = shift @ARGV;
+	} elsif ($arg eq '--cgi-lib-dir') {
+		die "option --cgi-lib-dir missing path"
+					unless $cgi_lib_dir = shift @ARGV;
+	} elsif ($arg eq '--source-sha1') {
+		die "option --source-sha1 requires digest"
+					unless $source_sha1 = shift @ARGV;
+		die "--source-sha1: unexpected pattern: $source_sha1"
+				unless $source_sha1 =~ /^[0-9a-f]{40}$/;
+	} elsif ($arg eq '--source-path') {
+		die 'option --source-path: given more than once' if $SOURCE;
+		die "option --source-path requires path"
+					unless $source_path = shift @ARGV;
+		open($SOURCE, "<$source_path") ||
+				die "open(<$source_path) failed: $!";
+	} elsif ($arg =~ /^--/) {
+		die "unknown option: $arg";
+	} else {
+		die "unknown argument: $arg";
+	}
+}
+
+#
+#  Read from standard input if --source-path is not defined.
+#
+unless ($SOURCE) {
+	$SOURCE = 'STDIN';
+	$source_path = 'STDIN';
+}
+
+my $parser = XML::Parser->new(
+			Style => 'Tree'
+	) or die "XML::Parser->new(Tree) failed: $!";
+#
+#  For each cgi script passed from the command,
+#  generate the script and script.d/help.pl
+#
+#
+#  Parse the cgi/xml definition file into perl structure..
+#
+print "<$source_path\n";
+my $tree = $parser->parse($SOURCE);
+
+#
+#  Make sure the /cgi[@name] attribute matches
+#  the name of the file.  This is a common error
+#  that can not be defined in an xml schema verifier.
+#
+my $name = $tree->[1]->[0]->{name};
+die '/cgi[@name] not defined' unless $name;
+
+#
+#  Write the main, front-end cgi script named /cgi[@name]
+#
+my $cgi_bin = sprintf('%s/%s', $cgi_bin_dir, $name);
+print ">$cgi_bin\n";
+open(MAIN, ">$cgi_bin") or die "open(>$cgi_bin) failed: $!";
+
+print MAIN <<END;
+#!$perl_path
+#
+#  Synopsis:
+#	Implements argument processing for /cgi-bin/$name.
+#  Source Path:
+#	$source_path
+#  Source SHA1 Digest:
+#	$source_sha1
+#  Note:
+#	/cgi-bin/$name was generated automatically by $PROG.
+#
+#	Do not make changes directly to this script.
+#
+die "SERVER_ROOT environment variable not defined"
+				unless defined \$ENV{SERVER_ROOT};
+
+#
+#  Prepend the \$SERVER_ROOT/lib directory
+#  to the load path.
+#
+unshift \@INC, "\$ENV{SERVER_ROOT}/lib";
+
+our (\%CGI);
+
+require 'httpd2.d/common.pl';
+END
+print MAIN <<END if defined $tree->[1]->[0]->{perl5_require};
+require '$tree->[1]->[0]->{perl5_require}';
+END
+
+print MAIN <<END;
+\$CGI{name} = '$name';
+END
+put_GET(&find_kid(
+		tag	=>	'GET',
+		kids	=>	$tree->[1]
+	));
+put_POST(&find_kid(
+		tag	=>	'POST',
+		kids	=>	$tree->[1]
+	));
+
+#
+#  Help always in text/html.
+#  Need to parameterize content-type.
+#
+print MAIN <<'END';
+$CGI{GET}->{out}->{putter}->{help}->{name} = 'help';
+$CGI{GET}->{out}->{putter}->{help}->{'content-type'} = 'text/html';
+
+require "httpd2.d/$ENV{REQUEST_METHOD}.pl";
+END
+close(MAIN) or die "close(>$cgi_bin) failed: $!";
+chmod(0744, $cgi_bin) or die "chmod(0700, $cgi_bin) failed: $!";
+
+#
+#  Make the directory $name.d/help.pl.
+#
+my $dir = "$cgi_lib_dir/$name.d";
+if (! -d $dir) {
+	print ">$dir\n";
+	mkdir($dir) or die "mkdir($dir) failed: $!";
+}
+my $help = "$dir/help.pl";
+open(HELP, ">$help") or die "open($help) failed: $!";
+print ">$help\n";
+
+#
+#  Write the $name.d/help.pl file
+#
+print HELP <<EOT;
+#
+#  Synopsis:
+#	Write <div> help page for script $name.
+#  Source Path:
+#	$source_path
+#  Source SHA1 Digest:
+#	$source_sha1
+#  Note:
+#	$name.d/help.pl was generated automatically by $PROG.
+#
+#	Do not make changes directly to this script.
+#
+
+our (%QUERY_ARG);
+
+print <<END;
+<div\$QUERY_ARG{id_att}\$QUERY_ARG{class_att}>
+END
+print <<'END';
+ <h1>Help Page for <code>/cgi-bin/$name</code></h1>
+ <div class="overview">
+  <h2>Overview</h2>
+  <dl>
+EOT
+
+my $cgi = $tree->[1];
+
+&put_HELP_dl_item(
+	dt	=>	'Title',
+	element	=>	'title',
+	root	=>	$cgi,
+);
+&put_HELP_dl_item(
+	dt	=>	'Synopsis',
+	element	=>	'synopsis',
+	root	=>	$cgi,
+);
+&put_HELP_dl_item(
+	dt	=>	'Blame',
+	element	=>	'blame',
+	root	=>	$cgi,
+);
+&put_HELP_dl_item(
+	dt	=>	'Subversion',
+	element	=>	'subversion',
+	root	=>	$cgi,
+);
+#
+#  Close the overview <dl> and <div> for /cgi/[^GET|PUT]
+#
+print HELP <<END;
+  </dl>
+ </div>
+END
+#
+#  Open the /cgi/GET section.
+#
+if (my $GET = &find_kid(
+		tag	=>	'GET',
+		kids	=>	$cgi)) {
+	#
+	#  Open the GET <div>
+	#
+	print HELP <<END;
+ <div class="GET">
+  <h2><code>GET</code> Request.</h2>
+END
+	#
+	#   Write the output scripts. 
+	#
+	if (my $out = &find_kid(
+			tag	=>	'out',
+			kids	=>	$GET)) {
+		#
+		#   Open the GET/out div
+		#
+		print HELP <<END;
+   <div class="out">
+END
+		#
+		#  Write default query args
+		#
+		&put_HELP_query_args_div(
+			root	=>	$out,
+			headline =>	'Default Query Args',
+			headline_tag=>	'h3',
+			class =>	'query-args',
+		);
+
+		#
+		#  Open the GET/out/putter div
+		#
+		print HELP <<END;
+    <div class="handlers">
+    <h3>Output Scripts in <code>\$SERVER_ROOT/lib/$name.d</code></h3>
+    <dl>
+END
+
+		#
+		#  Write out the /cgi/GET/out/putter script definitions.
+		#
+		for (my $i = 1;  defined $out->[$i];  $i += 2) {
+			next unless $out->[$i] eq 'putter';
+			my $putter = $out->[$i + 1];
+			my $name = $putter->[0]->{name};
+			my $title = find_text(find_kid(
+					tag	=> 'title',
+					kids	=> $putter,
+					required => 'no',
+					what => 'HELP: /cgi/GET/out/' .
+						"putter[\@name=$name]"
+				));
+			$title = " - $title" if $title;
+			print HELP <<END;
+     <dt>$name$title</dt>
+     <dd>
+END
+			#
+			#  Write default query args
+			#
+			&put_HELP_query_args_div(
+				root	=>	$putter,
+				headline =>	'Query Args',
+				headline_tag=>	'h4',
+				class =>	'query-args',
+			);
+			print HELP <<END;
+     </dd>
+END
+		}
+		#
+		#  Close the GET/out/putter <dl> & <div>
+		#
+		print HELP <<END;
+  </dl>
+ </div>
+END
+		#
+		#  Close the GET/out <div>
+		#
+		print HELP <<END;
+</div>
+END
+	}
+	&put_HELP_examples(
+		root =>		$GET,
+		name =>		$name,
+	);
+
+	#
+	#  Close the GET <div>
+	#
+	print HELP <<END;
+ </div>
+END
+}
+
+#
+#  Close the outer <div>
+#
+print HELP <<EOT;
+</div>
+END
+
+1;
+EOT
+	
+close(HELP) or die "close(>$help) failed: $!";
+exit 0

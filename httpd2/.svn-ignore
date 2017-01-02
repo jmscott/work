@@ -1,0 +1,11 @@
+bin
+tmp
+cgi-bin
+env
+etc
+file
+form
+htdocs
+httpd2*.pax.bz2
+lib
+manifest

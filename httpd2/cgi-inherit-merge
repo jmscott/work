@@ -1,0 +1,392 @@
+#!/usr/local/bin/perl
+#
+#  Synopsis:
+#	Merge inheritable <cgi> files into single document.
+#  Usage:
+#	cgi-inherit-merge [--debug] inherit1.cgi inherit2.cgi [...]
+#
+#  Description:
+#	Merge serveral <cgi> documents of inheritable values into
+#	a single <cgi> tree.  Duplicate <arg> or <var> in different
+#	documents is not allowed.  In other words, we check for
+#
+#		doc1:/cgi/GET/query-args/arg[@name] ==
+#		doc2:/cgi/GET/query-args/arg[@name]
+#	or
+#		doc1:/cgi/GET/query-args/var[@name] ==
+#		doc2:/cgi/GET/query-args/var[@name]
+#
+#  Note:
+#	All the inherit.cgi files are assumed to have been verified
+#	against a non existent DTD.  Come the revolution.
+#
+#	This program could easily be rewritten in xslt.
+#
+use XML::Parser;
+use Digest;
+
+my $PROG = 'cgi-inherit-merge';
+my (%ARG, %VAR, $debug);
+
+my (@path, @sha1, @tree);
+
+my $USAGE = "$PROG inherit1.cgi inherit2.cgi [...]";
+
+$SIG{__DIE__} = sub
+{
+	chop(my $msg = join('', @_));
+	#
+	#  Strip off trailing ' at ./file.pl line 123.'
+	#
+	$msg =~ s/ at [\w\/.-]+ line \d+\.$//;
+	print STDERR "$PROG: $msg\n";
+	print STDERR "usage: $USAGE\n";
+	exit 1;
+};
+
+sub encode_xml_entities
+{
+	my $e = $_[0];
+
+	$e =~ s/&/\&amp;/g;		#  #38;
+	$e =~ s/</\&lt;/g;		#  #60;
+	$e =~ s/>/\&gt;/g;		#  #62;
+	$e =~ s/"/\&quot;/g;		#  #34;
+	$e =~ s/'/\&apos;/g;		#  #39;
+
+	return $e;
+}
+
+sub find_element
+{
+	my ($element, $kids) = @_;
+
+	print STDERR "find_element: element=$element\n" if $debug;
+	for (my $i = 1;  defined $kids->[$i];  $i += 2) {
+		return $kids->[$i + 1] if $kids->[$i] eq $element;
+	}
+	print STDERR "find_element: $element not found\n" if $debug;
+	return undef;	
+}
+
+sub find_text
+{
+	my $node = $_[0];
+	my $text;
+
+	print STDERR "find_text: node=$node\n" if $debug;
+	for (my $i = 1;  defined $node->[$i];  $i += 2) {
+		next unless $node->[$i] == 0;
+		$text .= $node->[$i + 1];
+	}
+	#
+	#  Strip leading and trailing text.
+	#
+	$text =~ s/^\s*|\s*$//g;
+
+	print STDERR "find_text: $text\n" if $debug;
+
+	return &encode_xml_entities($text);
+}
+
+die "missing arguments" if @ARGV == 0;
+die "wrong number of arguments" if @ARGV == 1;
+
+my $parse_path;
+sub duplicate_var_arg_name
+{
+	my ($p, $element, %att) = @_;
+
+	print STDERR "duplicate_var_arg_name: element=$element\n" if $debug;
+	if ($element eq 'arg') {
+		my $name = $att{name};
+		if (my $path = $ARG{$name}) {
+			die "duplicate <arg [\@name=$name]: $path";
+		}
+		$ARG{$name} = $parse_path;
+	} elsif ($element eq 'var') {
+		my $name = $att{name};
+		if (my $path = $VAR{$name}) {
+			die "duplicate <VAR [\@name=$name]: $path";
+		}
+		$VAR{$name} = $parse_path;
+	}
+}
+
+sub empty
+{
+}
+
+sub put_twig
+{
+	my %arg = @_;
+	my (
+		$name,
+		$twig,
+		$depth,
+		$atts
+	) = (
+		$arg{name},
+		$arg{twig},
+		$arg{depth},
+		$arg{atts},
+	);
+
+	print STDERR "put_twig: entered: name=$name, depth=$depth\n" if $debug;
+
+	print "<$name";
+
+	#
+	#  Merge any extra attributes defined by the caller.
+	#
+	if (defined $atts) {
+		print STDERR "put_twig: extra attributes\n" if $debug;
+		print "\n";
+		for my $a (keys %$atts) {
+			printf "	$a=\"$atts->{$a}\"\n";
+		}
+	}
+
+	#
+	#  Write the attributes defined in the twig.
+	#
+	if (my $att = $twig->[0]) {
+		print STDERR "put_twig: putting attributes\n" if $debug;
+		print "\n" unless defined $atts;
+		for my $a (keys %$att) {
+			printf "	$a=\"$att->{$a}\"\n";
+		}
+	}
+	
+	print ">";
+
+	for (my $i = 1;  defined $twig->[$i];  $i += 2) {
+		if ($twig->[$i] eq '0') {
+			print STDERR "put_twig: text\n" if $debug;
+			print encode_xml_entities($twig->[$i + 1]);
+		} else {
+			print STDERR "put_twig: recursing: $twig->[$i]\n"
+							if $debug;
+			put_twig(
+				name	=>	$twig->[$i],
+				twig	=>	$twig->[$i + 1],
+				depth	=>	$depth + 1,
+			);
+		}
+	}
+	print "</$name>\n" if $depth > 0;
+	print STDERR "put_twig: exit: depth=$depth\n" if $debug;
+}
+
+#
+#  First pass checks for duplicates in //(arg|var)[@name].
+#
+while (my $arg = shift @ARGV) {
+	if ($arg =~ m/^--debug$/) {
+		print STDERR "main: debug enabled\n";
+		$debug = 1;
+		next;
+	}
+	my $p = new XML::Parser(
+		Style		=>	'Stream',
+		Handlers	=> {
+					Start	=>
+						\&duplicate_var_arg_name,
+					End		=>	\&empty,
+					Char		=>	\&empty,
+					Proc		=>	\&empty,
+					Comment		=>	\&empty,
+					CdataStart	=>	\&empty,
+					CdataEnd	=>	\&empty,
+					Default		=>	\&empty,
+					Unparsed	=>	\&empty,
+					Notation	=>	\&empty,
+					ExternEnt	=>	\&empty,
+					Entity		=>	\&empty,
+					Element		=>	\&empty,
+					Attlist		=>	\&empty,
+					Doctype		=>	\&empty,
+				},
+	) or die "new XML::Parser(stream) failed: $!";
+
+	#
+	#  First parse for dupilcates in <arg/var> names.
+	#
+	$parse_path = $arg;
+	print STDERR "main: checking duplicates in $parse_path\n" if $debug;
+	$p->parsefile($parse_path);
+	print STDERR "main: duplicates checked $parse_path\n" if $debug;
+	push @path, $parse_path;
+
+	#
+	#  Parse the document into an in memory tree.
+	#
+	$p = new XML::Parser(
+		Style		=>	'Tree',
+	) or die "new XML::Parser(tree) failed: $!";
+
+	print STDERR "main: parsing .cgi: $parse_path\n" if $debug;
+	push @tree, $p->parsefile($parse_path);
+
+	print STDERR "main: calculating sha1: $parse_path\n" if $debug;
+	my $s = new Digest('SHA-1');
+	my $XML;
+	open($XML, "<$parse_path") or die "open(<$parse_path) failed: $!";
+	$s->addfile($XML);
+	push @sha1, $s->hexdigest;
+	close($XML) or die "close(<$parse_path) failed: $parse_path";
+}
+
+print STDERR "main: finished scanning .cgi files\n" if $debug;
+
+print STDERR
+print <<END;
+<cgi
+	name="$PROG"
+>
+ <title>Merge of
+END
+
+#
+#  Merge the titles into single <title>.
+#
+print STDERR "main: merging /cgi/title\n" if $debug;
+for my $t (@tree) {
+	print "\n,\n" if $t != $tree[0];
+	my $title = find_text(find_element('title', $t->[1]));
+	print <<END;
+$title
+END
+}
+print <<END;
+ </title>
+END
+
+#
+#  Create the
+#
+#	<inherits>
+#	 <inherit ...>
+#
+#  twig
+#
+print STDERR "main: generating /cgi/inherits\n" if $debug;
+print <<END;
+ <inherits>
+END
+for (my $i = 0;  $i < @tree;  $i++) {
+	print <<END;
+  <inherit
+	path="$path[$i]"
+ 	sha1="$sha1[$i]"
+  />
+END
+}
+print <<END;
+ </inherits>
+END
+
+#
+#  Create the merged <GET><out><query-args><arg> twig.
+#
+print STDERR "main: generating /cgi/GET\n" if $debug;
+my $put_GET;
+for my $t (@tree) {
+	my $GET = find_element('GET', $t->[1]);
+	next unless defined $GET;
+	#
+	#  Open <GET>
+	#
+	unless ($put_GET) {
+		print <<END;
+ <GET>
+  <out>
+   <query-args>
+END
+		$put_GET = 1;
+	}
+	#
+	#  Find <query-args>
+	#
+	my $qa = find_element('query-args', find_element('out', $GET));
+	#
+	#  Put the <args>s in the <query-args> twig
+	#
+	for (my $i = 1;  defined $qa->[$i];  $i += 2) {
+		#
+		#  Put the <arg> twig
+		#
+		put_twig(
+			name	=>	'arg',
+			twig	=>	$qa->[$i + 1],
+			depth	=>	1,
+		) if $qa->[$i] eq 'arg';
+	}
+	
+}
+
+#
+#  Close <GET>
+#
+print <<END if $put_GET;
+   </query-args>
+  </out>
+ </GET>
+END
+
+#
+#  Create the merged <POST><out><query-args><arg> twig.
+#
+my $put_POST;
+print STDERR "main: generating /cgi/POST\n" if $debug;
+for my $t (@tree) {
+	my $POST = find_element('POST', $t->[1]);
+	next unless defined $POST;
+	#
+	#  Open <POST>
+	#
+	unless ($put_POST) {
+		print <<END;
+ <POST>
+  <in>
+   <vars>
+END
+		$put_POST = 1;
+	}
+	#
+	#  Find <vars>.
+	#
+	my $vars = find_element('vars', find_element('in', $POST));
+	#
+	#  Put the <var>s in the <vars> twig
+	#
+	for (my $i = 1;  defined $vars->[$i];  $i += 2) {
+		#
+		#  Put the <var> twig
+		#
+		put_twig(
+			name	=>	'var',
+			twig	=>	$vars->[$i + 1],
+			depth	=>	1,
+		) if $vars->[$i] eq 'var';
+	}
+}
+
+#
+#  Close <POST>
+#
+print <<END if $put_POST;
+   </vars>
+  </in>
+ </POST>
+END
+
+#
+#  Close <cgi>
+#
+print <<END;
+</cgi>
+END
+
+print STDERR "main: done\n" if $debug;
+exit 0;

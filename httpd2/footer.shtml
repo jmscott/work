@@ -1,0 +1,14 @@
+<div id="footer">
+ <ul>
+  <li>
+   <a
+   	class="active"
+   	href="/">Home</a>
+  </li>
+  <li>
+   <a
+   	class="active"
+   	href="/manifest.shtml">Manifest</a>
+  </li>
+ </ul>
+</div>

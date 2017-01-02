@@ -1,0 +1,38 @@
+<html>
+ <head>
+  <title>File View</title>
+  <link
+    	rel="stylesheet"
+        type="text/css"
+        href="common.css" />
+  <style type="text/css">
+  /*<![CDATA[*/
+  #source
+  {
+        margin:                 3em;
+  }
+
+  #source
+  {
+        font-family:            fixed;
+        background-color:       black;
+        color:                  white;
+  }
+  /*]]>*/
+  </style>
+
+ </head>
+
+ <body>
+  <!--#include virtual="/header.shtml" -->
+  <h1>File View</h1>
+  <h2><!--#include
+  	virtual="/cgi-bin/file?out=text.full-path&${QUERY_STRING}" -->
+  </h2>
+  <!--#include virtual="/cgi-bin/file?id=source&out=pre&${QUERY_STRING}" -->
+  <!--#include virtual="/footer.shtml" -->
+  <p class="svn">
+   Subversion Id: $Id$
+  </p>
+ </body>
+</html>

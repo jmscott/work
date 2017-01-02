@@ -1,0 +1,19 @@
+<html>
+ <head>
+  <title>Manifest of Web Site</title>
+  <link
+    	rel="stylesheet"
+        type="text/css"
+        href="common.css" />
+ </head>
+
+ <body>
+  <!--#include virtual="/header.shtml" -->
+  <h1>Manifest of Web Site</h1>
+  <!--#include virtual="/cgi-bin/manifest?out=table&type=cgi" -->
+  <!--#include virtual="/footer.shtml" -->
+  <p class="svn">
+   Subversion Id: $Id$
+  </p>
+ </body>
+</html>
