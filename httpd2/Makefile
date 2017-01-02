@@ -1,7 +1,12 @@
 #
 #  Synopsis:
-#	Development makefile
+#	Development or Instalation Makefile
 #
+
+include local.mk
+
+DIST_ROOT=$(PREFIX)/jmscott
+HTTPD2_ROOT=$(DIST_ROOT)/httpd2
 
 CGI=	env env.d/help.pl env.d/env.xml \
 	file file.d/help.pl file.d/file.xml \
@@ -11,6 +16,23 @@ NOW="`date`"
 CGI2PERL5=cgi2perl5 \
 		--when $(NOW)
 
+install: all
+	install -g $(DIST_GROUP) -o $(DIST_USER)			\
+		-d $(DIST_ROOT)
+	install -g $(DIST_GROUP) -o $(DIST_USER)			\
+		-d $(HTTPD2_ROOT)
+	install -g $(DIST_GROUP) -o $(DIST_USER)			\
+		-d $(HTTPD2_ROOT)/httpd2.d
+	install -g $(DIST_GROUP) -o $(DIST_USER)			\
+		-d $(HTTPD2_ROOT)/env.d
+
+	install -g $(DIST_GROUP) -o $(DIST_USER) -m ug=r,o=		\
+		local-macosx.mk.example					\
+		env.cgi							\
+		httpd2.cgi						\
+		$(HTTPD2_ROOT)
+
+	
 all: $(CGI)
 clean-cgi:
 	rm -f $(CGI)
@@ -31,9 +53,7 @@ links:
 #  env
 #
 env env.d/help.pl: env.d/env.xml
-	$(CGI2PERL5) \
-		--source-sha1 `sha1sum $< | awk '{print $$1}'` \
-		--source-path $<
+	cgi2perl5 --source-path $<
 env.d/env.xml: env.cgi
 	cgi-inherit $< httpd2.cgi >env.d/env.xml
 
@@ -41,8 +61,7 @@ env.d/env.xml: env.cgi
 #  file
 #
 file file.d/help.pl: file.d/file.xml
-	$(CGI2PERL5) \
-		--source-sha1 `sha1sum $< | awk '{print $$1}'` \
+	cgi2perl5 \
 		--source-path $<
 file.d/file.xml: file.cgi
 	cgi-inherit $< httpd2.cgi >file.d/file.xml
@@ -50,8 +69,7 @@ file.d/file.xml: file.cgi
 #  form
 #
 form form.d/help.pl: form.d/form.xml
-	$(CGI2PERL5) \
-		--source-sha1 `sha1sum $< | awk '{print $$1}'` \
+	cgi2perl5 \
 		--source-path $<
 form.d/form.xml: form.cgi
 	cgi-inherit $< httpd2.cgi >form.d/form.xml
@@ -60,8 +78,7 @@ form.d/form.xml: form.cgi
 #  manifest
 #
 manifest manifest.d/help.pl: manifest.d/manifest.xml
-	$(CGI2PERL5) \
-		--source-sha1 `sha1sum $< | awk '{print $$1}'` \
+	cgi2perl5 \
 		--source-path $<
 manifest.d/manifest.xml: manifest.cgi
 	cgi-inherit $< httpd2.cgi >manifest.d/manifest.xml
