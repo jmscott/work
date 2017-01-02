@@ -58,14 +58,6 @@ env.d/env.xml: env.cgi
 	cgi-inherit $< httpd2.cgi >env.d/env.xml
 
 #
-#  file
-#
-file file.d/help.pl: file.d/file.xml
-	cgi2perl5 \
-		--source-path $<
-file.d/file.xml: file.cgi
-	cgi-inherit $< httpd2.cgi >file.d/file.xml
-#
 #  form
 #
 form form.d/help.pl: form.d/form.xml
