@@ -1,18 +1,35 @@
 #!/bin/sh
 #
 #  Synopsis:
-#	Script to bundle a file set into {bin,lib,htdocs,cgi-bin} tar file
+#	Script to bundle a files set into {bin,lib,htdocs,cgi-bin} tar file
+#  Description:
+#	This script 'make-dist' creates a tar of a "distribution" to be unpacked
+#	in a typical SystemV filesystem layout:
+#
+#		$ROOT/bin
+#		$ROOT/sbin
+#		$ROOT/lib
+#		$ROOT/etc
+#		$ROOT/spool
+#		$ROOT/log
+#		$ROOT/run
+#		$ROOT/src
+#
+#	Additional are web directories to support http access: cgi-bin, htdocs
+#
+#		$ROOT/run
+#		$ROOT/src
+#
 #  Usage:
 #	make-dist --help
-#	make-dist --template
+#	make-dist --template >setspace.conf
+#	vi setspace.con
 #
 #	make-dist setspace.conf
 #	D=$(pwd)
 #	cd /path/to/product/root && tar xvf $D/setspace-20140403_1213.tar
-#  Blame:
-#	jmscott@setspace.com
-#  Subversion:
-#	svn cat http://svn.setspace.com/jmscott/make-dist
+#  GitHub:
+#	https://github.com/jmscott/work/blob/master/make-dist
 #
 
 PROG=$(basename $0)
