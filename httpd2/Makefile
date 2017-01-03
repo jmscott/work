@@ -26,10 +26,13 @@ install: all
 		-d $(HTTPD2_LIB)/httpd2.d
 	install -g $(DIST_GROUP) -o $(DIST_USER)			\
 		-d $(HTTPD2_LIB)/env.d
+	install -g $(DIST_GROUP) -o $(DIST_USER)			\
+		-d $(HTTPD2_LIB)/form.d
 
 	install -g $(DIST_GROUP) -o $(DIST_USER) -m ug=r,o=		\
 		local-macosx.mk.example					\
 		env.cgi							\
+		form.cgi						\
 		httpd2.cgi						\
 		$(HTTPD2_LIB)
 
