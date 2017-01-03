@@ -10,8 +10,8 @@ DIST_ROOT?=$(PREFIX)/jmscott
 HTTPD2_ROOT?=$(DIST_ROOT)/httpd2
 HTTPD2_LIB?=$(HTTPD2_ROOT)/lib
 
-COMPILED=	env env.d/help.pl env.d/env.xml \
-	form form.d/help.pl file.d/file.xml
+COMPILED=	env env.d/help.pl 					\
+		form form.d/help.pl
 
 distclean:
 	rm -rf $(HTTPD2_LIB)
