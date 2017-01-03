@@ -36,6 +36,24 @@ install: all
 		httpd2.cgi						\
 		$(HTTPD2_LIB)
 
+	install -g $(DIST_GROUP) -o $(DIST_USER) -m ug=r,o=		\
+		env.d/div.pl						\
+		env.d/dl.pl						\
+		env.d/help.pl						\
+		env.d/input.pl						\
+		env.d/text.pl						\
+		$(HTTPD2_LIB)/env.d
+
+	install -g $(DIST_GROUP) -o $(DIST_USER) -m ug=r,o=		\
+		httpd2.d/GET.pl						\
+		httpd2.d/POST.pl					\
+		httpd2.d/common.pl					\
+		httpd2.d/make-work-dir.pl				\
+		httpd2.d/multipart-form-data.pl				\
+		httpd2.d/system.pl					\
+		httpd2.d/www-form-urlencoded.pl				\
+		$(HTTPD2_LIB)/httpd2.d
+
 all: $(COMPILED)
 
 clean:
