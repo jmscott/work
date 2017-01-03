@@ -87,14 +87,14 @@ Description:
 				default is '/usr/bin/env perl'
 Depends:
 	XML::Parse
+GitHub:
+	https://github.com/jmscott/work/tree/master/httpd2
 Notes:
 	Unfortunately, no DTD exists for the xml.cgi schema, so the
 	vocabulary is subject to sudden change.
 
 	Partially built files are left around after an error,
 	which confuses make and is not good.
-Blame:
-	jmscott\@setspace.com
 END
 }
 
@@ -618,6 +618,8 @@ print MAIN <<END;
 #	$source_path
 #  Source SHA1 Digest:
 #	$source_sha1
+#  GitHub:
+#	https://github.com/jmscott/work/tree/master/httpd2
 #  Note:
 #	/cgi-bin/$name was generated automatically by $PROG.
 #
