@@ -30,6 +30,7 @@ install: all
 		-d $(HTTPD2_LIB)/form.d
 
 	install -g $(DIST_GROUP) -o $(DIST_USER) -m ug=r,o=		\
+		local-linux.mk.example					\
 		local-macosx.mk.example					\
 		env.cgi							\
 		form.cgi						\

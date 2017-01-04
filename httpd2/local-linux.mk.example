@@ -1,0 +1,15 @@
+#
+#  Synopsis:
+#	Example makefile configuration for local mac os x
+#  Usage:
+#	cp local.mk.exmaple local.mk
+#
+#	#  for development, change PREFIX from /usr/local to, say,
+#	#  $(HOME)/opt/jmscott
+#	vi local.mk
+
+PREFIX=/usr/local
+#PREFIX=$(HOME)/opt
+
+DIST_USER=$(USER)
+DIST_GROUP=$(USER)
