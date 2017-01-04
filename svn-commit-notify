@@ -20,8 +20,8 @@
 PROG=$(basename $0)
 USAGE="usage: $PROG repo rev [--notify email@adress.com]+"
 
-LOOK_OUT=${TMPDIR:=/tmp}/$PROGNAME.$$
-trap "rm -f $SVNLOOK_OUT" EXIT
+LOOK_OUT=${TMPDIR:=/tmp}/$PROG.$$
+trap "rm -f $LOOK_OUT" EXIT
 
 die()
 {
