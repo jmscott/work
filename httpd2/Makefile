@@ -29,7 +29,7 @@ install: all
 	install -g $(DIST_GROUP) -o $(DIST_USER)			\
 		-d $(HTTPD2_LIB)/form.d
 
-	install -g $(DIST_GROUP) -o $(DIST_USER) -m ug=r,o=		\
+	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=r		\
 		local-linux.mk.example					\
 		local-macosx.mk.example					\
 		env.cgi							\
@@ -37,7 +37,7 @@ install: all
 		httpd2.cgi						\
 		$(HTTPD2_LIB)
 
-	install -g $(DIST_GROUP) -o $(DIST_USER) -m ug=r,o=		\
+	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=r		\
 		env.d/div.pl						\
 		env.d/dl.pl						\
 		env.d/help.pl						\
@@ -45,7 +45,7 @@ install: all
 		env.d/text.pl						\
 		$(HTTPD2_LIB)/env.d
 
-	install -g $(DIST_GROUP) -o $(DIST_USER) -m ug=r,o=		\
+	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=r		\
 		httpd2.d/GET.pl						\
 		httpd2.d/POST.pl					\
 		httpd2.d/common.pl					\
@@ -53,6 +53,11 @@ install: all
 		httpd2.d/multipart-form-data.pl				\
 		httpd2.d/system.pl					\
 		httpd2.d/www-form-urlencoded.pl				\
+		$(HTTPD2_LIB)/httpd2.d
+
+	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=r		\
+		form.d/post.dump.pl					\
+		form.d/religion.pl					\
 		$(HTTPD2_LIB)/httpd2.d
 
 all: $(COMPILED)
