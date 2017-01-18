@@ -54,10 +54,12 @@
     <arg
     	name="evar"
 	inherit="yes"
+	perl5_re=".{1,64}"
     />
     <arg
     	name="qarg"
 	inherit="yes"
+	perl5_re=".{1,64}"
     />
   </query-args>
   </putter>
