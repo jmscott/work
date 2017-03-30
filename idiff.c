@@ -236,7 +236,7 @@ static void idiff(FILE *f1, FILE *f2, FILE *fin, FILE *fout)
 				strcpy(temppath, "/tmp/idiff.XXXXXX");
 
 				if (!tempfile)
-					tempfile = mktemp(temppath);
+					tempfile = mkdtemp(temppath);
 				if (!tempfile) {
 					fprintf(stderr,
 					  "%s: could not construct temp file\n",
