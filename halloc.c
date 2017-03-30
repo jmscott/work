@@ -1,33 +1,33 @@
 /*
  *  Synopsis:
  *	A hierarchical replacement for malloc() with callbacks on free()
- *  Usage:
- *	cc -Wall -Wextra -c halloc.c
+ *  Description:
+ *	halloc is a memory allocator dependant upon the well known malloc().
+ *	halloc() organizes memory into hierarchical allocations;  freeing
+ *	the parent frees all the children.  halloc() works best in a long
+ *	running process with complex memory mangemanet.  halloc() is NOT thread
+ *	safe and NEVER will be.
  *
- *	struct person {
- *		char	*name;
- *		char	*email;
- *		int	year_of_birth;
- *	};
- *	struct people **person, *p;
- *	people = (struct person **)halloc((void *)0, sizeof *struct person *10);
- *	people[0] = (struct person *)halloc(people, sizeof person);
- *	p = people[0];
- *	p->name = halloc_strdup(p, "John Scott");
- *	p->email = halloc_strdup(p, "jmscott@setspace.com");
- *	p->year_of_birth = 1960;
- *	...
- *	halloc_free(p);		//  frees individual p and name and email
- *	people[0] = 0;
- *	...
- *	halloc_free(people);	//  frees list and all individuals
+ *	For example,
+ *
+ *		parent = halloc(NULL, 10);
+ *		child = halloc(parent, 20);
+ *		...
+ *		do some work.
+ *		halloc_free(parent);
+ *
+ *	will create chunks of RAM in "parent" and "child", do some work and then
+ *	free both the parent and child with halloc_free().  Any grand kids of
+ *	"child are also freed.
+ *
+ *	Additionally, a funcation callback to each blob can be added via
+ *	halloc_add_callback(p, *func).  The callbacks are invoked deepest
+ *	child first, with no other assumptions.
  *  See:
  *	https://github.com/jmscott/work/halloc.c
  *  Note:
- *	Not thread safe and VERY memory inefficient.
- *
  *	This version is a complete rewrite of a similar production version
- *	owned by partners of august.com.
+ *	owned by partners of august.com, back in the day.
  */
 #include <stdlib.h>
 #include <string.h>
