@@ -9,7 +9,6 @@
 #		--url http://panoz.setspace.com			\
 #		--notify jmscott@setspace.com			\
 #		--notify 2147701797@txt.att.net
-#		--data
 #  See:
 #	https://github.com/jmscott/work
 #  Note:
@@ -134,11 +133,6 @@ while [ "$1" ];  do
 	--url)
 		test -n "$1" || die 'option --url: missing url'
 		URL="$1"
-		shift
-		;;
-	--data)
-		test -n "$1" || die 'option --data: missing data value'
-		DATA="$1"
 		shift
 		;;
 	--curl-config)
