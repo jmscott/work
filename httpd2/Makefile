@@ -72,13 +72,13 @@ dev-links:
 #  Dump the process environment for debugging.
 #
 env env.d/help.pl: env.cgi
-	cgi2perl5 --source-path env.cgi
+	./cgi2perl5 --source-path env.cgi
 
 #
 #  Dump contents of a POSTED form during debuging.
 #
 form form.d/help.pl: form.cgi
-	cgi2perl5 --source-path form.cgi
+	./cgi2perl5 --source-path form.cgi
 
 dist-lib:
 	make-dist dist-lib.conf
