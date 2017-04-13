@@ -1,7 +1,20 @@
 #!/bin/bash
 #
 #  Synopsis:
-#	Fault/Alert for transitions in status of curl operation
+#	Fault/Alert for transitions in status codes of curl request.
+#  Description:
+#	Query a url using the mighty and well known 'curl' program from GNU.
+#	When the curl request fails, then send a single email to users in a
+#	notify list and furl goes into a fault state.  While in the fault state
+#	send NO subsequent notify emails until the fault clears.  In other words,
+#	subsequent and contiguous failures do NOT send more failure messages.
+#
+#	A reboot of the OS clears ALL furl states via a @reboot cron recipe.
+#	Clearing from cron @recoot pleases our new docker overlords.
+#
+#	Furl is NOT a replacement for an enterprise grade alert system.
+#	You have been warned.
+#
 #  Usage:
 #	export FURL_ROOT=/home/furl
 #	furl							\
@@ -12,14 +25,22 @@
 #  See:
 #	https://github.com/jmscott/work
 #  Note:
+#	Think about adding a "furl clear" action.
+#
+#	Why is a warning issued when default write-out file does not exist.
+#	Wouldn't a fault be more natural?
+#
 #	Need to max curl status code on english, based on curl manual page.
 #
-#	State file is $FURL_ROOT/spool/state/$TAG.state.
+#	State file is $FURL_ROOT/spool/state/$TAG.state.  The file MUST
+#	be in $FURL_ROOT/run!  Dam I (jms) am getting old.
 #
 #	Ought to add other options that test for either size or byte sequence
 #	in the file.
 #
 #	Need to address how to handle runaways.
+#
+#	Not sure how reliable furl is when writes to the state file fail.
 #
 PROG=$(basename $0)
 LOCK=
@@ -53,6 +74,13 @@ log()
 	echo "$(date +'%Y/%m/%d %H:%M:%S'): ${TAG:-$PROG}#$$: $@"
 }
 
+notify()
+{
+	SUBJECT="$TAG: $1"
+	log "mail: $SUBJECT: $NOTIFY ..."
+	date | mail -s "$SUBJECT" $NOTIFY
+}
+
 leave()
 {
 	STATUS=$?
@@ -84,13 +112,6 @@ leave()
 	exit $STATUS
 }
 
-notify()
-{
-	SUBJECT="$TAG: $1"
-	log "mail: $SUBJECT: $NOTIFY ..."
-	date | mail -s "$SUBJECT" $NOTIFY
-}
-
 log 'hello, world'
 trap leave EXIT
 
@@ -106,6 +127,9 @@ case "$FURL_ROOT" in
 	cd $FURL_ROOT || die "cd $FURL_ROOT failed"
 	test -r etc/profile || die "can't read $FURL_ROOT/etc/profile"
 	. etc/profile
+
+	#  insure the $FURL_ROOT/spool directory exists
+
 	if test -e spool/state;  then
 		true
 	else
@@ -115,7 +139,7 @@ case "$FURL_ROOT" in
 	;;
 esac
 
-CURL_OUTPUT=${TMPDIR:=/tmp}/$PROG.$$
+CURL_OUTPUT=${TMPDIR:=/tmp}/$PROG-$(time +'%s')-$$.curl
 log "curl output path: $CURL_OUTPUT"
 
 if [ -n "$WRITE_OUT" -a ! -f "$WRITE_OUT" ];  then
@@ -156,7 +180,7 @@ while [ "$1" ];  do
 		N="$1"
 		test -n "$1" || die 'option --notify: missing email address'
 		#
-		#  Accumlate email address with mutiple --notify
+		#  Accumulate email addresses with mutiple --notify
 		#
 		if [ -n "$NOTIFY" ];  then
 			NOTIFY="$NOTIFY $1"
@@ -223,10 +247,9 @@ log "temporary curl output: $CURL_OUTPUT"
 STATE_PATH=spool/state/$TAG.state
 log "state path: $STATE_PATH"
 
-
 #
-#  Missing state path implies we are starting, so send and alert message
-#  and let the next pass test the fault..
+#  Missing state path implies we are starting, so send an alert message
+#  and let the next pass test the fault.
 #
 if [ ! -f $STATE_PATH ];  then
 	log "missing $STATE_PATH"
