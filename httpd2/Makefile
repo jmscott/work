@@ -12,7 +12,6 @@ HTTPD2_LIB?=$(HTTPD2_ROOT)/lib
 
 COMPILED=	env env.d/help.pl 					\
 		form form.d/help.pl
-
 distclean:
 	rm -rf $(HTTPD2_LIB)
 install: all
@@ -82,3 +81,5 @@ form form.d/help.pl: form.cgi
 
 dist-lib:
 	make-dist dist-lib.conf
+
+world: clean all distclean install
