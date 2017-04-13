@@ -12,11 +12,21 @@ HTTPD2_LIB?=$(HTTPD2_ROOT)/lib
 
 COMPILED=	env env.d/help.pl 					\
 		form form.d/help.pl
+
+#  Note: be paranoid about removing $(DIST_ROOT)
 distclean:
 	rm -rf $(HTTPD2_LIB)
+	rm -f $(DIST_ROOT)/bin/cgi-inherit
+	rm -f $(DIST_ROOT)/bin/cgi-inherit-merge
+	rm -f $(DIST_ROOT)/bin/cgi-manifest
+	rm -f $(DIST_ROOT)/bin/cgi-template
+	rm -f $(DIST_ROOT)/bin/cgi2perl5
+
 install: all
 	install -g $(DIST_GROUP) -o $(DIST_USER)			\
 		-d $(DIST_ROOT)
+	install -g $(DIST_GROUP) -o $(DIST_USER)			\
+		-d $(DIST_ROOT)/bin
 	install -g $(DIST_GROUP) -o $(DIST_USER)			\
 		-d $(HTTPD2_ROOT)
 	install -g $(DIST_GROUP) -o $(DIST_USER)			\
@@ -58,6 +68,22 @@ install: all
 		form.d/post.dump.pl					\
 		form.d/religion.pl					\
 		$(HTTPD2_LIB)/httpd2.d
+
+	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=r		\
+		env.d/div.pl						\
+		env.d/dl.pl						\
+		env.d/help.pl						\
+		env.d/input.pl						\
+		env.d/text.pl						\
+		$(HTTPD2_LIB)/env.d
+
+	install -g $(DIST_GROUP) -o $(DIST_USER) -m u=rwx,go=rx		\
+		cgi-inherit						\
+		cgi-inherit-merge					\
+		cgi-manifest						\
+		cgi-template						\
+		cgi2perl5						\
+		$(DIST_ROOT)/bin
 
 all: $(COMPILED)
 
