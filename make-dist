@@ -1,25 +1,7 @@
 #!/bin/sh
 #
 #  Synopsis:
-#	Script to bundle a files set into {bin,lib,htdocs,cgi-bin} tar file
-#  Description:
-#	This script 'make-dist' creates a tar of a "distribution" to be unpacked
-#	in a typical SystemV filesystem layout:
-#
-#		$ROOT/bin
-#		$ROOT/sbin
-#		$ROOT/lib
-#		$ROOT/etc
-#		$ROOT/spool
-#		$ROOT/log
-#		$ROOT/run
-#		$ROOT/src
-#
-#	Additional are web directories to support http access: cgi-bin, htdocs
-#
-#		$ROOT/run
-#		$ROOT/src
-#
+#	Script to bundle a tar file in typical SystemV unix layout.
 #  Usage:
 #	make-dist --help
 #	make-dist --template >setspace.conf
