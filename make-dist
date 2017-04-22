@@ -22,7 +22,7 @@ help()
 	cat <<END
 
 Synopsis:
-	Build a tar archive file suitable for unpacking into a product tree.
+	Build a tar archive for unpacking into a SystemV file system layout .
 Usage:
 	$USAGE
 Description:
@@ -30,9 +30,9 @@ Description:
 	files in a typical unix directory layout.  The confiugration files
 	contains bourne shell variable definitions.  The tar file is 
 	suitable for unpacking to install or upgrade a target host.  
-	The files rebuilt in the tar archive into the following sub directories:
+	The files rebuilt in the tar archive into the following sub
+	directories:
 	
-		./	#  Base level files/directorys.
 		bin/	#  read only executables executed by cli or scripts
 		sbin/	#  read only executables executed by daemons/services.
 		src/	#  compilable source code, not scripts.
@@ -70,6 +70,13 @@ Exit Status:
 			left intact.
 Note:
 	Need to use mtree format for directory layout.
+
+	Need to document additional directories
+		
+		etc/
+		log/
+		run/
+		spool/
 END
 }
 
