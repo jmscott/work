@@ -12,15 +12,20 @@
  *
  *		parent = halloc(NULL, 10);
  *		child = halloc(parent, 20);
- *		...
- *		do some work.
+ *
+ *		... do some work ...
+ *	
  *		halloc_free(parent);
  *
- *	will create chunks of RAM in "parent" and "child", do some work and then
- *	free both the parent and child with halloc_free().  Any grand kids of
- *	"child are also freed.
+ *	will allocate chunks of RAM in "parent" and "child", do some work and
+ *	then free both the parent and child with single call
  *
- *	Additionally, a funcation callback to each blob can be added via
+ *		halloc_free(parent).
+ *
+ *	All descendents of parent are also freed.  Any attempt to free "child"
+ *	will be unpredicatable.
+ *
+ *	Additionally, a function callback to each blob can be added via
  *	halloc_add_callback(p, *func).  The callbacks are invoked deepest
  *	child first, with no other assumptions.
  *  See:
