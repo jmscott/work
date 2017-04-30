@@ -19,11 +19,11 @@ indicating that the fault has cleared.
 ```crontab
 #
 #  What:
-#	Poll esdreports.esdallas.org
+#	Poll reports.abcdallas.org
 #  When:
 #	Every 10 minutes
 #
 FURL_NOTIFY=jmscott@setspace.com
 
-*/10 * * * * bin/furl --tag abcreports --url http://abcreports.abcallas.org $FURL_NOTIFY --curl-option '--user jmscott:lose20pd' >>log/abcreports.log 2>&1
+*/10 * * * * bin/furl --tag abcreports --url http://reports.abcallas.org $FURL_NOTIFY --curl-option '--user jmscott:lose20pd' >>log/abcreports.log 2>&1
 ```
