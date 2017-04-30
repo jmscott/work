@@ -5,7 +5,7 @@
 FURL stands for "Fault URL".  Furl can be used in trivial monitoring
 environments that don't need the overhead of
 [SNPP](http://en.wikipedia.org/wiki/Simple_Network_Management_Protocol).
-The monitor rules to furl can set on the command line of a cronjob.
+The monitor rules to furl are on the command line, typically as a crontab.
 
 Using the well known [curl](http://en.wikipedia.org/wiki/CURL) program,
 furl will fetch a url and go into a fault state upon failure.
