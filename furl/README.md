@@ -16,7 +16,7 @@ After the fault has cleared, a second notice is emailed to the hordes,
 indicating that the fault has cleared.
 
 ##  Usage
-```
+```crontab
 #
 #  What:
 #	Poll esdreports.esdallas.org
