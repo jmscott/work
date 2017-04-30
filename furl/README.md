@@ -2,7 +2,7 @@
 
 ##  Description
 
-FURL stands for "Fault URL".  Furl can be used in trivial monitoring
+FURL stands for "Fault URL".  Furl works in trivial monitoring
 environments that don't need the overhead of
 [SNPP](http://en.wikipedia.org/wiki/Simple_Network_Management_Protocol).
 The rules for a particular monitor to furl are listed on the command line,
