@@ -30,17 +30,19 @@
 #	Why is a warning issued when default write-out file does not exist.
 #	Wouldn't a fault be more natural?
 #
-#	Need to max curl status code on english, based on curl manual page.
+#	Need to express curl status code in english, based on curl manual page.
 #
 #	State file is $FURL_ROOT/spool/state/$TAG.state.  The file MUST
-#	be in $FURL_ROOT/run!  Dam I (jms) am getting old.
+#	be in $FURL_ROOT/run!
 #
 #	Ought to add other options that test for either size or byte sequence
 #	in the file.
 #
 #	Need to address how to handle runaways.
 #
-#	Not sure how reliable furl is when writes to the state file fail.
+#	Furl does NOT notify when writes to state file file.
+#
+#	Rename the state file from $TAG.state to $TAG.furl.
 #
 PROG=$(basename $0)
 LOCK=
