@@ -4,7 +4,7 @@
 
 FURL stands for "Fault URL".  Furl can be used in trivial monitoring
 environments that don't need the overhead of
-[SNPP]SMT://en.wikipedia.org/wiki/Simple_Network_Management_Protocol().
+[SNPP](http://en.wikipedia.org/wiki/Simple_Network_Management_Protocol).
 
 Using the well known "curl" program
 furl will fetch a url and go into a fault state upon failure.
