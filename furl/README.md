@@ -14,3 +14,16 @@ send another email until a fault file is removed in the
 `$FURL_ROOT/spool` directory, indicating the fault has cleared.
 After the fault has cleared, a second notice is emailed to the hordes,
 indicating that the fault has cleared.
+
+##  Usage
+```
+#
+#  What:
+#	Poll esdreports.esdallas.org
+#  When:
+#	Every 10 minutes
+#
+FURL_NOTIFY=jmscott@setspace.com
+
+*/10 * * * * bin/furl --tag abcreports --url http://abcreports.abcallas.org $FURL_NOTIFY --curl-option '--user jmscott:lose20pd' >>log/abcreports.log 2>&1
+```
