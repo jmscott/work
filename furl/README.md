@@ -5,13 +5,12 @@
 FURL stands for "Fault URL".  Furl can be used in trivial monitoring
 environments that don't need the overhead of
 [SNPP](http://en.wikipedia.org/wiki/Simple_Network_Management_Protocol).
+The monitor rules to furl can set on the command line of a cronjob.
 
-Using the well known "curl" program
+Using the well known [curl](http://en.wikipedia.org/wiki/CURL) program,
 furl will fetch a url and go into a fault state upon failure.
-When entering the fault state will notify the hords once and not
+When entering the fault state furl will notify the hords once and not
 send another email until a fault file is removed in the
-$FURL_ROOT/spool directory, indicating the fault has cleared.
+`$FURL_ROOT/spool` directory, indicating the fault has cleared.
 After the fault has cleared, a second notice is emailed to the hordes,
 indicating that the fault has cleared.
-
-Typically furl is invoked from a cron jobs.
