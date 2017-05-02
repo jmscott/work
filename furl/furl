@@ -13,6 +13,11 @@
 #	A reboot of the OS clears ALL furl states via a @reboot cron recipe.
 #	Clearing from cron @reboot pleases our new docker overlords.
 #
+#	Furl requires the gnu command "timeout" for the --command option.
+#	Unfortunatly, the timeout command is not available on Mac OS, as of
+#	release 10.12.4 (sierra).  You will need to install "timeout" using
+#	homebrew or the ports distrubution managers.
+#
 #	Furl is NOT a replacement for an enterprise grade alert system.
 #	You have been warned.
 #
