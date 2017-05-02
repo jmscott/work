@@ -6,17 +6,19 @@
 #	Query a url using the mighty and well known 'curl' program from GNU.
 #	When the curl request fails, then send a single email to users in a
 #	notify list and furl goes into a fault state.  While in the fault state
-#	send NO subsequent notify emails until the fault clears.  In other words,
-#	subsequent and contiguous failures do NOT send more failure messages.
+#	send NO subsequent notify emails until the fault clears.  In other
+#	words, subsequent and contiguous failures do NOT send more failure
+#	messages.
 #
 #	A reboot of the OS clears ALL furl states via a @reboot cron recipe.
-#	Clearing from cron @recoot pleases our new docker overlords.
+#	Clearing from cron @reboot pleases our new docker overlords.
 #
 #	Furl is NOT a replacement for an enterprise grade alert system.
 #	You have been warned.
 #
 #  Usage:
 #	export FURL_ROOT=/home/furl
+#
 #	furl							\
 #		--tag panoz					\
 #		--url http://panoz.setspace.com			\
@@ -25,7 +27,7 @@
 #  See:
 #	https://github.com/jmscott/work
 #  Note:
-#	Think about adding a "furl clear" action.
+#	Think about adding a "furl clear" action upon, say, a docker reboot.
 #
 #	Why is a warning issued when default write-out file does not exist.
 #	Wouldn't a fault be more natural?
@@ -37,8 +39,6 @@
 #
 #	Ought to add other options that test for either size or byte sequence
 #	in the file.
-#
-#	Need to address how to handle runaways.
 #
 #	Furl does NOT notify when writes to state file file.
 #
