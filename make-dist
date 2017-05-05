@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 #  Synopsis:
-#	Script to bundle a tar file in typical SystemV unix layout.
+#	From a simple configuration file, bundle a tar file in the typical SystemV unix file system layout.
 #  Usage:
 #	make-dist --help
 #	make-dist --template >setspace.conf
@@ -10,8 +10,9 @@
 #	make-dist setspace.conf
 #	D=$(pwd)
 #	cd /path/to/product/root && tar xvf $D/setspace-20140403_1213.tar
-#  GitHub:
+#  See:
 #	https://github.com/jmscott/work/blob/master/make-dist
+#	https://en.wikipedia.org/wiki/Unix_filesystem
 #
 
 PROG=$(basename $0)
