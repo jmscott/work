@@ -23,7 +23,7 @@
  *		halloc_free(parent).
  *
  *	All descendents of parent are also freed.  Any attempt to free "child"
- *	will be unpredicatable.
+ *	after "parent" is freed will be unpredicatable.
  *
  *	Additionally, a function callback to each blob can be added via
  *	halloc_add_callback(p, *func).  The callbacks are invoked deepest
