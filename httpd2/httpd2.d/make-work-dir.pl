@@ -9,6 +9,8 @@
 #	Depends upon the perl5 Cwd.pm modules.
 #	Does the Cwd module need to be global?
 #
+#	What uses this file?
+#
 use Cwd;
 
 our (
