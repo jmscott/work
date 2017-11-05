@@ -174,7 +174,7 @@ sub zap_uri_query_arg
 sub add_uri_query_arg
 {
 	my $uri = shift @_;
-	if ($uri =~ /[&]/) {
+	if ($uri =~ /[&]/ || $uri =~ /[?]/) {
 		$uri .= '&amp;' . $_[0] . '=' . encode_url_query_arg($_[1]);
 	} else {
 		$uri .= '?' . $_[0] . '=' . encode_url_query_arg($_[1]);
