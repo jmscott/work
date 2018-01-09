@@ -229,12 +229,12 @@ func (cf *Config) load_auth() {
 
 	ba_log := func(format string, args ...interface{}) {
 
-		log("basic auth: %s", fmt.Sprintf(format, args...))
+		log("basic auth: " + format, args...)
 	}
 
 	ba_die := func(format string, args ...interface{}) {
 
-		die("basic auth: %s", fmt.Sprintf(format, args...))
+		die("basic auth: " + format, args...)
 	}
 
 	cf.basic_auth = nil

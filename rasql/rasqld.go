@@ -23,21 +23,22 @@ func reply_ERROR(
 	status int,
 	w http.ResponseWriter,
 	r *http.Request,
-	format string, args ...interface{}) {
+	format string,
+	args ...interface{},
+) {
 
-	msg := fmt.Sprintf(format, args...)
-
-	ERROR("%s: %s", r.RemoteAddr, msg)
-	http.Error(w, msg, status)
+	ERROR(r.RemoteAddr + ": " + format, args...)
+	http.Error(w, fmt.Sprintf(format, args...), status)
 }
 
 func ERROR(format string, args ...interface{}) {
 
 	fmt.Fprintf(
 		stderr,
-		"%s: ERROR: %s\n",
-		time.Now().Format("2006/01/02 15:04:05"),
-		fmt.Sprintf(format, args...),
+		time.Now().Format("2006/01/02 15:04:05") +
+		": ERROR: " +
+		format,
+		args...,
 	)
 }
 
@@ -45,17 +46,21 @@ func WARN(format string, args ...interface{}) {
 
 	fmt.Fprintf(
 		stderr,
-		"%s: WARN: %s\n",
-		time.Now().Format("2006/01/02 15:04:05"),
-		fmt.Sprintf(format, args...),
+		time.Now().Format("2006/01/02 15:04:05") +
+		": WARN: " +
+		format,
+		args...,
 	)
 }
 
 func log(format string, args ...interface{}) {
 
-	fmt.Fprintf(stderr, "%s: %s\n",
-		time.Now().Format("2006/01/02 15:04:05"),
-		fmt.Sprintf(format, args...),
+	fmt.Fprintf(
+		stderr,
+		time.Now().Format("2006/01/02 15:04:05") +
+		": " +
+		format,
+		args...,
 	)
 }
 

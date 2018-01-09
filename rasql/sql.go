@@ -133,13 +133,13 @@ func (qset SQLQuerySet) open() {
 
 func (q *SQLQuery) die(format string, args ...interface{}) {
 
-	die("sql query: %s: %s", q.SourcePath, fmt.Sprintf(format, args...))
+	//  Note: % needs to be escaped in q.SourcePath!
+	die("sql query: " + q.SourcePath + ": " + format, args...)
 }
 
 func (q *SQLQuery) WARN(format string, args ...interface{}) {
 
-	log("WARN: sql query: %s: %s", q.SourcePath,
-		fmt.Sprintf(format, args...))
+	log("WARN: sql query: " + q.SourcePath + ": " + format, args...)
 }
 
 func (q *SQLQuery) load() {
@@ -288,9 +288,16 @@ func (q *SQLQuery) db_query(
 		format string,
 		args ...interface{},
 	) {
-		msg := fmt.Sprintf(format, args...)
-		ERROR("%s: %s", r.RemoteAddr, r.URL)
-		reply_ERROR(status, w, r, "%s", msg)
+		//  Note: need to escape % in r.URL!
+		fmt := fmt.Sprintf(
+			"%s: [%d]: %s: ",
+			r.RemoteAddr,
+			status,
+			r.URL,
+		) + format
+
+		ERROR(fmt, args...) 
+		reply_ERROR(status, w, r, fmt, args...)
 	}
 
 	//  only allow http GET method
@@ -322,14 +329,12 @@ func (q *SQLQuery) db_query(
 		}
 
 		bada := func(format string, args ...interface{}) {
-			msg := fmt.Sprintf(
-				"query arg: %s: %s",
-				ha.name,
-				fmt.Sprintf(format, args...),
-			)
 			client_error(
 				http.StatusBadRequest,
-				"%s", msg,
+				"query arg: " +
+				ha.name +
+				": ",
+				args...,
 			)
 		}
 
