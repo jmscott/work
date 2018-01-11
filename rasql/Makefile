@@ -7,9 +7,10 @@
 GO:=/usr/local/go/bin/go
 export GOPATH := /usr/local
 
-GOSRC=rasqld.go								\
+RASQLD_SRC=rasqld.go							\
 	config.go							\
 	http.go								\
+	log.go								\
 	preamble.go							\
 	sql.go
 
@@ -21,15 +22,15 @@ install: rasqld
 clean:
 	rm -f rasqld
 
-rasqld: $(GOSRC)
-	$(GO) build $(GOSRC)
+rasqld: $(RASQLD_SRC)
+	$(GO) build $(RASQLD_SRC)
 fmt:
-	$(GO) fmt $(GOSRC)
+	$(GO) fmt $(RASQLD_SRC)
 vet:
 	#  vet wants formating functions to end in 'f'.  jmscott doesn't want.
 	#  -printf=0 eliminates "possible formatting directive in log call"
 	#  gripes
-	$(GO) tool vet -printf=0 $(GOSRC)
+	$(GO) tool vet -printf=0 $(RASQLD_SRC)
 pem:
 	#
 	#  Generate test pem files for public certificate and private keys.
@@ -39,3 +40,6 @@ pem:
 	#
 	openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 \
 			-keyout self-signed.key -out self-signed.cert
+
+dev-links:
+	test -e log || ln -s . log

@@ -8,9 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
-	"sort"
 	"syscall"
-	"time"
 )
 
 var stderr = os.NewFile(uintptr(syscall.Stderr), "/dev/stderr")
@@ -32,85 +30,21 @@ func reply_ERROR(
 }
 
 func ERROR(format string, args ...interface{}) {
-
-	fmt.Fprintf(
-		stderr,
-		time.Now().Format("2006/01/02 15:04:05") +
-		": ERROR: " +
-		format,
-		args...,
-	)
+	log("ERROR: " + format, args...)
 }
 
 func WARN(format string, args ...interface{}) {
 
-	fmt.Fprintf(
-		stderr,
-		time.Now().Format("2006/01/02 15:04:05") +
-		": WARN: " +
-		format,
-		args...,
-	)
+	log("WARN: " + format, args...)
 }
 
-func log(format string, args ...interface{}) {
-
-	fmt.Fprintf(
-		stderr,
-		time.Now().Format("2006/01/02 15:04:05") +
-		": " +
-		format,
-		args...,
-	)
-}
-
-func die(format string, args ...interface{}) {
-
-	ERROR(format, args...)
-	leave(2)
-}
-
-func leave(exit_status int) {
-	log("good bye, cruel world")
-	os.Exit(exit_status)
-}
-
-func main() {
-
-	log("hello, world")
-
-	if len(os.Args) != 2 {
-		die(
-			"wrong number of arguments: got %d, expected 1",
-			len(os.Args),
-		)
-	}
-
-	//  catch signals
-
-	go func() {
-		c := make(chan os.Signal)
-		signal.Notify(c, syscall.SIGTERM)
-		signal.Notify(c, syscall.SIGQUIT)
-		signal.Notify(c, syscall.SIGINT)
-		s := <-c
-		log("caught signal: %s", s)
-		leave(0)
-	}()
+func boot() {
 
 	var cf Config
 
 	log("process id: %d", os.Getpid())
 	log("go version: %s", runtime.Version())
 	log("process environment ...")
-
-	//  dump the process environment
-
-	env := os.Environ()
-	sort.Strings(env)
-	for _, e := range env {
-		log("  %s", e)
-	}
 
 	cf.load(os.Args[1])
 	cf.SQLQuerySet.open()
@@ -186,6 +120,26 @@ func main() {
 			die("http listen tls: %s", err)
 		}()
 	}
-	pause := make(chan interface{})
-	<-pause
+}
+
+func main() {
+
+	log("hello, world")
+
+	if len(os.Args) != 2 {
+		die("wrong number of arguments: got %d, expected 1",
+			len(os.Args),
+		)
+	}
+	log_init("rasqld")
+	boot()
+
+	//  wait for signals
+	c := make(chan os.Signal)
+	signal.Notify(c, syscall.SIGTERM)
+	signal.Notify(c, syscall.SIGQUIT)
+	signal.Notify(c, syscall.SIGINT)
+	s := <-c
+	log("caught signal: %s", s)
+	leave(0)
 }
