@@ -209,7 +209,6 @@ func leave(exit_status int) {
 	os.Exit(1)
 }
 
-
 func die(format string, args ...interface{}) {
 
 	if log_file == nil {
@@ -217,7 +216,7 @@ func die(format string, args ...interface{}) {
 			fmt.Sprintf("ERROR: " + format + "\n", args...),
 		))
 	} else {
-		log("ERROR: " + log_name + ": " + format, args...)
+		log("ERROR: " + format, args...)
 	}
 	leave(1)
 }
