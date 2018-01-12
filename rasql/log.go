@@ -199,12 +199,13 @@ func leave(exit_status int) {
 		if err != nil {
 			fmt.Fprintf(
 				os.Stderr,
-				"ERROR: close(log file) failed: %s",
+				"\n%s: rasqld: ERROR: " +
+				  "close(log file) failed: %s\n",
+				time.Now().Format("2006/01/02 15:04:05"),
 				err,
 			)
 		}
 	}
-
 	os.Exit(1)
 }
 

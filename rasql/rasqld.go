@@ -124,8 +124,6 @@ func boot() {
 
 func main() {
 
-	log("hello, world")
-
 	if len(os.Args) != 2 {
 		die("wrong number of arguments: got %d, expected 1",
 			len(os.Args),
