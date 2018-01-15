@@ -44,7 +44,6 @@ func boot() {
 
 	log("process id: %d", os.Getpid())
 	log("go version: %s", runtime.Version())
-	log("process environment ...")
 
 	cf.load(os.Args[1])
 	cf.SQLQuerySet.open()
@@ -130,6 +129,7 @@ func main() {
 		)
 	}
 	log_init("rasqld")
+
 	boot()
 
 	//  wait for signals

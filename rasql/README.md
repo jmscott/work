@@ -1,12 +1,13 @@
-# rasql - Rest API for SQL
+REST API for SQL - RASQL
+========================
 
-## Synopsis
+# Synopsis
 	Build a simple REST server by parsing PostgreSQL query files.
 
 	Both http and ssl are supported, as well as anonymous and basic authentification.
 
 	Logging is to standard error.
-## Build and Test in Unix Environment
+# Build and Test in Unix Environment
 	#  Install lib/pq, the pure postgresql package
 
 	GOPATH=/usr/local /usr/local/go/bin/go get -u github.com/lib/pq

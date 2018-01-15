@@ -37,11 +37,18 @@ type SQLQuery struct {
 	name           string
 	synopsis       string
 	description    string
-	SourcePath     string `json:"source-path"`
-	SQLQueryArgSet `json:"query-arg-set"`
+	SourcePath     string 			`json:"source-path"`
+	SQLQueryArgSet 				`json:"query-arg-set"`
 	sql_text       string
 	stmt           *sql.Stmt
 	argv           []*SQLQueryArg
+}
+
+type JSONQueryReply struct {
+	Status		string			`json:"status"`
+	Duration	time.Duration		`json:"duration"`
+	Columns		[]string		`json:"columns"`
+	Rows		[][]interface{}		`json:"rows"`
 }
 
 var (
@@ -111,6 +118,7 @@ func (qset SQLQuerySet) open() {
 
 	var err error
 
+	log("opening default postgres database ...")
 	db, err = sql.Open(
 		"postgres",
 		"sslmode=disable",
@@ -118,6 +126,12 @@ func (qset SQLQuerySet) open() {
 	if err != nil {
 		panic(err)
 	}
+	log("pinging database to verify open parameters ...")
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	}
+	log("ping ok; database is open")
 
 	log("preparing %d queries in sql database", len(qset))
 	for n, q := range qset {
@@ -465,6 +479,8 @@ func (q *SQLQuery) handle_query_json(
 	cf *Config,
 ) {
 	duration, columns, rows, vals := q.db_query(w, r, cf)
+
+	//  Note: need to reply with status error!
 	if vals == nil {
 		return
 	}
@@ -476,82 +492,22 @@ func (q *SQLQuery) handle_query_json(
 		vals[i] = new(interface{})
 	}
 
-	putf := func(format string, args ...interface{}) {
-		fmt.Fprintf(w, format, args...)
-	}
-
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-	//  write the reply with the query duration
-
-	putf(`[
-    "duration,columns,rows",
-    %.9f,
-    `,
-		duration,
-	)
-
-	//  write bytes string to client
-
-	putb := func(b []byte) {
-		_, err := w.Write(b)
-		if err != nil {
-			panic(err)
-		}
+	reply := JSONQueryReply{
+		Status:		"ok",
+		Duration:	time.Duration(duration),
+		Columns:	columns,
 	}
-
-	puts := func(s string) {
-		putb([]byte(s))
+	buf, err := json.Marshal(reply)
+	if err != nil {
+		panic(err)
 	}
-
-	//  write a json array to the client
-
-	puta := func(a []string) {
-		b, err := json.Marshal(a)
-		if err != nil {
-			panic(err)
-		}
-		putb(b)
+	_, err = w.Write(buf)
+	if err != nil {
+		ERROR("write(handle_query_json) failed: %s", err)
+		return
 	}
-
-	puta(columns)
-	puts(",\n\n    [\n")
-
-	count := uint64(0)
-	for rows.Next() {
-
-		if count > 0 {
-			puts(",\n")
-		}
-		count++
-
-		err := rows.Scan(vals...)
-		if err != nil {
-			panic(err)
-		}
-
-		puts("      [")
-		for i := 0; i < len(vals); i++ {
-			if i > 0 {
-				puts(",")
-			}
-
-			var b []byte
-
-			switch v := (*vals[i].(*interface{})).(type) {
-			case []byte:
-				b, err = json.Marshal(string(v))
-			default:
-				b, err = json.Marshal(v)
-			}
-			if err != nil {
-				panic(err)
-			}
-			putb(b)
-		}
-		puts("]")
-	}
-	puts("\n    ]\n]\n")
 }
 
 //  Tab separated reply to an sql query request from a url.

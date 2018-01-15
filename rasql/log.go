@@ -47,18 +47,27 @@ func logger() {
 	new_line := []byte("\n")
 	buf := bytes.NewBuffer(make([]byte, 1024))
 
-	for msg := range log_c {
-		if msg == "" {
-			log_roll()
-		}
-
+	fill := func(msg string) {
 		buf.Reset()
+
 		buf.Write([]byte(time.Now().Format("2006/01/02 15:04:05")))
 		buf.Write(colon)
 		buf.Write([]byte(msg))
 		buf.Write(new_line)
+	}
+
+	//  read log messages from global channel
+	for msg := range log_c {
+		if msg == "" {
+			log_roll()
+		}
+		fill(msg)
+
 		_, err := log_file.Write(buf.Bytes())
 		if err != nil {
+			os.Stderr.Write(buf.Bytes())
+			fill("write(log_failed) failed: " + err.Error())
+			os.Stderr.Write(buf.Bytes())
 			panic(err)
 		}
 	}
@@ -98,6 +107,21 @@ func log_init(name string) {
 	log_env()
 }
 
+/*
+ *  Synopsis:
+ *	Format a time zone seconds into [+-]HHMM. suitable for file path
+ *  Note:
+ *	Do timezones exists which are not on minute boundaries?
+ */
+func tzo2file_name(sec int) string {
+	
+	min := (sec % 3600) / 60
+	if min < 0 {
+		min = -min
+	}
+	return fmt.Sprintf("%+03d%02d", sec / 3600, min)
+}
+
 func log_roll() {
 
 	put := func (format string, args ...interface{}) {
@@ -113,13 +137,21 @@ func log_roll() {
 	yesterday := time.Now().Add(-time.Hour).Weekday().String()[0:3]
 	today := time.Now().Weekday().String()[0:3]
 
-	flip := func() {
+	flip := func(before bool) {
+		tz, sec := time.Now().Zone()
+
+		if before {
+			put("time zone (seconds UTC): %s (%d)", tz, sec)
+		}
 		put("log/%s-%s.log -> log/%s-%s.log",
 			log_name,
 			yesterday,
 			log_name,
 			today,
 		)
+		if !before {
+			put("time zone (seconds UTC): %s (%d)", tz, sec)
+		}
 	}
 
 	stat := func() {
@@ -149,7 +181,7 @@ func log_roll() {
 	}
 
 	stat()
-	flip()
+	flip(true)
 
 	if err := log_file.Close();  err != nil {
 		log_file = nil
@@ -158,7 +190,7 @@ func log_roll() {
 
 	log_open(syscall.O_TRUNC)
 
-	flip()
+	flip(false)
 	stat()
 
 	log_roll_done <- true
@@ -179,6 +211,7 @@ func log(format string, args ...interface{}) {
 func log_env() {
 	//  dump the process environment
 
+	log("process environment ...")
 	env := os.Environ()
 	sort.Strings(env)
 	for _, e := range env {
