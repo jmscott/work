@@ -47,7 +47,6 @@ func boot() {
 
 	cf.load(os.Args[1])
 	cf.SQLQuerySet.open()
-	defer db.Close()
 
 	log("path sql query index: %s", cf.RESTPathPrefix)
 	http.HandleFunc(

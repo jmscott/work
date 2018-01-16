@@ -221,6 +221,15 @@ func log_env() {
 
 func leave(exit_status int) {
 
+	if db != nil {
+		log("closing database ...")
+		err := db.Close()
+		db = nil
+		if err != nil {
+			log("ERROR: db.Close() failed", err)
+		}
+	}
+
 	//  seems to force async i/o
 	os.Stderr.Sync()
 
