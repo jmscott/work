@@ -15,6 +15,7 @@ var (
 	log_file		*os.File
 	log_roll_done		chan(bool)
 	log_c 			chan(string)
+	log_heartbeat_duration =60 * time.Second
 )
 
 //  open the log file log/<log_name>-Dow.log in append or truncate mode
@@ -88,7 +89,7 @@ func log_init(name string) {
 		for {
 			now := time.Now().Weekday().String()[0:3]
 			if now != today {
-				log("log roll watch: %s -> %s ...", today , now)
+				log("log roll watch: %s -> %s ...", today, now)
 				log_c <- ""
 
 				//  Note: need a timeout!
@@ -105,6 +106,16 @@ func log_init(name string) {
 	}()
 	log("hello, world")
 	log_env()
+
+	//  start heartbeat
+
+	go func() {
+		
+		for {
+			log("heartbeat: %s", log_heartbeat_duration)
+			time.Sleep(log_heartbeat_duration)
+		}
+	}()
 }
 
 /*
