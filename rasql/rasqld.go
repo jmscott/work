@@ -29,15 +29,6 @@ func reply_ERROR(
 	http.Error(w, fmt.Sprintf(format, args...), status)
 }
 
-func ERROR(format string, args ...interface{}) {
-	log("ERROR: " + format, args...)
-}
-
-func WARN(format string, args ...interface{}) {
-
-	log("WARN: " + format, args...)
-}
-
 func boot() {
 
 	var cf Config
@@ -132,11 +123,13 @@ func main() {
 	boot()
 
 	//  wait for signals
+	//  Note: see SIGTERM ignored on mac 10.13.2 from time to time.
+
 	c := make(chan os.Signal)
 	signal.Notify(c, syscall.SIGTERM)
 	signal.Notify(c, syscall.SIGQUIT)
 	signal.Notify(c, syscall.SIGINT)
-	s := <-c
+	s := <- c
 	log("caught signal: %s", s)
 	leave(0)
 }

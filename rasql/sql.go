@@ -153,7 +153,7 @@ func (q *SQLQuery) die(format string, args ...interface{}) {
 
 func (q *SQLQuery) WARN(format string, args ...interface{}) {
 
-	log("WARN: sql query: " + q.SourcePath + ": " + format, args...)
+	WARN("sql query: " + q.SourcePath + ": " + format, args...)
 }
 
 func (q *SQLQuery) load() {

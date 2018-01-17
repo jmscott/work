@@ -15,7 +15,7 @@ var (
 	log_file		*os.File
 	log_roll_done		chan(bool)
 	log_c 			chan(string)
-	log_heartbeat_duration =60 * time.Second
+	log_heartbeat_duration =20 * time.Second
 )
 
 //  open the log file log/<log_name>-Dow.log in append or truncate mode
@@ -136,13 +136,11 @@ func tzo2file_name(sec int) string {
 func log_roll() {
 
 	put := func (format string, args ...interface{}) {
-		fmt.Fprintf(
-			log_file,
-			fmt.Sprintf("%s: log roll: " + format + "\n",
+
+		f := fmt.Sprintf("%s: log roll: " + format + "\n",
 				time.Now().Format("2006/01/02 15:04:05"),
-			),
-			args...,
 		)
+		fmt.Fprintf(log_file, f, args...)
 	}
 
 	yesterday := time.Now().Add(-time.Hour).Weekday().String()[0:3]
@@ -152,6 +150,7 @@ func log_roll() {
 		tz, sec := time.Now().Zone()
 
 		if before {
+			put("heartbeat duration: %s", log_heartbeat_duration)
 			put("time zone (seconds UTC): %s (%d)", tz, sec)
 		}
 		put("log/%s-%s.log -> log/%s-%s.log",
@@ -162,6 +161,7 @@ func log_roll() {
 		)
 		if !before {
 			put("time zone (seconds UTC): %s (%d)", tz, sec)
+			put("heartbeat duration: %s", log_heartbeat_duration)
 		}
 	}
 
@@ -214,7 +214,7 @@ func log(format string, args ...interface{}) {
 		if log_name == "" {
 			fmt.Fprintf(os.Stdout, format, args...)
 		} else {
-			fmt.Fprintf(os.Stdout, log_name + ": " + format,args...)
+			fmt.Fprintf(os.Stdout, log_name + ": " +format,args...)
 		}
 	}
 }
@@ -230,6 +230,15 @@ func log_env() {
 	}
 }
 
+func ERROR(format string, args ...interface{}) {
+	log("ERROR: " + format, args...)
+}
+
+func WARN(format string, args ...interface{}) {
+
+	log("WARN: " + format, args...)
+}
+
 func leave(exit_status int) {
 
 	if db != nil {
@@ -237,7 +246,7 @@ func leave(exit_status int) {
 		err := db.Close()
 		db = nil
 		if err != nil {
-			log("ERROR: db.Close() failed", err)
+			ERROR("db.Close() failed", err)
 		}
 	}
 
@@ -269,7 +278,7 @@ func die(format string, args ...interface{}) {
 			fmt.Sprintf("ERROR: " + format + "\n", args...),
 		))
 	} else {
-		log("ERROR: " + format, args...)
+		ERROR(format, args...)
 	}
 	leave(1)
 }
