@@ -135,12 +135,18 @@ func tzo2file_name(sec int) string {
 
 func log_roll() {
 
+	//  write directly to log file while rolling
+
 	put := func (format string, args ...interface{}) {
 
-		f := fmt.Sprintf("%s: log roll: " + format + "\n",
-				time.Now().Format("2006/01/02 15:04:05"),
+		fmt.Fprintf(
+			log_file,
+			time.Now().Format("2006/01/02 15:04:05") +
+				": log roll: " +
+				format +
+				"\n",
+			args...,
 		)
-		fmt.Fprintf(log_file, f, args...)
 	}
 
 	yesterday := time.Now().Add(-time.Hour).Weekday().String()[0:3]
