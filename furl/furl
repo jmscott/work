@@ -1,25 +1,43 @@
 #!/bin/bash
 #
 #  Synopsis:
-#	Fault/Alert for transitions in status codes of curl request.
+#	Alert the masses on transitions in exit codes of curl requests.
+#
 #  Description:
-#	Query a url using the mighty and well known 'curl' program from GNU.
-#	When the curl request fails, then send a single email to users in a
-#	notify list and furl goes into a fault state.  While in the fault state
-#	send NO subsequent notify emails until the fault clears.  In other
-#	words, subsequent and contiguous failures do NOT send more failure
-#	messages.
+#	"furl" is a shell script to monitor the state of URLs fetched via
+#	"curl", the famous GNU command that fetchs urls via many protocols.
+#	"furl" means "Fault URL".
 #
-#	A reboot of the OS clears ALL furl states via a @reboot cron recipe.
-#	Clearing from cron @reboot pleases our new docker overlords.
+#	A fault is a change in the exit status of curl invocations.
+#	The exit status is written to the file $FURL_ROOT/run/<tag>.furl.
+#	Additionally, when no previous exit status exists, furl assumes
+#	the status START.
 #
-#	Furl requires the gnu command "timeout" for the --command option.
-#	Unfortunatly, the timeout command is not available on Mac OS, as of
-#	release 10.12.4 (sierra).  You will need to install "timeout" using
-#	homebrew or the ports distrubution managers.
+#	Upon fault, an email notification is sent.  Faults are cleared outside
+#	of furl by removing the status file in $FURL_ROOT/run/<tag>.furl.
+#	Notifications in furl are email messages, sent to a list of users
+#	specified on the command line.
 #
-#	Furl is NOT a replacement for an enterprise grade alert system.
-#	You have been warned.
+#	After a curl request, the exit code is mapped to OK or ERROR.
+#	The exit status codes fall into three categories:
+#
+#		START:	created file <tag>.furl
+#		OK:	exit status == 0
+#		ERR:	exit status > 0
+#
+#	All requests are timed out.  The default timeout is 30 secs.  A timeout
+#	maps to the ERR state.
+#
+#	The three curl states define a state machine with 27 dimensions.  We
+#	enumerate the states which trigger an notification.  Unenumerated
+#	transitions do nothing.
+#
+#		START:		notify hello, world
+#		START -> OK:	notify OK <- START
+#		START -> ERR:	notify ERR(exit status code) <- START
+#
+#		ERR -> OK:	notify OK <- ERR(exit status code)
+#		OK -> ERR:	notify ERR(exit status code) <- OK
 #
 #  Usage:
 #	export FURL_ROOT=/home/furl
@@ -30,24 +48,15 @@
 #		--notify jmscott@setspace.com			\
 #		--notify 2147701797@txt.att.net
 #  See:
-#	https://github.com/jmscott/work
+#	https://github.com/jmscott/work/tree/master/furl
 #  Note:
-#	Think about adding a "furl clear" action upon, say, a docker reboot.
+#	The transition of NULL -> NULL is problematic and may be a runaway.
+#	For example, what happens when shortage of disk prevents writing
+#	the initialze state file in $FURL_ROOT/run/<tab>.furl?  Such a
+#	situation may gernate many NULL->NULL transition.
 #
 #	Why is a warning issued when default write-out file does not exist.
 #	Wouldn't a fault be more natural?
-#
-#	Need to express curl status code in english, based on curl manual page.
-#
-#	State file is $FURL_ROOT/spool/state/$TAG.state.  The file MUST
-#	be in $FURL_ROOT/run!
-#
-#	Ought to add other options that test for either size or byte sequence
-#	in the file.
-#
-#	Furl does NOT notify when writes to state file file.
-#
-#	Rename the state file from $TAG.state to $TAG.furl.
 #
 PROG=$(basename $0)
 LOCK=
@@ -137,11 +146,9 @@ case "$FURL_ROOT" in
 
 	#  insure the $FURL_ROOT/spool directory exists
 
-	if test -e spool/state;  then
-		true
-	else
-		warn "making directory: $(pwd)/spool/state"
-		mkdir -p spool/state || die 'mkdir spool/state failed'
+	if [ ! -e run ];  then
+		warn "making directory: $(pwd)/run"
+		mkdir -p run || die 'mkdir run/ failed'
 	fi
 	;;
 esac
@@ -211,6 +218,7 @@ done
 
 #
 #  Is another curl-fault running?
+#  Need to check age of pid file.
 #
 _LOCK=run/$PROG-$TAG.pid
 if [ -f $_LOCK ];  then
@@ -251,7 +259,7 @@ fi
 
 log "temporary curl output: $CURL_OUTPUT"
 
-STATE_PATH=spool/state/$TAG.state
+STATE_PATH=run/$TAG.state
 log "state path: $STATE_PATH"
 
 #
@@ -261,17 +269,16 @@ log "state path: $STATE_PATH"
 if [ ! -f $STATE_PATH ];  then
 	log "missing $STATE_PATH"
 	log "setting to start state"
-	echo start >$STATE_PATH
-	if [ -s $STATE_PATH ];  then
-		notify start
-		exit 0
-	fi
+
 	#
 	#  DO NOT send alert if write fails, to prevent runaways.
 	#  Really ought to prevent runaways by tracking last successfull sent.
 	#  furl needs a separate monitor for such situations.
 	#
-	panic "write to state file failed: $STATE_PATH"
+	echo START >$STATE_PATH ||
+				panic "write to state file failed: $STATE_PATH"
+	notify 'hello, world'
+	exit 0
 fi
 
 test -r $STATE_PATH || panic "can't read state file: $STATE_PATH"
@@ -290,24 +297,46 @@ curl -q $WRITE_OUT $CURL_CONFIG $CURL_OPTION $MAX_TIME		\
 	--silent						\
 	--output $CURL_OUTPUT					\
 	$URL
+
 STATUS=$?
 log "curl exit status: $STATUS"
+case $STATUS in
+0)
+	STATUS='OK'
+	;;
+[1-9]*)
+	STATUS="ERR($STATUS)"
+	;;
+*)	panic "impossible curl exit status: $STATUS"
+	;;
+esac
 
 #
 #  Status didn't change, so do nothing.
 #
 if [ $STATUS = $STATE ];  then
-	log 'no change in status'
+	log "no change in status: $STATUS"
 	#
 	#  Touch the file for quick reference of time last test.
 	#  no exit status for touch??
 	#
-	touch --no-create $STATE_PATH
+	touch $STATE_PATH || panic "touch $STATE_PATH failed: exit status=$?"
+
+	#  do not create empty state file.  macos does not have the
+	#  --no-create option.
+
+	if [ ! -s $STATE_PATH ];  then
+		rm $STATE_PATH
+		panic "unexpected empty state file: $STATE_PATH"
+	fi
 	exit 0
 fi
 
+STEP="$STATE -> $STATUS"
+log "step: $STEP"
+
 #
-#  State changed so update the status file.
+#  State changed so update file run/<tag>.furl.
 #  Notice that just because the state changed doesn't mean we realert.
 #
 echo $STATUS >$STATE_PATH
@@ -317,6 +346,10 @@ test -s || panic "write state file failed: $STATE_PATH"
 #  Handle the status fault.
 #
 case $STATUS in
+'START -> OK: 0')
+	notify 'ok <- start'
+	;;
+
 0)
 	#
 	#  Going from ok to failed state
