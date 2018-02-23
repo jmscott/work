@@ -7,6 +7,16 @@ import (
 	"time"
 )
 
+const (
+	log_file_perm = 00640
+	heartbeat_pause_default = 10 * time.Second
+)
+
+var logger_default = Logger{
+	directory:	".",
+	heartbeat_pause:heartbeat_pause_default,
+}
+
 type Logger struct {
 	name		string
 	directory	string
@@ -31,14 +41,14 @@ type option func(log *Logger) option
 
 func (log *Logger) dow_open() (err error) {
 
-	path := log.directory + "/" +
+	path := log.directory + string(os.PathSeparator) +
 			log.name +
 			"-" +
 			time.Now().Weekday().String()[0:3] +
 			".log"
 
 	mode := os.O_APPEND | os.O_CREATE | os.O_WRONLY
-	log.file, err = os.OpenFile(path, mode, 00640)
+	log.file, err = os.OpenFile(path, mode, log_file_perm)
 	if err != nil {
 		return err
 	}
@@ -66,9 +76,6 @@ func (log *Logger) read() {
 			msg := []byte(now + ": " + s + "\n")
 
 			_, err := log.file.Write(msg)
-
-			//  write to file failed, switch output to stderr.
-
 			if err != nil {
 				fmt.Fprintf(
 					os.Stderr,
@@ -79,20 +86,37 @@ func (log *Logger) read() {
 					err,
 				)
 				os.Stderr.Write(msg)
-				log.file = os.Stderr
+				panic(err)
 			}
 		}
 	}
 }
 
-// Verbosity sets Foo's verbosity level to v.
-func HeartbeatPause(pause time.Duration) option {
+//  Check heart beat pause
 
+func CheckHeartbeatPause(pause time.Duration) error {
+	if pause < 0 {
+		return errors.New(
+			fmt.Sprintf("heart beat pause < 0: %s", pause))
+	}
+	return nil
+}
+
+func HeartbeatPause(pause time.Duration) option {
 	return func(log *Logger) option {
 		previous := log.heartbeat_pause
 		log.heartbeat_pause = pause
 		return HeartbeatPause(previous)
 	}
+}
+
+func (log *Logger) Options(options ...option) (option, error) {
+	
+	var previous option
+	for _, opt := range options {
+		previous = opt(log)
+	}
+	return previous, nil
 }
 
 func Open(name, driver_name string, options ...option) (*Logger, error) {
@@ -103,26 +127,26 @@ func Open(name, driver_name string, options ...option) (*Logger, error) {
 		return nil, errors.New("unknown log driver: " + driver_name)
 	}
 
-	log := &Logger{
-		name:		name,
-		directory:	".",
-		driver:		&driver{
-					name:	driver_name,
-					open:	(*Logger).dow_open,
-					close:	(*Logger).dow_close,
-				},
-		heartbeat_pause:time.Second * 10,
+	log_df := logger_default
+	log := &log_df
+
+	log.name = name
+	log.driver = &driver{
+				name:	driver_name,
+				open:	(*Logger).dow_open,
+				close:	(*Logger).dow_close,
 	}
 
-	for _, opt := range options {
-		if opt(log) == nil {
-			return nil, errors.New("error setting option")
-		}
+	//  reset options
+
+	_, err := log.Options(options...)
+	if err != nil {
+		return nil, err
 	}
 
 	//  open specific logger
 
-	err := log.driver.open(log)
+	err = log.driver.open(log)
 	if err != nil {
 		return nil, err
 	}
@@ -137,6 +161,8 @@ func Open(name, driver_name string, options ...option) (*Logger, error) {
 	go log.read()
 
 	log.INFO("hello, world")
+
+	//  Note: need to burb out log file
 	log.INFO("heartbeat pause: %s", log.heartbeat_pause)
 
 	go log.heartbeat()
