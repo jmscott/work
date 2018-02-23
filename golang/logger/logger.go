@@ -87,11 +87,12 @@ func (log *Logger) read() {
 
 // Verbosity sets Foo's verbosity level to v.
 func HeartbeatPause(pause time.Duration) option {
-    return func(log *Logger) option {
-        previous := log.heartbeat_pause
-        log.heartbeat_pause = pause
-        return HeartbeatPause(previous)
-    }
+
+	return func(log *Logger) option {
+		previous := log.heartbeat_pause
+		log.heartbeat_pause = pause
+		return HeartbeatPause(previous)
+	}
 }
 
 func Open(name, driver_name string, options ...option) (*Logger, error) {
