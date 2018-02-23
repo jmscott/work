@@ -85,6 +85,15 @@ func (log *Logger) read() {
 	}
 }
 
+// Verbosity sets Foo's verbosity level to v.
+func HeartbeatPause(pause time.Duration) option {
+    return func(log *Logger) option {
+        previous := log.heartbeat_pause
+        log.heartbeat_pause = pause
+        return HeartbeatPause(previous)
+    }
+}
+
 func Open(name, driver_name string, options ...option) (*Logger, error) {
 	if name == "" {
 		return nil, errors.New("empty log name")
@@ -126,40 +135,19 @@ func Open(name, driver_name string, options ...option) (*Logger, error) {
 
 	go log.read()
 
-	log.message_c <- "hello, world"
+	log.INFO("hello, world")
+	log.INFO("heartbeat pause: %s", log.heartbeat_pause)
 
 	go log.heartbeat()
 
 	return log, nil
 }
 
-func (log *Logger) Open() error {
-
-	err := log.driver.open(log)
-	if err != nil {
-		return err
-	}
-
-	//  request to close log file
-	log.close_c = make(chan(interface{}))
-
-	//  open the logger message channel
-	log.message_c = make(chan(string))
-
-	go log.read()
-
-	log.message_c <- "hello, world"
-
-	go log.heartbeat()
-
-	return nil
-}
-
 func (log *Logger) heartbeat() {
 
 	tick := time.NewTicker(log.heartbeat_pause)
 	for range tick.C {
-		log.INFO("heartbeat pause: %s", log.heartbeat_pause)
+		log.INFO("alive")
 	}
 }
 
@@ -169,7 +157,7 @@ func (log *Logger) Close() (error) {
 		return nil
 	}
 	if log.file != nil {
-		log.message_c <- "good bye, cruel world"
+		log.INFO("good bye, cruel world")
 		log.close_c <- new(interface{})
 	}
 	return log.driver.close(log)

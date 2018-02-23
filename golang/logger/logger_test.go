@@ -7,12 +7,7 @@ import (
 
 func Test(t *testing.T) {
 
-	log, err := Open("test", "Dow")
-	if err != nil {
-		t.Fatalf("NewLogger() failed: %s", err)
-	}
-
-	err = log.Open()
+	log, err := Open("test", "Dow", HeartbeatPause(2 * time.Second))
 	if err != nil {
 		t.Fatalf("Open() failed: %s", err)
 	}
@@ -25,9 +20,9 @@ func Test(t *testing.T) {
 
 	//  test heartbeat
 
-	log.INFO("sleep 11s")
-	time.Sleep(11 * time.Second)
-	log.INFO("awoke from 11s sleep")
+	log.INFO("sleep 3s")
+	time.Sleep(3 * time.Second)
+	log.INFO("awoke from 3s sleep")
 
 	defer log.Close()
 }
