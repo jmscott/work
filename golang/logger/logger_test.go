@@ -1,6 +1,9 @@
 package logger
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func Test(t *testing.T) {
 
@@ -16,8 +19,18 @@ func Test(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open() failed: %s", err)
 	}
-	log.INFO("INFO: test: hi")
-	log.WARN("test: hi")
-	log.ERROR("test: hi")
+
+	// test print functions
+
+	log.INFO("INFO: hi")
+	log.WARN("hi")
+	log.ERROR("hi")
+
+	//  test heartbeat
+
+	log.INFO("sleep 11s")
+	time.Sleep(11 * time.Second)
+	log.INFO("awoke from 11s sleep")
+
 	defer log.Close()
 }

@@ -15,6 +15,10 @@ type Logger struct {
 	file		*os.File
 	message_c	chan(string)
 	close_c		chan(interface{})
+
+	heartbeat_pause	time.Duration
+
+	client_data	interface{}
 }
 
 type driver struct {
@@ -24,14 +28,6 @@ type driver struct {
 }
 
 type option func(log *Logger) option
-
-func (log *Logger) Option(opts ...option) (previous option) {
-
-	for _, opt := range opts {
-		previous = opt(log)
-	}
-	return previous
-}
 
 func (log *Logger) dow_open() (err error) {
 
@@ -105,6 +101,7 @@ func NewLogger(name, driver_name string, options ...option) (*Logger, error) {
 					open:	(*Logger).dow_open,
 					close:	(*Logger).dow_close,
 				},
+		heartbeat_pause:time.Second * 10,
 	}
 
 	for _, opt := range options {
@@ -128,16 +125,27 @@ func (log *Logger) Open() error {
 		return err
 	}
 
-	//  log file is closing
+	//  request to close log file
 	log.close_c = make(chan(interface{}))
 
 	//  open the logger message channel
 	log.message_c = make(chan(string))
 
 	go log.read()
+
 	log.message_c <- "hello, world"
 
+	go log.heartbeat()
+
 	return nil
+}
+
+func (log *Logger) heartbeat() {
+
+	tick := time.NewTicker(log.heartbeat_pause)
+	for range tick.C {
+		log.INFO("heartbeat pause: %s", log.heartbeat_pause)
+	}
 }
 
 func (log *Logger) Close() (error) {
