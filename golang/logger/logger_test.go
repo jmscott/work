@@ -16,5 +16,8 @@ func Test(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open() failed: %s", err)
 	}
+	log.INFO("INFO: test: hi")
+	log.WARN("test: hi")
+	log.ERROR("test: hi")
 	defer log.Close()
 }

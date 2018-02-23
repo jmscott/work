@@ -151,3 +151,15 @@ func (log *Logger) Close() (error) {
 	}
 	return log.driver.close(log)
 }
+
+func (log *Logger) INFO(format string, args ...interface{}) {
+	log.message_c <- fmt.Sprintf(format, args...)
+}
+
+func (log *Logger) ERROR(format string, args ...interface{}) {
+	log.message_c <- fmt.Sprintf("ERROR: " + format, args...)
+}
+
+func (log *Logger) WARN(format string, args ...interface{}) {
+	log.message_c <- fmt.Sprintf("WARN: " + format, args...)
+}
