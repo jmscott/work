@@ -85,7 +85,7 @@ func (log *Logger) read() {
 	}
 }
 
-func NewLogger(name, driver_name string, options ...option) (*Logger, error) {
+func Open(name, driver_name string, options ...option) (*Logger, error) {
 	if name == "" {
 		return nil, errors.New("empty log name")
 	}
@@ -109,17 +109,32 @@ func NewLogger(name, driver_name string, options ...option) (*Logger, error) {
 			return nil, errors.New("error setting option")
 		}
 	}
+
+	//  open specific logger
+
+	err := log.driver.open(log)
+	if err != nil {
+		return nil, err
+	}
+
+	//  request to close log file
+
+	log.close_c = make(chan(interface{}))
+
+	//  open the logger message channel
+	log.message_c = make(chan(string))
+
+	go log.read()
+
+	log.message_c <- "hello, world"
+
+	go log.heartbeat()
+
 	return log, nil
 }
 
 func (log *Logger) Open() error {
 
-	if log == nil {
-		return errors.New("Logger is null")
-	}
-	if log.driver == nil {
-		return errors.New("NewLogger not called")
-	}
 	err := log.driver.open(log)
 	if err != nil {
 		return err

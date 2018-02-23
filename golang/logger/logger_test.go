@@ -7,10 +7,7 @@ import (
 
 func Test(t *testing.T) {
 
-	log, err := NewLogger(
-			"test",
-			"Dow",
-		    )
+	log, err := Open("test", "Dow")
 	if err != nil {
 		t.Fatalf("NewLogger() failed: %s", err)
 	}
