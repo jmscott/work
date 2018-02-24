@@ -20,6 +20,7 @@ var logger_default = Logger{
 type Logger struct {
 	name		string
 	directory	string
+	log_path	string
 
 	driver		*driver
 	file		*os.File
@@ -52,6 +53,7 @@ func (log *Logger) dow_open() (err error) {
 	if err != nil {
 		return err
 	}
+	log.log_path = path
 	return nil
 }
 
@@ -110,6 +112,14 @@ func HeartbeatPause(pause time.Duration) option {
 	}
 }
 
+func Directory(directory string) option {
+	return func(log *Logger) option {
+		previous := log.directory
+		log.directory = directory
+		return Directory(previous)
+	}
+}
+
 func (log *Logger) Options(options ...option) (option, error) {
 	
 	var previous option
@@ -161,6 +171,8 @@ func Open(name, driver_name string, options ...option) (*Logger, error) {
 	go log.read()
 
 	log.INFO("hello, world")
+	log.INFO("directory: %s", log.directory)
+	log.INFO("log path: %s", log.log_path)
 
 	//  Note: need to burb out log file
 	log.INFO("heartbeat pause: %s", log.heartbeat_pause)
