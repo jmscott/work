@@ -127,8 +127,8 @@ func Open(name, driver_name string, options ...option) (*Logger, error) {
 		return nil, errors.New("unknown log driver: " + driver_name)
 	}
 
-	log_df := logger_default
-	log := &log_df
+	log := &Logger{}
+	*log = logger_default
 
 	log.name = name
 	log.driver = &driver{
