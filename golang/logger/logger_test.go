@@ -7,18 +7,26 @@ import (
 
 const heartbeat_pause = 2 * time.Second
 
-func Test(t *testing.T) {
-
+func test_open(what string, t *testing.T) (*Logger, bool) {
 	log, err := Open("test", "Dow", HeartbeatPause(heartbeat_pause))
 	if err != nil {
-		t.Fatalf("Open() failed: %s", err)
+		t.Fatalf("Open(%s) failed: %s", what, err)
+		return nil, false
 	}
 
 	// test print functions
 
-	log.INFO("INFO: hi")
-	log.WARN("hi")
-	log.ERROR("hi")
+	log.INFO("INFO: %s: hi", what)
+	log.WARN("%s: hi", what)
+	log.ERROR("%s: hi", what)
+	return log, true
+}
+func TestHeartbeat(t *testing.T) {
+
+	log, ok := test_open("TestHeartbeat", t)
+	if !ok {
+		return
+	}
 
 	//  test heartbeat
 
