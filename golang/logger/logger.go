@@ -106,21 +106,16 @@ func Open(name, driver_name string, options ...option) (*Logger, error) {
 	if name == "" {
 		return nil, errors.New("empty log name")
 	}
-	if driver_name != "Dow" {
-		return nil, errors.New("unknown log driver: " + driver_name)
-	}
-
 	log := &Logger{}
 	*log = logger_default
-
 	log.name = name
-	log.driver = &driver{
-				name:	driver_name,
-				open:	(*Logger).dow_open,
-				close:	(*Logger).dow_close,
-	}
 
-	//  reset options
+	switch driver_name {
+	case "Dow":
+		log.driver = dow_driver
+	default:
+		return nil, errors.New("unknown log driver: " + driver_name)
+	}
 
 	_, err := log.Options(options...)
 	if err != nil {
@@ -139,6 +134,7 @@ func Open(name, driver_name string, options ...option) (*Logger, error) {
 	log.close_c = make(chan(interface{}))
 
 	//  open the logger message channel
+
 	log.message_c = make(chan(string))
 
 	go log.read()
@@ -155,10 +151,12 @@ func Open(name, driver_name string, options ...option) (*Logger, error) {
 	return log, nil
 }
 
+//  Note: what happens if logger is closed!
 func (log *Logger) heartbeat() {
 
 	tick := time.NewTicker(log.heartbeat_pause)
 	for range tick.C {
+
 		log.INFO("alive")
 	}
 }

@@ -5,6 +5,13 @@ import (
 	"time"
 )
 
+var dow_driver = &driver{
+	name:	"Dow",
+
+	open:	(*Logger).dow_open,
+	close:	(*Logger).dow_close,
+}
+
 func (log *Logger) dow_open() (err error) {
 
 	path := log.directory + string(os.PathSeparator) +
