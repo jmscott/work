@@ -5,9 +5,11 @@ import (
 	"time"
 )
 
+const heartbeat_pause = 2 * time.Second
+
 func Test(t *testing.T) {
 
-	log, err := Open("test", "Dow", HeartbeatPause(2 * time.Second))
+	log, err := Open("test", "Dow", HeartbeatPause(heartbeat_pause))
 	if err != nil {
 		t.Fatalf("Open() failed: %s", err)
 	}
@@ -20,9 +22,10 @@ func Test(t *testing.T) {
 
 	//  test heartbeat
 
-	log.INFO("sleep 3s")
-	time.Sleep(3 * time.Second)
-	log.INFO("awoke from 3s sleep")
+	sleep_pause := heartbeat_pause + time.Second
+	log.INFO("sleep %s", sleep_pause)
+	time.Sleep(sleep_pause)
+	log.INFO("awoke from %s sleep", sleep_pause)
 
 	defer log.Close()
 }
