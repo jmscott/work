@@ -6,10 +6,12 @@ import (
 )
 
 var dow_driver = &driver{
-	name:	"Dow",
+	name:		"Dow",
 
-	open:	(*Logger).dow_open,
-	close:	(*Logger).dow_close,
+	open:		(*Logger).dow_open,
+	close:		(*Logger).dow_close,
+	roll:		(*Logger).dow_roll,
+	rollable:	(*Logger).dow_rollable,
 }
 
 func (log *Logger) dow_open() (err error) {
@@ -37,4 +39,13 @@ func (log *Logger) dow_close() error {
 	f := log.file
 	log.file = nil
 	return f.Close()
+}
+
+func (log *Logger) dow_rollable(now time.Time) (bool, error) {
+	return false, nil
+}
+
+func (log *Logger) dow_roll() error {
+	
+	return nil
 }

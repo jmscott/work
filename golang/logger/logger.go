@@ -24,7 +24,8 @@ type Logger struct {
 
 	driver		*driver
 	file		*os.File
-	message_c	chan(string)
+	read_c		chan(string)
+	roll_c		chan(interface{})
 	close_c		chan(interface{})
 
 	heartbeat_pause	time.Duration
@@ -36,6 +37,8 @@ type driver struct {
 	name		string
 	open		func(*Logger) error
 	close		func(*Logger) error
+	roll		func(*Logger) error
+	rollable	func(*Logger, time.Time) (bool, error)
 }
 
 type option func(log *Logger) option
@@ -46,23 +49,44 @@ func (log *Logger) read() {
 		select {
 		case <- log.close_c:
 			return
-		case s := <- log.message_c:
+		case <- log.roll_c:
+			log.INFO("request to roll log file")
+			err := log.driver.roll(log)
+			if err == nil {
+				log.INFO("log file rolled")
+				continue
+			}
+
+			now := time.Now().Format("2006/01/02 15:04:05")
+			fmt.Fprintf(
+				os.Stderr,
+				"%s: PANIC: Logger.roll(%s, %s) failed: %s\n",
+				now,
+				log.name,
+				log.driver.name,
+				err,
+			)
+			panic(err)
+		case s := <- log.read_c:
 			now := time.Now().Format("2006/01/02 15:04:05")
 			msg := []byte(now + ": " + s + "\n")
 
 			_, err := log.file.Write(msg)
-			if err != nil {
-				fmt.Fprintf(
-					os.Stderr,
-					"%s: PANIC: Logger: " +
-						"Write(%s) failed: %s\n",
-					now,
-					log.name,
-					err,
-				)
-				os.Stderr.Write(msg)
-				panic(err)
+			if err == nil {
+				continue
 			}
+
+			//  panicy situation
+			fmt.Fprintf(
+				os.Stderr,
+				"%s: PANIC: Logger: " +
+					"Write(%s) failed: %s\n",
+				now,
+				log.name,
+				err,
+			)
+			os.Stderr.Write(msg)
+			panic(err)
 		}
 	}
 }
@@ -135,7 +159,7 @@ func Open(name, driver_name string, options ...option) (*Logger, error) {
 
 	//  open the logger message channel
 
-	log.message_c = make(chan(string))
+	log.read_c = make(chan(string))
 
 	go log.read()
 
@@ -174,13 +198,13 @@ func (log *Logger) Close() (error) {
 }
 
 func (log *Logger) INFO(format string, args ...interface{}) {
-	log.message_c <- fmt.Sprintf(format, args...)
+	log.read_c <- fmt.Sprintf(format, args...)
 }
 
 func (log *Logger) ERROR(format string, args ...interface{}) {
-	log.message_c <- fmt.Sprintf("ERROR: " + format, args...)
+	log.read_c <- fmt.Sprintf("ERROR: " + format, args...)
 }
 
 func (log *Logger) WARN(format string, args ...interface{}) {
-	log.message_c <- fmt.Sprintf("WARN: " + format, args...)
+	log.read_c <- fmt.Sprintf("WARN: " + format, args...)
 }
