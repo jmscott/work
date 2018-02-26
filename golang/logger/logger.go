@@ -8,40 +8,40 @@ import (
 )
 
 type Logger struct {
-	name		string
+	name string
 
-	directory	string
-	log_path	string
-	log_file_perm	os.FileMode
-	log_file	*os.File
+	directory     string
+	log_path      string
+	log_file_perm os.FileMode
+	log_file      *os.File
 
-	read_c		chan(string)
-	roll_c		chan(chan interface{})
-	close_c		chan(interface{})
+	read_c  chan (string)
+	roll_c  chan (chan interface{})
+	close_c chan (interface{})
 
-	heartbeat_tick	time.Duration
-	poll_roll_tick	time.Duration
+	heartbeat_tick time.Duration
+	poll_roll_tick time.Duration
 
-	client_data	interface{}
-	driver		*driver
-	driver_data	interface{}
+	client_data interface{}
+	driver      *driver
+	driver_data interface{}
 }
 
 type driver struct {
-	name		string
-	open		func(*Logger) error
-	close		func(*Logger) error
-	roll		func(*Logger, time.Time) error
-	poll_roll	func(*Logger, time.Time) (bool, error)
+	name      string
+	open      func(*Logger) error
+	close     func(*Logger) error
+	roll      func(*Logger, time.Time) error
+	poll_roll func(*Logger, time.Time) (bool, error)
 }
 
 type option func(log *Logger) option
 
 var logger_default = Logger{
-	directory:	".",
-	heartbeat_tick:	10 * time.Second,
-	poll_roll_tick:	3 * time.Second,
-	log_file_perm:	00640,
+	directory:      ".",
+	heartbeat_tick: 10 * time.Second,
+	poll_roll_tick: 3 * time.Second,
+	log_file_perm:  00640,
 }
 
 func (log *Logger) read() {
@@ -49,9 +49,9 @@ func (log *Logger) read() {
 	for {
 		now := time.Now()
 		select {
-		case <- log.close_c:
+		case <-log.close_c:
 			return
-		case reply := <- log.roll_c:
+		case reply := <-log.roll_c:
 			err := log.driver.roll(log, now)
 			if err == nil {
 				reply <- new(interface{})
@@ -59,9 +59,9 @@ func (log *Logger) read() {
 			}
 
 			log.PANIC("roll", err)
-		case s := <- log.read_c:
+		case s := <-log.read_c:
 			msg := []byte(
-					now.Format("2006/01/02 15:04:05") +
+				now.Format("2006/01/02 15:04:05") +
 					": " +
 					s +
 					"\n",
@@ -123,7 +123,7 @@ func Directory(directory string) option {
 }
 
 func (log *Logger) Options(options ...option) (option, error) {
-	
+
 	var previous option
 	for _, opt := range options {
 		previous = opt(log)
@@ -160,15 +160,15 @@ func Open(name, driver_name string, options ...option) (*Logger, error) {
 
 	//  request to close log file
 
-	log.close_c = make(chan(interface{}))
+	log.close_c = make(chan (interface{}))
 
 	//  open the logger message channel
 
-	log.read_c = make(chan(string))
+	log.read_c = make(chan (string))
 
 	//  open the roll request chan
 
-	log.roll_c = make(chan(chan interface{}))
+	log.roll_c = make(chan (chan interface{}))
 
 	go log.read()
 
@@ -195,7 +195,7 @@ func (log *Logger) heartbeat() {
 	}
 }
 
-func (log *Logger) Close() (error) {
+func (log *Logger) Close() error {
 
 	if log == nil || log.driver == nil {
 		return nil
@@ -212,11 +212,11 @@ func (log *Logger) INFO(format string, args ...interface{}) {
 }
 
 func (log *Logger) ERROR(format string, args ...interface{}) {
-	log.read_c <- fmt.Sprintf("ERROR: " + format, args...)
+	log.read_c <- fmt.Sprintf("ERROR: "+format, args...)
 }
 
 func (log *Logger) WARN(format string, args ...interface{}) {
-	log.read_c <- fmt.Sprintf("WARN: " + format, args...)
+	log.read_c <- fmt.Sprintf("WARN: "+format, args...)
 }
 
 func (log *Logger) PANIC(what string, err error) {

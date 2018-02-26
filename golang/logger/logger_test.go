@@ -26,9 +26,9 @@ func test_open(what string, t *testing.T, options ...option) (*Logger, bool) {
 func TestHeartbeat(t *testing.T) {
 
 	log, ok := test_open(
-			"TestHeartbeat",
-			t,
-			HeartbeatTick(heartbeat_tick),
+		"TestHeartbeat",
+		t,
+		HeartbeatTick(heartbeat_tick),
 	)
 	if !ok {
 		return
@@ -45,10 +45,10 @@ func TestHeartbeat(t *testing.T) {
 
 func TestDirectory(t *testing.T) {
 	log, ok := test_open(
-			"TestDirectory",
-			t,
-			HeartbeatTick(heartbeat_tick),
-			Directory("tmp"),
+		"TestDirectory",
+		t,
+		HeartbeatTick(heartbeat_tick),
+		Directory("tmp"),
 	)
 	if !ok {
 		return

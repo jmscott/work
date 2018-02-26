@@ -6,23 +6,23 @@ import (
 )
 
 var dow_driver = &driver{
-	name:		"Dow",
+	name: "Dow",
 
-	open:		(*Logger).dow_open,
-	close:		(*Logger).dow_close,
-	roll:		(*Logger).dow_roll,
-	poll_roll:	(*Logger).dow_poll_roll,
+	open:      (*Logger).dow_open,
+	close:     (*Logger).dow_close,
+	roll:      (*Logger).dow_roll,
+	poll_roll: (*Logger).dow_poll_roll,
 }
 
 func (log *Logger) dow_open() (err error) {
 
 	dow := time.Now().Weekday().String()[0:3]
 	path := log.directory +
-			string(os.PathSeparator) +
-			log.name +
-			"-" +
-			dow +
-			".log"
+		string(os.PathSeparator) +
+		log.name +
+		"-" +
+		dow +
+		".log"
 
 	mode := os.O_APPEND | os.O_CREATE | os.O_WRONLY
 	log.log_file, err = os.OpenFile(path, mode, log.log_file_perm)
@@ -31,7 +31,7 @@ func (log *Logger) dow_open() (err error) {
 	}
 	log.log_path = path
 
-	log.driver_data = dow 
+	log.driver_data = dow
 	return nil
 }
 
@@ -54,7 +54,7 @@ func (log *Logger) dow_poll_roll(now time.Time) (bool, error) {
 }
 
 func (log *Logger) dow_roll(now time.Time) error {
-	
+
 	err := log.log_file.Close()
 	if err != nil {
 		return err
@@ -62,11 +62,11 @@ func (log *Logger) dow_roll(now time.Time) error {
 
 	dow := now.Weekday().String()[0:3]
 	roll_path := log.directory +
-			string(os.PathSeparator) +
-			log.name +
-			"-" +
-			dow +
-			".log"
+		string(os.PathSeparator) +
+		log.name +
+		"-" +
+		dow +
+		".log"
 	mode := os.O_TRUNC | os.O_CREATE | os.O_WRONLY
 	log.log_file, err = os.OpenFile(roll_path, mode, log.log_file_perm)
 	if err != nil {
