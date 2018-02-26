@@ -5,13 +5,9 @@ import (
 	"time"
 )
 
-const heartbeat_pause = 2 * time.Second
+const heartbeat_tick = 2 * time.Second
 
-func test_open(
-	what string,
-	t *testing.T,
-	options ...option,
-) (*Logger, bool) {
+func test_open(what string, t *testing.T, options ...option) (*Logger, bool) {
 
 	log, err := Open("test", "Dow", options...)
 	if err != nil {
@@ -32,7 +28,7 @@ func TestHeartbeat(t *testing.T) {
 	log, ok := test_open(
 			"TestHeartbeat",
 			t,
-			HeartbeatPause(heartbeat_pause),
+			HeartbeatTick(heartbeat_tick),
 	)
 	if !ok {
 		return
@@ -41,17 +37,17 @@ func TestHeartbeat(t *testing.T) {
 
 	//  test heartbeat
 
-	sleep_pause := heartbeat_pause + time.Second
-	log.INFO("sleep %s", sleep_pause)
-	time.Sleep(sleep_pause)
-	log.INFO("awoke from %s sleep", sleep_pause)
+	sleep_tick := heartbeat_tick + time.Second
+	log.INFO("sleep tick: %s", sleep_tick)
+	time.Sleep(sleep_tick)
+	log.INFO("awoke from %s sleep", sleep_tick)
 }
 
 func TestDirectory(t *testing.T) {
 	log, ok := test_open(
 			"TestDirectory",
 			t,
-			HeartbeatPause(heartbeat_pause),
+			HeartbeatTick(heartbeat_tick),
 			Directory("tmp"),
 	)
 	if !ok {
