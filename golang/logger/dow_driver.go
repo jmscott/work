@@ -5,74 +5,76 @@ import (
 	"time"
 )
 
-var dow_driver = &driver{
+//  need to use interfaces
+var dow_driver = &roll_driver{
 	name: "Dow",
 
-	open:      (*Logger).dow_open,
-	close:     (*Logger).dow_close,
-	roll:      (*Logger).dow_roll,
-	poll_roll: (*Logger).dow_poll_roll,
+	open:      (*Roller).dow_open,
+	close:     (*Roller).dow_close,
+	roll:      (*Roller).dow_roll,
+	poll_roll: (*Roller).dow_poll_roll,
 }
 
-func (log *Logger) dow_open() (err error) {
-
-	dow := time.Now().Weekday().String()[0:3]
-	path := log.directory +
+func (roll *Roller) dow_path(now time.Time) string {
+	dow := now.Weekday().String()[0:3]
+	return roll.directory +
 		string(os.PathSeparator) +
-		log.name +
+		roll.name +
 		"-" +
 		dow +
-		".log"
+		"." +
+		roll.file_suffix
+}
+
+func (roll *Roller) dow_open() (err error) {
+
+	dow := time.Now().Weekday().String()[0:3]
+	path := roll.dow_path(time.Now())
 
 	mode := os.O_APPEND | os.O_CREATE | os.O_WRONLY
-	log.log_file, err = os.OpenFile(path, mode, log.log_file_perm)
+	roll.file, err = os.OpenFile(path, mode, roll.file_perm)
 	if err != nil {
 		return err
 	}
-	log.log_path = path
+	roll.path = path
 
-	log.driver_data = dow
+	roll.driver_data = dow
 	return nil
 }
 
-func (log *Logger) dow_close() error {
+func (roll *Roller) dow_close() error {
 
-	if log.log_file == nil || log.log_file == os.Stderr {
+	if roll.file == nil {
 		return nil
 	}
-	f := log.log_file
-	log.log_file = nil
+	f := roll.file
+	roll.file = nil
+	roll.driver_data = ""
 	return f.Close()
 }
 
-func (log *Logger) dow_poll_roll(now time.Time) (bool, error) {
+func (roll *Roller) dow_poll_roll(now time.Time) (bool, error) {
 
-	if now.Weekday().String()[0:3] == log.driver_data.(string) {
+	if now.Weekday().String()[0:3] == roll.driver_data.(string) {
 		return false, nil
 	}
 	return true, nil
 }
 
-func (log *Logger) dow_roll(now time.Time) error {
+func (roll *Roller) dow_roll(now time.Time) error {
 
-	err := log.log_file.Close()
+	err := roll.Close()
 	if err != nil {
 		return err
 	}
 
-	dow := now.Weekday().String()[0:3]
-	roll_path := log.directory +
-		string(os.PathSeparator) +
-		log.name +
-		"-" +
-		dow +
-		".log"
+	path := roll.dow_path(now)
 	mode := os.O_TRUNC | os.O_CREATE | os.O_WRONLY
-	log.log_file, err = os.OpenFile(roll_path, mode, log.log_file_perm)
+	roll.file, err = os.OpenFile(path, mode, roll.file_perm)
 	if err != nil {
 		return err
 	}
-	log.log_path = roll_path
-	log.driver_data = dow
+	roll.path = path
+	roll.driver_data = now.Weekday().String()[0:3]
 	return nil
 }

@@ -3,100 +3,19 @@ package logger
 import (
 	"errors"
 	"fmt"
-	"os"
 	"time"
 )
 
 type Logger struct {
-	name string
-
-	directory     string
-	log_path      string
-	log_file_perm os.FileMode
-	log_file      *os.File
-
-	read_c  chan (string)
-	roll_c  chan (chan interface{})
-	close_c chan (interface{})
-
+	roll	*Roller
 	heartbeat_tick time.Duration
-	poll_roll_tick time.Duration
-
-	client_data interface{}
-	driver      *driver
-	driver_data interface{}
 }
 
-type driver struct {
-	name      string
-	open      func(*Logger) error
-	close     func(*Logger) error
-	roll      func(*Logger, time.Time) error
-	poll_roll func(*Logger, time.Time) (bool, error)
-}
-
-type option func(log *Logger) option
+type log_option func(log *Logger) log_option
 
 var logger_default = Logger{
-	directory:      ".",
 	heartbeat_tick: 10 * time.Second,
-	poll_roll_tick: 3 * time.Second,
-	log_file_perm:  00640,
 }
-
-func (log *Logger) read() {
-
-	for {
-		now := time.Now()
-		select {
-		case <-log.close_c:
-			return
-		case reply := <-log.roll_c:
-			err := log.driver.roll(log, now)
-			if err == nil {
-				reply <- new(interface{})
-				continue
-			}
-
-			log.PANIC("roll", err)
-		case s := <-log.read_c:
-			msg := []byte(
-				now.Format("2006/01/02 15:04:05") +
-					": " +
-					s +
-					"\n",
-			)
-
-			_, err := log.log_file.Write(msg)
-			if err == nil {
-				continue
-			}
-			os.Stderr.Write(msg)
-			log.PANIC("Write", err)
-		}
-	}
-}
-
-func (log *Logger) poll_roll() {
-
-	tick := time.NewTicker(log.poll_roll_tick)
-	for now := range tick.C {
-		rollable, err := log.driver.poll_roll(log, now)
-
-		if err != nil {
-			log.PANIC("poll_roll", err)
-		}
-		if rollable == false {
-			continue
-		}
-		log.INFO("request to log file")
-		reply := make(chan interface{})
-		log.roll_c <- reply
-		log.INFO("log file rolled")
-	}
-}
-
-//  Check heart beat tick
 
 func ValidHeartbeatTick(tick time.Duration) error {
 	if tick < 0 {
@@ -106,80 +25,40 @@ func ValidHeartbeatTick(tick time.Duration) error {
 	return nil
 }
 
-func HeartbeatTick(tick time.Duration) option {
-	return func(log *Logger) option {
+func HeartbeatTick(tick time.Duration) log_option {
+	return func(log *Logger) log_option {
 		previous := log.heartbeat_tick
 		log.heartbeat_tick = tick
 		return HeartbeatTick(previous)
 	}
 }
 
-func Directory(directory string) option {
-	return func(log *Logger) option {
-		previous := log.directory
-		log.directory = directory
-		return Directory(previous)
-	}
-}
+func (log *Logger) Options(options ...log_option) (log_option, error) {
 
-func (log *Logger) Options(options ...option) (option, error) {
-
-	var previous option
+	var previous log_option
 	for _, opt := range options {
 		previous = opt(log)
 	}
 	return previous, nil
 }
 
-func Open(name, driver_name string, options ...option) (*Logger, error) {
-	if name == "" {
-		return nil, errors.New("empty log name")
-	}
+func OpenLogger(roll *Roller, options ...log_option) (*Logger, error) {
 	log := &Logger{}
 	*log = logger_default
-	log.name = name
-
-	switch driver_name {
-	case "Dow":
-		log.driver = dow_driver
-	default:
-		return nil, errors.New("unknown log driver: " + driver_name)
-	}
+	log.roll = roll
 
 	_, err := log.Options(options...)
 	if err != nil {
 		return nil, err
 	}
 
-	//  open specific logger
-
-	err = log.driver.open(log)
-	if err != nil {
-		return nil, err
-	}
-
-	//  request to close log file
-
-	log.close_c = make(chan (interface{}))
-
-	//  open the logger message channel
-
-	log.read_c = make(chan (string))
-
-	//  open the roll request chan
-
-	log.roll_c = make(chan (chan interface{}))
-
-	go log.read()
-
 	log.INFO("hello, world")
-	log.INFO("directory: %s", log.directory)
-	log.INFO("log path: %s", log.log_path)
+	log.INFO("directory: %s", roll.directory)
+	log.INFO("log path: %s", roll.path)
+	log.INFO("poll roll tick: %s", roll.poll_roll_tick)
+	log.INFO("hz tick: %s", roll.hz_tick)
 
-	//  Note: need to burb out log file
 	log.INFO("heartbeat tick: %s", log.heartbeat_tick)
-
-	go log.poll_roll()
 	go log.heartbeat()
 
 	return log, nil
@@ -197,43 +76,37 @@ func (log *Logger) heartbeat() {
 
 func (log *Logger) Close() error {
 
-	if log == nil || log.driver == nil {
+	if log.roll == nil {
 		return nil
 	}
-	if log.log_file != nil {
-		log.INFO("good bye, cruel world")
-		log.close_c <- new(interface{})
-	}
-	return log.driver.close(log)
+	err := log.roll.Close()
+	log.roll = nil
+	return err
 }
 
 func (log *Logger) INFO(format string, args ...interface{}) {
-	log.read_c <- fmt.Sprintf(format, args...)
+	log.roll.read_c <- []byte(
+		time.Now().Format("2006/01/02 15:04:05") +
+		": " +
+		fmt.Sprintf(format, args...) +
+		"\n",
+	)
 }
 
 func (log *Logger) ERROR(format string, args ...interface{}) {
-	log.read_c <- fmt.Sprintf("ERROR: "+format, args...)
+	log.roll.read_c <- []byte(
+		time.Now().Format("2006/01/02 15:04:05") +
+		": " +
+		fmt.Sprintf("ERROR: " + format, args...) +
+		"\n",
+	)
 }
 
 func (log *Logger) WARN(format string, args ...interface{}) {
-	log.read_c <- fmt.Sprintf("WARN: "+format, args...)
-}
-
-func (log *Logger) PANIC(what string, err error) {
-
-	var driver_name string
-
-	if log.driver != nil {
-		driver_name = log.driver.name
-	}
-	fmt.Fprintf(
-		os.Stderr,
-		"%s: PANIC: %s(%s): Logger.%s() failed: %s\n",
-		time.Now().Format("2006/01/02 15:04:05"),
-		log.name,
-		driver_name,
-		what,
-		err,
+	log.roll.read_c <- []byte(
+		time.Now().Format("2006/01/02 15:04:05") +
+		": " +
+		fmt.Sprintf("WARN: " + format, args...) +
+		"\n",
 	)
-	panic(err)
 }

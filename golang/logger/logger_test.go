@@ -7,11 +7,21 @@ import (
 
 const heartbeat_tick = 2 * time.Second
 
-func test_open(what string, t *testing.T, options ...option) (*Logger, bool) {
+func test_open(
+	what string,
+	t *testing.T,
+	options ...log_option,
+) (*Logger, bool) {
 
-	log, err := Open("test", "Dow", options...)
+	roll, err := OpenRoller("test", "Dow")
 	if err != nil {
-		t.Fatalf("Open(%s) failed: %s", what, err)
+		t.Fatalf("OpenRoller(%s) failed: %s", what, err)
+		return nil, false
+	}
+
+	log, err := OpenLogger(roll, options...)
+	if err != nil {
+		t.Fatalf("OpenLogger(%s) failed: %s", what, err)
 		return nil, false
 	}
 
@@ -41,17 +51,4 @@ func TestHeartbeat(t *testing.T) {
 	log.INFO("sleep tick: %s", sleep_tick)
 	time.Sleep(sleep_tick)
 	log.INFO("awoke from %s sleep", sleep_tick)
-}
-
-func TestDirectory(t *testing.T) {
-	log, ok := test_open(
-		"TestDirectory",
-		t,
-		HeartbeatTick(heartbeat_tick),
-		Directory("tmp"),
-	)
-	if !ok {
-		return
-	}
-	defer log.Close()
 }
