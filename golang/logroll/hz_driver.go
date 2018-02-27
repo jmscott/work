@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var hz_driver = &roll_driver{
+var hz_driver = &driver{
 	name: "Hz",
 
 	open:      (*Roller).hz_open,

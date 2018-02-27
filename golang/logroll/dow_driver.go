@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-//  need to use interfaces
-var dow_driver = &roll_driver{
+//  need to use interface?
+var dow_driver = &driver{
 	name: "Dow",
 
 	open:      (*Roller).dow_open,

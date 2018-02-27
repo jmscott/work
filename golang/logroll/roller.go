@@ -25,11 +25,11 @@ type Roller struct {
 	//  rate to roll file for hz driver
 	hz_tick time.Duration
 
-	driver      *roll_driver
+	driver      *driver
 	driver_data interface{}
 }
 
-type roll_driver struct {
+type driver struct {
 	name      string
 	open      func(*Roller) error
 	close     func(*Roller) error
