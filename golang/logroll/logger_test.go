@@ -7,42 +7,26 @@ import (
 
 const heartbeat_tick = 2 * time.Second
 
-func test_open(
-	what string,
-	t *testing.T,
-	options ...log_option,
-) (*Logger, bool) {
+func TestDowHeartbeat(t *testing.T) {
 
 	roll, err := OpenRoller("test", "Dow")
 	if err != nil {
-		t.Fatalf("OpenRoller(%s) failed: %s", what, err)
-		return nil, false
+		t.Fatalf("OpenRoller() failed: %s", err)
+		return
 	}
 
-	log, err := OpenLogger(roll, options...)
+	log, err := OpenLogger(roll, HeartbeatTick(heartbeat_tick))
 	if err != nil {
-		t.Fatalf("OpenLogger(%s) failed: %s", what, err)
-		return nil, false
+		t.Fatalf("OpenLogger() failed: %s", err)
+		return
 	}
 
 	// test print functions
 
-	log.INFO("INFO: %s: hi", what)
-	log.WARN("%s: hi", what)
-	log.ERROR("%s: hi", what)
-	return log, true
-}
+	log.INFO("TestDowHeartbeat: INFO: hi")
+	log.WARN("TestDowHeartbeat: hi")
+	log.ERROR("TestDowHeartbeat: hi")
 
-func TestHeartbeat(t *testing.T) {
-
-	log, ok := test_open(
-		"TestHeartbeat",
-		t,
-		HeartbeatTick(heartbeat_tick),
-	)
-	if !ok {
-		return
-	}
 	defer log.Close()
 
 	//  test heartbeat
