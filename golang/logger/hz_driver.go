@@ -53,12 +53,12 @@ func (roll *Roller) hz_poll_roll(now time.Time) (bool, error) {
 }
 
 func tzo2file_name(sec int) string {
-	
+
 	min := (sec % 3600) / 60
 	if min < 0 {
 		min = -min
 	}
-	return fmt.Sprintf("%+03d%02d", sec / 3600, min)
+	return fmt.Sprintf("%+03d%02d", sec/3600, min)
 }
 
 func (roll *Roller) hz_roll(now time.Time) error {

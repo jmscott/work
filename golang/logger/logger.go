@@ -7,7 +7,7 @@ import (
 )
 
 type Logger struct {
-	roll	*Roller
+	roll           *Roller
 	heartbeat_tick time.Duration
 }
 
@@ -87,26 +87,26 @@ func (log *Logger) Close() error {
 func (log *Logger) INFO(format string, args ...interface{}) {
 	log.roll.read_c <- []byte(
 		time.Now().Format("2006/01/02 15:04:05") +
-		": " +
-		fmt.Sprintf(format, args...) +
-		"\n",
+			": " +
+			fmt.Sprintf(format, args...) +
+			"\n",
 	)
 }
 
 func (log *Logger) ERROR(format string, args ...interface{}) {
 	log.roll.read_c <- []byte(
 		time.Now().Format("2006/01/02 15:04:05") +
-		": " +
-		fmt.Sprintf("ERROR: " + format, args...) +
-		"\n",
+			": " +
+			fmt.Sprintf("ERROR: "+format, args...) +
+			"\n",
 	)
 }
 
 func (log *Logger) WARN(format string, args ...interface{}) {
 	log.roll.read_c <- []byte(
 		time.Now().Format("2006/01/02 15:04:05") +
-		": " +
-		fmt.Sprintf("WARN: " + format, args...) +
-		"\n",
+			": " +
+			fmt.Sprintf("WARN: "+format, args...) +
+			"\n",
 	)
 }

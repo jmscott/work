@@ -10,20 +10,20 @@ import (
 type Roller struct {
 	name string
 
-	directory     string
-	path      string
-	file_perm os.FileMode
-	file      *os.File
+	directory   string
+	path        string
+	file_perm   os.FileMode
+	file        *os.File
 	file_suffix string
 
-	read_c  chan ([]byte)
-	request_c  chan (chan interface{})
-	done_c chan (interface{})
+	read_c    chan ([]byte)
+	request_c chan (chan interface{})
+	done_c    chan (interface{})
 
 	poll_roll_tick time.Duration
 
 	//  rate to roll file for hz driver
-	hz_tick  time.Duration
+	hz_tick time.Duration
 
 	driver      *roll_driver
 	driver_data interface{}
@@ -42,9 +42,9 @@ type roll_option func(roll *Roller) roll_option
 var roller_default = Roller{
 	directory:      ".",
 	poll_roll_tick: 3 * time.Second,
-	file_perm:  00640,
-	file_suffix: "log",
-	hz_tick: 10 * time.Minute,
+	file_perm:      00640,
+	file_suffix:    "log",
+	hz_tick:        10 * time.Minute,
 }
 
 func (roll *Roller) read() {
