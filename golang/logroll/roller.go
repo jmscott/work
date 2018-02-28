@@ -117,8 +117,8 @@ func (roll *Roller) panic(what string, err error) {
 }
 
 func ValidHzTick(tick time.Duration) error {
-	if tick < time.Minute {
-		return errors.New(fmt.Sprintf("hz tick < 1m: %s", tick))
+	if tick < time.Second {
+		return errors.New(fmt.Sprintf("hz tick < 1s: %s", tick))
 	}
 	return nil
 }
@@ -136,6 +136,14 @@ func Directory(directory string) roll_option {
 		previous := roll.directory
 		roll.directory = directory
 		return Directory(previous)
+	}
+}
+
+func FileSuffix(file_suffix string) roll_option {
+	return func(roll *Roller) roll_option {
+		previous := roll.file_suffix
+		roll.file_suffix = file_suffix
+		return FileSuffix(previous)
 	}
 }
 
@@ -210,4 +218,9 @@ func (roll *Roller) Close() error {
 		roll.done_c <- new(interface{})
 	}
 	return roll.driver.close(roll)
+}
+
+func (roll *Roller) Write(msg []byte) error {
+	roll.read_c <- msg
+	return nil
 }

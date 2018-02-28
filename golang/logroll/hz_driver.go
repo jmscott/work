@@ -19,17 +19,33 @@ var zero_time time.Time
 
 func (roll *Roller) hz_open() (err error) {
 
-	now := time.Now()
-	path := roll.dow_path(now)
+	path := roll.directory +
+			string(os.PathSeparator) +
+			roll.name +
+			"." +
+			roll.file_suffix
 
-	mode := os.O_APPEND | os.O_CREATE | os.O_WRONLY
+	//  move an existing log file to time stamped version
+
+	_, err = os.Stat(path)
+	if err == nil {
+		ts_path := roll.hz_path(time.Now())
+		err = os.Rename(path, ts_path)
+		if err != nil {
+			return err
+		}
+	} else if !os.IsNotExist(err) {
+		return err
+	}
+
+	mode := os.O_CREATE | os.O_WRONLY
 	roll.file, err = os.OpenFile(path, mode, roll.file_perm)
 	if err != nil {
 		return err
 	}
 	roll.path = path
 
-	roll.driver_data = now
+	roll.driver_data = time.Now().Add(roll.hz_tick)
 	return nil
 }
 
@@ -39,22 +55,23 @@ func (roll *Roller) hz_close() error {
 		return nil
 	}
 	f := roll.file
-	roll.file = nil
 	roll.driver_data = zero_time
-	return f.Close()
+	err := f.Close()
+	if err != nil {
+		return err
+	}
+	roll.file = nil
+	return os.Rename(roll.path, roll.hz_path(time.Now()))
 }
 
 func (roll *Roller) hz_poll_roll(now time.Time) (bool, error) {
 
-	if now.Weekday().String()[0:3] == roll.driver_data.(string) {
-		return false, nil
-	}
-	return true, nil
+	return now.After(roll.driver_data.(time.Time)), nil
 }
 
 func tzo2file_name(sec int) string {
 
-	min := (sec % 3600) / 60
+	min := (sec % 3600) / 60		//  hours
 	if min < 0 {
 		min = -min
 	}
@@ -67,31 +84,21 @@ func (roll *Roller) hz_roll(now time.Time) error {
 	if err != nil {
 		return err
 	}
-	_, tzo := time.Now().Zone()
+	roll.file = nil
 
-	path := roll.directory +
-		string(os.PathSeparator) +
-		roll.name +
-		"-" +
-		fmt.Sprintf("%d%02d%02d_%02d%02d%02d%s",
-			now.Year(),
-			now.Month(),
-			now.Day(),
-			now.Hour(),
-			now.Minute(),
-			now.Second(),
-			tzo2file_name(tzo),
-		) +
-		"." +
-		roll.file_suffix
+	//  move log/<name>.txn to log/<name>-YYYYMMDD_HHMMSS[+-]hhmm
 
-	mode := os.O_TRUNC | os.O_CREATE | os.O_WRONLY
-	roll.file, err = os.OpenFile(path, mode, roll.file_perm)
+	err = os.Rename(roll.path, roll.hz_path(now))
 	if err != nil {
 		return err
 	}
-	roll.path = path
-	roll.driver_data = now
+
+	mode := os.O_TRUNC | os.O_CREATE | os.O_WRONLY
+	roll.file, err = os.OpenFile(roll.path, mode, roll.file_perm)
+	if err != nil {
+		return err
+	}
+	roll.driver_data = now.Add(roll.hz_tick)
 	return nil
 }
 
@@ -110,5 +117,6 @@ func (roll *Roller) hz_path(now time.Time) string {
 			now.Second(),
 			tzo2file_name(tzo),
 		) +
-		".log"
+		"." +
+		roll.file_suffix
 }
