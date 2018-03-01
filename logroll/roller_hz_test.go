@@ -12,9 +12,9 @@ func (roll *Roller) write(msg string) {
 func TestHz(t *testing.T) {
 
 	roll, err := OpenRoller("test", "Hz",
-			Directory("tmp"),
-			FileSuffix("txn"),
-			HzTick(time.Second * 10),
+		Directory("tmp"),
+		FileSuffix("txn"),
+		HzTick(time.Second*10),
 	)
 	if err != nil {
 		t.Fatalf("OpenRoller() failed: %s", err)
@@ -24,7 +24,7 @@ func TestHz(t *testing.T) {
 
 	// test print functions
 
-	stop_time := time.Now().Add(time.Minute + 10 * time.Second)
+	stop_time := time.Now().Add(time.Minute + 10*time.Second)
 	tick := time.NewTicker(time.Second)
 	for now := range tick.C {
 		roll.Write([]byte(now.Format("2006/01/02 15:04:05") + "\n"))

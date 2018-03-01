@@ -20,10 +20,10 @@ var zero_time time.Time
 func (roll *Roller) hz_open() (err error) {
 
 	path := roll.directory +
-			string(os.PathSeparator) +
-			roll.name +
-			"." +
-			roll.file_suffix
+		string(os.PathSeparator) +
+		roll.name +
+		"." +
+		roll.file_suffix
 
 	//  move an existing log file to time stamped version
 
@@ -71,7 +71,7 @@ func (roll *Roller) hz_poll_roll(now time.Time) (bool, error) {
 
 func tzo2file_name(sec int) string {
 
-	min := (sec % 3600) / 60		//  hours
+	min := (sec % 3600) / 60 //  hours
 	if min < 0 {
 		min = -min
 	}
