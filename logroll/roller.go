@@ -216,6 +216,10 @@ func (roll *Roller) Close() error {
 	}
 	if roll.file != nil {
 		roll.done_c <- new(interface{})
+
+		//  Note: in the past Sync() seems to fix issues with incomplete
+		//        log writes.
+		//roll.file.Sync()
 	}
 	return roll.driver.close(roll)
 }
