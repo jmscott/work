@@ -42,7 +42,7 @@ type Config struct {
 
 func (cf *Config) load(path string) {
 
-	log("loading config file: %s", path)
+	INFO("loading config file: %s", path)
 
 	cf.source_path = path
 
@@ -64,20 +64,20 @@ func (cf *Config) load(path string) {
 	if cf.HTTPListen == "" {
 		die("config: http-listen not defined or empty")
 	}
-	log("http listen: %s", cf.HTTPListen)
+	INFO("http listen: %s", cf.HTTPListen)
 
 	if cf.RESTPathPrefix == "" {
 		cf.RESTPathPrefix = "/"
 	}
-	log("rest path prefix: %s", cf.RESTPathPrefix)
-	log("warn slow sql query duration: %0.9fs", cf.WarnSlowSQLQueryDuration)
+	INFO("rest path prefix: %s", cf.RESTPathPrefix)
+	INFO("warn slow sql query duration: %0.9fs",cf.WarnSlowSQLQueryDuration)
 
 	cf.SQLQuerySet.load()
 	cf.HTTPQueryArgSet.load()
 
 	//  wire up sql aliases for the http query arguments
 
-	log("bind http query args to sql variables query args ...")
+	INFO("bind http query args to sql variables query args ...")
 	for _, ha := range cf.HTTPQueryArgSet {
 		a := ha.SQLAlias
 		if a == "" {
@@ -96,7 +96,7 @@ func (cf *Config) load(path string) {
 				if qa.path != a {
 					continue
 				}
-				log("  %s -> %s", qa.path, ha.name)
+				INFO("  %s -> %s", qa.path, ha.name)
 				found = true
 				qa.http_arg = ha
 			}
@@ -108,7 +108,7 @@ func (cf *Config) load(path string) {
 	}
 	cf.load_auth()
 
-	log("%s: loaded", cf.source_path)
+	INFO("%s: loaded", cf.source_path)
 }
 
 func (cf *Config) check_basic_auth(
@@ -227,9 +227,9 @@ func (cf *Config) new_handler_query_html(sqlq *SQLQuery) http.HandlerFunc {
 
 func (cf *Config) load_auth() {
 
-	ba_log := func(format string, args ...interface{}) {
+	ba_INFO := func(format string, args ...interface{}) {
 
-		log("basic auth: " + format, args...)
+		INFO("basic auth: " + format, args...)
 	}
 
 	ba_die := func(format string, args ...interface{}) {
@@ -239,12 +239,12 @@ func (cf *Config) load_auth() {
 
 	cf.basic_auth = nil
 	if cf.BasicAuthPath == "" {
-		ba_log("password file not defined")
-		ba_log("no password required to access queries")
+		ba_INFO("password file not defined")
+		ba_INFO("no password required to access queries")
 		return
 	}
 	cf.basic_auth = make(map[string]string)
-	ba_log("password file: %s", cf.BasicAuthPath)
+	ba_INFO("password file: %s", cf.BasicAuthPath)
 
 	f, err := os.Open(cf.BasicAuthPath)
 	if err != nil {
@@ -257,7 +257,7 @@ func (cf *Config) load_auth() {
 	comment_re := regexp.MustCompile(`^\s*#`)
 	entry_re := regexp.MustCompile(`^([[:alpha:]0-9]{1,32}):(..*)`)
 
-	ba_log("loading passwords ...")
+	ba_INFO("loading passwords ...")
 	lc := uint32(0)
 	for {
 		line, err := in.ReadString('\n')
@@ -280,7 +280,7 @@ func (cf *Config) load_auth() {
 		}
 		cf.basic_auth[fields[1]] = fields[2]
 	}
-	log("loaded %d password entries", len(cf.basic_auth))
+	INFO("loaded %d password entries", len(cf.basic_auth))
 }
 
 //  Note: why only json output?  Need to generalize!

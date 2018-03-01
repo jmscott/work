@@ -17,25 +17,25 @@ type HTTPQueryArgSet map[string]*HTTPQueryArg
 func (qa HTTPQueryArgSet) load() {
 	var err error
 
-	log("http query args: %d args", len(qa))
+	INFO("http query args: %d args", len(qa))
 
-	alog := func(what, value string) {
+	aINFO := func(what, value string) {
 		if value == "" {
 			return
 		}
-		log("    %s: %s", what, value)
+		INFO("    %s: %s", what, value)
 	}
 
 	for n := range qa {
 		a := qa[n]
 		a.name = n
 
-		log("  %s: {", a.name)
+		INFO("  %s: {", a.name)
 
-		alog("default", a.Default)
-		alog("matches", a.Matches)
-		alog("sql-alias", a.SQLAlias)
-		log("  }")
+		aINFO("default", a.Default)
+		aINFO("matches", a.Matches)
+		aINFO("sql-alias", a.SQLAlias)
+		INFO("  }")
 
 		if a.Matches == "" {
 			if a.SQLAlias != "" {

@@ -96,18 +96,18 @@ type SQLQuerySet map[string]*SQLQuery
 
 func (queries SQLQuerySet) load() {
 
-	log("%d sql query files in config {", len(queries))
+	INFO("%d sql query files in config {", len(queries))
 	for n, q := range queries {
 		q.name = n
-		log("  %s: {", q.name)
-		log("    source-path: %s", q.SourcePath)
-		log("  }")
+		INFO("  %s: {", q.name)
+		INFO("    source-path: %s", q.SourcePath)
+		INFO("  }")
 	}
-	log("}")
+	INFO("}")
 
 	//  load sql queries from external files
 
-	log("loading sql queries from %d files", len(queries))
+	INFO("loading sql queries from %d files", len(queries))
 	for n := range queries {
 		q := queries[n]
 		q.load()
@@ -118,7 +118,7 @@ func (qset SQLQuerySet) open() {
 
 	var err error
 
-	log("opening default postgres database ...")
+	INFO("opening default postgres database ...")
 	db, err = sql.Open(
 		"postgres",
 		"sslmode=disable",
@@ -126,23 +126,23 @@ func (qset SQLQuerySet) open() {
 	if err != nil {
 		panic(err)
 	}
-	log("pinging database to verify open parameters ...")
+	INFO("pinging database to verify open parameters ...")
 	err = db.Ping()
 	if err != nil {
 		panic(err)
 	}
-	log("ping ok; database is open")
+	INFO("ping ok; database is open")
 
-	log("preparing %d queries in sql database", len(qset))
+	INFO("preparing %d queries in sql database", len(qset))
 	for n, q := range qset {
-		log("	%s", n)
+		INFO("	%s", n)
 		q.stmt, err = db.Prepare(q.sql_text)
 		if err != nil {
 			ERROR("sql prepare failed:\n%s", q.sql_text)
 			die("%s", err)
 		}
 	}
-	log("all queries prepared")
+	INFO("all queries prepared")
 }
 
 func (q *SQLQuery) die(format string, args ...interface{}) {
@@ -158,7 +158,7 @@ func (q *SQLQuery) WARN(format string, args ...interface{}) {
 
 func (q *SQLQuery) load() {
 
-	log("  %s", q.SourcePath)
+	INFO("  %s", q.SourcePath)
 
 	sqlf, err := os.Open(q.SourcePath)
 	if err != nil {
@@ -241,10 +241,10 @@ func (q *SQLQuery) load() {
 
 	//  verify pg sql types
 
-	log("    %d arguments:", len(q.SQLQueryArgSet))
+	INFO("    %d arguments:", len(q.SQLQueryArgSet))
 	for n, qa := range q.SQLQueryArgSet {
 		qa.path = n
-		log("      %s:{pgtype:%s}", qa.path, qa.pg_type)
+		INFO("      %s:{pgtype:%s}", qa.path, qa.pg_type)
 
 		// verify PostgreSQL types
 		// Note: replace with table lookup

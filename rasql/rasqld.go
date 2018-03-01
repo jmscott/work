@@ -33,13 +33,13 @@ func boot() {
 
 	var cf Config
 
-	log("process id: %d", os.Getpid())
-	log("go version: %s", runtime.Version())
+	INFO("process id: %d", os.Getpid())
+	INFO("go version: %s", runtime.Version())
 
 	cf.load(os.Args[1])
 	cf.SQLQuerySet.open()
 
-	log("path sql query index: %s", cf.RESTPathPrefix)
+	INFO("path sql query index: %s", cf.RESTPathPrefix)
 	http.HandleFunc(
 		cf.RESTPathPrefix,
 		cf.handle_query_index_json,
@@ -85,7 +85,7 @@ func boot() {
 	}
 
 	if cf.HTTPListen != "" {
-		log("listening: %s%s", cf.HTTPListen, cf.RESTPathPrefix)
+		INFO("listening: %s%s", cf.HTTPListen, cf.RESTPathPrefix)
 		go func() {
 			err := http.ListenAndServe(cf.HTTPListen, nil)
 			die("http listen error: %s", err)
@@ -98,7 +98,7 @@ func boot() {
 		if cf.TLSKeyPath == "" {
 			die("http listen tls: missing tls-key-path")
 		}
-		log("tls listening: %s%s", cf.TLSHTTPListen, cf.RESTPathPrefix)
+		INFO("tls listening: %s%s", cf.TLSHTTPListen, cf.RESTPathPrefix)
 		go func() {
 			err := http.ListenAndServeTLS(
 				cf.TLSHTTPListen,
@@ -130,6 +130,6 @@ func main() {
 	signal.Notify(c, syscall.SIGQUIT)
 	signal.Notify(c, syscall.SIGINT)
 	s := <- c
-	log("caught signal: %s", s)
+	INFO("caught signal: %s", s)
 	leave(0)
 }
