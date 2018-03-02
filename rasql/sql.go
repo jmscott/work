@@ -37,18 +37,18 @@ type SQLQuery struct {
 	name           string
 	synopsis       string
 	description    string
-	SourcePath     string 			`json:"source-path"`
-	SQLQueryArgSet 				`json:"query-arg-set"`
+	SourcePath     string `json:"source-path"`
+	SQLQueryArgSet `json:"query-arg-set"`
 	sql_text       string
 	stmt           *sql.Stmt
 	argv           []*SQLQueryArg
 }
 
 type JSONQueryReply struct {
-	Status		string			`json:"status"`
-	Duration	time.Duration		`json:"duration"`
-	Columns		[]string		`json:"columns"`
-	Rows		[][]interface{}		`json:"rows"`
+	Status   string          `json:"status"`
+	Duration time.Duration   `json:"duration"`
+	Columns  []string        `json:"columns"`
+	Rows     [][]interface{} `json:"rows"`
 }
 
 var (
@@ -148,12 +148,12 @@ func (qset SQLQuerySet) open() {
 func (q *SQLQuery) die(format string, args ...interface{}) {
 
 	//  Note: % needs to be escaped in q.SourcePath!
-	die("sql query: " + q.SourcePath + ": " + format, args...)
+	die("sql query: "+q.SourcePath+": "+format, args...)
 }
 
 func (q *SQLQuery) WARN(format string, args ...interface{}) {
 
-	WARN("sql query: " + q.SourcePath + ": " + format, args...)
+	WARN("sql query: "+q.SourcePath+": "+format, args...)
 }
 
 func (q *SQLQuery) load() {
@@ -310,7 +310,7 @@ func (q *SQLQuery) db_query(
 			r.URL,
 		) + format
 
-		ERROR(fmt, args...) 
+		ERROR(fmt, args...)
 		reply_ERROR(status, w, r, fmt, args...)
 	}
 
@@ -345,9 +345,9 @@ func (q *SQLQuery) db_query(
 		bada := func(format string, args ...interface{}) {
 			client_error(
 				http.StatusBadRequest,
-				"query arg: " +
-				ha.name +
-				": ",
+				"query arg: "+
+					ha.name+
+					": ",
 				args...,
 			)
 		}
@@ -495,9 +495,9 @@ func (q *SQLQuery) handle_query_json(
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 	reply := JSONQueryReply{
-		Status:		"ok",
-		Duration:	time.Duration(duration),
-		Columns:	columns,
+		Status:   "ok",
+		Duration: time.Duration(duration),
+		Columns:  columns,
 	}
 	buf, err := json.Marshal(reply)
 	if err != nil {

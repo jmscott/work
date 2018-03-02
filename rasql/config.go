@@ -24,7 +24,7 @@ type Config struct {
 	SQLQuerySet     `json:"sql-query-set"`
 	HTTPQueryArgSet `json:"http-query-arg-set"`
 
-	BasicAuthPath   string `json:"basic-auth-path"`
+	BasicAuthPath string `json:"basic-auth-path"`
 
 	basic_auth map[string]string
 
@@ -35,9 +35,9 @@ type Config struct {
 
 	//  https paramters
 
-	TLSHTTPListen   string `json:"tls-http-listen"`
-	TLSCertPath              string  `json:"tls-cert-path"`
-	TLSKeyPath               string  `json:"tls-key-path"`
+	TLSHTTPListen string `json:"tls-http-listen"`
+	TLSCertPath   string `json:"tls-cert-path"`
+	TLSKeyPath    string `json:"tls-key-path"`
 }
 
 func (cf *Config) load(path string) {
@@ -70,7 +70,7 @@ func (cf *Config) load(path string) {
 		cf.RESTPathPrefix = "/"
 	}
 	INFO("rest path prefix: %s", cf.RESTPathPrefix)
-	INFO("warn slow sql query duration: %0.9fs",cf.WarnSlowSQLQueryDuration)
+	INFO("warn slow sql query duration: %0.9fs", cf.WarnSlowSQLQueryDuration)
 
 	cf.SQLQuerySet.load()
 	cf.HTTPQueryArgSet.load()
@@ -229,12 +229,12 @@ func (cf *Config) load_auth() {
 
 	ba_INFO := func(format string, args ...interface{}) {
 
-		INFO("basic auth: " + format, args...)
+		INFO("basic auth: "+format, args...)
 	}
 
 	ba_die := func(format string, args ...interface{}) {
 
-		die("basic auth: " + format, args...)
+		die("basic auth: "+format, args...)
 	}
 
 	cf.basic_auth = nil

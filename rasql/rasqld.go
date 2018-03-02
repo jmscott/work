@@ -25,7 +25,7 @@ func reply_ERROR(
 	args ...interface{},
 ) {
 
-	ERROR(r.RemoteAddr + ": " + format, args...)
+	ERROR(r.RemoteAddr+": "+format, args...)
 	http.Error(w, fmt.Sprintf(format, args...), status)
 }
 
@@ -129,7 +129,7 @@ func main() {
 	signal.Notify(c, syscall.SIGTERM)
 	signal.Notify(c, syscall.SIGQUIT)
 	signal.Notify(c, syscall.SIGINT)
-	s := <- c
+	s := <-c
 	INFO("caught signal: %s", s)
 	leave(0)
 }
