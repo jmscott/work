@@ -1,3 +1,5 @@
+// Package logroll implements a very simple file roller for long running server
+// processes.
 package logroll
 
 import (
@@ -8,7 +10,7 @@ import (
 )
 
 type Roller struct {
-	name string
+	base_name string
 
 	directory   string
 	path        string
@@ -108,7 +110,7 @@ func (roll *Roller) panic(what string, err error) {
 		os.Stderr,
 		"%s: PANIC: %s(%s): Logger.%s() failed: %s\n",
 		time.Now().Format("2006/01/02 15:04:05"),
-		roll.name,
+		roll.base_name,
 		driver_name,
 		what,
 		err,
@@ -157,17 +159,25 @@ func (roll *Roller) Options(options ...roll_option) (roll_option, error) {
 	return previous, nil
 }
 
+// Open a File Roller with a base file name, a driver and variable number of
+// options.  The base file is the prefix for the rolled file names.  The driver
+// can be "Dow" or "Hz".  The "Dow" driver creates and rolls files with the
+// day of the week embedded the file name.  The "Hz" driver creates a file
+// named <base_name>.<suffix> and then rolls to a file
+// <base_name>-YYYYMMDD_hhmmss[-+]hrmi.<suffix> at regular rate of time.
+// An error is returned or the Roller is ready to accept bytes via
+// logrol.Write().
 func OpenRoller(
-	name,
+	base_name,
 	driver_name string,
 	options ...roll_option,
 ) (*Roller, error) {
-	if name == "" {
-		return nil, errors.New("empty roll name")
+	if base_name == "" {
+		return nil, errors.New("empty roll base name")
 	}
 	roll := &Roller{}
 	*roll = roller_default
-	roll.name = name
+	roll.base_name = base_name
 
 	switch driver_name {
 	case "Dow":

@@ -19,7 +19,7 @@ func (roll *Roller) dow_path(now time.Time) string {
 	dow := now.Weekday().String()[0:3]
 	return roll.directory +
 		string(os.PathSeparator) +
-		roll.name +
+		roll.base_name +
 		"-" +
 		dow +
 		"." +

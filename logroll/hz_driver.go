@@ -21,7 +21,7 @@ func (roll *Roller) hz_open() (err error) {
 
 	path := roll.directory +
 		string(os.PathSeparator) +
-		roll.name +
+		roll.base_name +
 		"." +
 		roll.file_suffix
 
@@ -106,7 +106,7 @@ func (roll *Roller) hz_path(now time.Time) string {
 	_, tzo := now.Zone()
 	return roll.directory +
 		string(os.PathSeparator) +
-		roll.name +
+		roll.base_name +
 		"-" +
 		fmt.Sprintf("%d%02d%02d_%02d%02d%02d%s",
 			now.Year(),
