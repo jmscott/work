@@ -17,6 +17,8 @@ var logger_default = Logger{
 	heartbeat_tick: 10 * time.Second,
 }
 
+//  Validate a heartbeat tick.
+//  The tick must be validated before calling HeartbeatTick()
 func ValidHeartbeatTick(tick time.Duration) error {
 	if tick < 0 {
 		return errors.New(

@@ -133,6 +133,8 @@ func HzTick(tick time.Duration) roll_option {
 	}
 }
 
+//  Directory() sets the directory containing the rolled file.
+//  The default directory is "."
 func Directory(directory string) roll_option {
 	return func(roll *Roller) roll_option {
 		previous := roll.directory
