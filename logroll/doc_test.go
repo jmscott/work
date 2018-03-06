@@ -41,7 +41,7 @@ func ExampleRoller() (err error) {
 		"CLOSE-TXN\n",
 	))
 
-	return err
+	return roll.Close()
 }
 
 func ExampleOpenLogger() (*logroll.Logger, error) {
