@@ -27,6 +27,9 @@ func ValidHeartbeatTick(tick time.Duration) error {
 	return nil
 }
 
+//  How often is a heartbeat "alive" message written to the log file.
+//  The default value is 10 seconds.  The heartbeat is not validated.
+//  Call ValidHeartbeatTick() to validate.
 func HeartbeatTick(tick time.Duration) log_option {
 	return func(log *Logger) log_option {
 		previous := log.heartbeat_tick
