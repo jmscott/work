@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+//  A rollable file.
 type Roller struct {
 	base_name string
 
