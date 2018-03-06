@@ -169,7 +169,7 @@ func (roll *Roller) Options(options ...roll_option) (roll_option, error) {
 // named <base_name>.<suffix> and then rolls to a file
 // <base_name>-YYYYMMDD_hhmmss[-+]hrmi.<suffix> at regular rate of time.
 // An error is returned or the Roller is ready to accept bytes via
-// logrol.Write().
+// logroll.Write().
 func OpenRoller(
 	base_name,
 	driver_name string,
