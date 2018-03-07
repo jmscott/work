@@ -1,5 +1,3 @@
-// Package logroll implements a very simple file roller for long running server
-// processes.
 package logroll
 
 import (
@@ -30,7 +28,15 @@ type Roller struct {
 
 	driver      *driver
 	driver_data interface{}
+
+	pre_roll_callback	roll_callback
+	post_roll_callback	roll_callback
+
+	client_data		interface{}
 }
+
+//  A client callback invoked by Roller.
+type roll_callback	func(client_data interface{}) (msgs [][]byte)
 
 type driver struct {
 	name      string
@@ -50,7 +56,21 @@ var roller_default = Roller{
 	hz_tick:        10 * time.Minute,
 }
 
+// Atomically read messages from a channel and write to rollable file.
 func (roll *Roller) read() {
+
+	//  invoke client defined callback, panicing on error
+	call := func(what string, cb roll_callback) {
+		if cb == nil {
+			return
+		}
+		for _, msg := range cb(roll.client_data) {
+			_, err := roll.file.Write(msg)
+			if err != nil {
+				roll.panic("roll(" + what + ").Write", err)
+			}
+		}
+	}
 
 	for {
 		now := time.Now()
@@ -60,17 +80,16 @@ func (roll *Roller) read() {
 			return
 
 		//  request to roll the file
-
 		case reply := <-roll.request_c:
+			call("pre", roll.pre_roll_callback)
 			err := roll.driver.roll(roll, now)
-			if err == nil {
-				reply <- new(interface{})
-				continue
+			if err != nil {
+				roll.panic("roll.Write", err)
 			}
-			roll.panic("roll", err)
+			call("post", roll.post_roll_callback)
+			reply <- new(interface{})
 
-		//  message to write to roll file
-
+		//  write a message to file
 		case msg := <-roll.read_c:
 			_, err := roll.file.Write(msg)
 			if err == nil {
@@ -144,22 +163,45 @@ func Directory(directory string) roll_option {
 	}
 }
 
+//  PreRollCallback() sets the callback to invoke immediately before rolling
+//  the underlying file.  The callback can not invoke roll.Write()!
+//  To write messages before closing the underlying file have the callback
+//  return [][]byte.
+func PreRollCallback(callback roll_callback) roll_option {
+	return func(roll *Roller) roll_option {
+		previous := roll.pre_roll_callback
+		roll.pre_roll_callback = callback
+		return PreRollCallback(previous)
+	}
+}
+
+//  Set client data passed to pre/post roll callbacks.
+func RollClientData(client_data interface{}) roll_option {
+	return func(roll *Roller) roll_option {
+		previous := roll.client_data
+		roll.client_data = client_data
+		return RollClientData(previous)
+	}
+}
+
+//  PostRollCallback() sets the callback to invoke immediately after rolling
+//  the underlying file.  The callback can not invoke roll.Write()!
+//  To write messages to the newly rolled file have the callback return
+//  [][]byte.
+func PostRollCallback(callback roll_callback) roll_option {
+	return func(roll *Roller) roll_option {
+		previous := roll.post_roll_callback
+		roll.post_roll_callback = callback
+		return PostRollCallback(previous)
+	}
+}
+
 func FileSuffix(file_suffix string) roll_option {
 	return func(roll *Roller) roll_option {
 		previous := roll.file_suffix
 		roll.file_suffix = file_suffix
 		return FileSuffix(previous)
 	}
-}
-
-func (roll *Roller) Options(options ...roll_option) (roll_option, error) {
-
-	var previous roll_option
-
-	for _, opt := range options {
-		previous = opt(roll)
-	}
-	return previous, nil
 }
 
 // Open a File Roller with a base file name, a driver and variable number of
@@ -191,32 +233,30 @@ func OpenRoller(
 		return nil, errors.New("unknown roll driver: " + driver_name)
 	}
 
-	_, err := roll.Options(options...)
+	// evaluate variadic options
+	for _, opt := range options {
+		opt(roll)
+	}
+
+	// open specific roller
+	err := roll.driver.open(roll)
 	if err != nil {
 		return nil, err
 	}
 
-	//  open specific logger
-
-	err = roll.driver.open(roll)
-	if err != nil {
-		return nil, err
-	}
-
-	//  request to close log file
-
+	// request to close log file
 	roll.done_c = make(chan (interface{}))
 
-	//  open the logger message channel
-
+	// open the logger message channel
 	roll.read_c = make(chan ([]byte))
 
-	//  open the roll request chan
-
+	// open the roll request chan
 	roll.request_c = make(chan (chan interface{}))
 
+	// start background to read requests for messages
 	go roll.read()
 
+	//  
 	go roll.poll_roll()
 
 	return roll, nil
