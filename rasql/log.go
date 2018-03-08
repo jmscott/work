@@ -56,7 +56,6 @@ func leave(exit_status int) {
 	os.Stderr.Sync()
 
 	if log != nil {
-		INFO("good bye, cruel world")
 		err := log.Close()
 		log = nil
 		if err != nil {
