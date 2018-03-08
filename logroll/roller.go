@@ -35,6 +35,16 @@ type Roller struct {
 	client_data		interface{}
 }
 
+type roll_option func(roll *Roller) roll_option
+
+var roller_default = Roller{
+	directory:      ".",
+	poll_roll_tick: 3 * time.Second,
+	file_perm:      00640,
+	file_suffix:    "log",
+	hz_tick:        10 * time.Minute,
+}
+
 //  A client callback invoked by Roller.
 type roll_callback	func(client_data interface{}) (msgs [][]byte)
 
@@ -46,15 +56,6 @@ type driver struct {
 	poll_roll func(*Roller, time.Time) (bool, error)
 }
 
-type roll_option func(roll *Roller) roll_option
-
-var roller_default = Roller{
-	directory:      ".",
-	poll_roll_tick: 3 * time.Second,
-	file_perm:      00640,
-	file_suffix:    "log",
-	hz_tick:        10 * time.Minute,
-}
 
 // Atomically read messages from a channel and write to rollable file.
 func (roll *Roller) read() {

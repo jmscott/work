@@ -87,7 +87,7 @@ func (log *Logger) record(format string, args ...interface{}) []byte {
 	return []byte(
 		time.Now().Format("2006/01/02 15:04:05") +
 		": " +
-		fmt.Sprintf("WARN: "+format, args...) +
+		fmt.Sprintf(format, args...) +
 		"\n",
 	)
 }
@@ -98,8 +98,8 @@ func call_log_roll_pre(client_data interface{}) (msgs [][]byte) {
 
 	//  tack final messages onto slice returned to roller
 	add := func(m [][]byte, format string, args ...interface{}) [][]byte {
-		return append(m,
-			log.record(log.roll.base_name + format, args...),
+		return append(m, log.record(
+			log.roll.base_name + ": " +format, args...),
 		)
 	}
 	if log.pre_roll_callback != nil { 
@@ -115,8 +115,8 @@ func call_log_roll_post(client_data interface{}) (msgs [][]byte) {
 
 	//  tack first messages onto slice returned to roller
 	add := func(m [][]byte, format string, args ...interface{}) [][]byte {
-		return append(m,
-			log.record(log.roll.base_name + format, args...),
+		return append(m, log.record(
+			log.roll.base_name + ": " + format, args...),
 		)
 	}
 
@@ -142,7 +142,7 @@ func OpenLogger(roll *Roller, options ...log_option) (*Logger, error) {
 	log := &Logger{}
 	*log = logger_default
 	log.roll = roll
-	log.client_data = log
+	roll.client_data = log
 
 	// evaluate variadic options.
 	for _, opt := range options {
