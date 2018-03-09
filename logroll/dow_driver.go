@@ -63,7 +63,9 @@ func (roll *Roller) dow_roll(now time.Time) error {
 
 	roll.driver_data = now.Weekday().String()[0:3]
 
-	err := roll.Close()
+	err := roll.file.Close()
+	roll.file = nil
+	roll.path = ""
 	if err != nil {
 		return err
 	}
