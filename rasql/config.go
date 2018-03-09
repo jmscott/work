@@ -70,7 +70,9 @@ func (cf *Config) load(path string) {
 		cf.RESTPathPrefix = "/"
 	}
 	INFO("rest path prefix: %s", cf.RESTPathPrefix)
-	INFO("warn slow sql query duration: %0.9fs", cf.WarnSlowSQLQueryDuration)
+	INFO("warn slow sql query duration: %0.9fs",
+		cf.WarnSlowSQLQueryDuration,
+	)
 
 	cf.SQLQuerySet.load()
 	cf.HTTPQueryArgSet.load()
