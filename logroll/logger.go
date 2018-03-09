@@ -1,4 +1,5 @@
 // Note: need to track change in timezone!
+// Note: think about renamed Logger to ServerLogger
 package logroll
 
 import (

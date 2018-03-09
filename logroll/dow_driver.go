@@ -45,10 +45,10 @@ func (roll *Roller) dow_close() error {
 	if roll.file == nil {
 		return nil
 	}
-	f := roll.file
+	err := roll.file.Close()
 	roll.file = nil
 	roll.driver_data = ""
-	return f.Close()
+	return err
 }
 
 func (roll *Roller) dow_poll_roll(now time.Time) (bool, error) {

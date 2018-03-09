@@ -82,10 +82,10 @@ func (roll *Roller) hz_roll(now time.Time) error {
 	roll.driver_data = now.Add(roll.hz_tick)
 
 	err := roll.file.Close()
+	roll.file = nil
 	if err != nil {
 		return err
 	}
-	roll.file = nil
 
 	//  move log/<name>.txn to log/<name>-YYYYMMDD_HHMMSS[+-]hhmm
 
@@ -96,10 +96,7 @@ func (roll *Roller) hz_roll(now time.Time) error {
 
 	mode := os.O_TRUNC | os.O_CREATE | os.O_WRONLY
 	roll.file, err = os.OpenFile(roll.path, mode, roll.file_perm)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (roll *Roller) hz_path(now time.Time) string {
