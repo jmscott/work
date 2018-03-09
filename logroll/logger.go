@@ -1,3 +1,4 @@
+// Note: need to track change in timezone!
 package logroll
 
 import (
@@ -16,7 +17,7 @@ type Logger struct {
 }
 
 //  A client callback invoked by Logger.
-type log_callback func(client_data interface{}) (msgs [][]byte)
+type log_callback func(client_data interface{}) (msgs []string)
 
 // variadic options passed to function OpenLogger()
 type log_option func(log *Logger) log_option
@@ -104,7 +105,9 @@ func call_log_roll_pre(client_data interface{}) (msgs [][]byte) {
 		)
 	}
 	if log.pre_roll_callback != nil {
-		msgs = append(msgs, log.pre_roll_callback(log.client_data)...)
+		for msg := range log.pre_roll_callback(log.client_data) {
+			msgs = add(msgs, "%s", msg)
+		}
 	}
 	msgs = add(msgs, "rolling log file")
 	return
@@ -122,18 +125,22 @@ func call_log_roll_post(client_data interface{}) (msgs [][]byte) {
 	}
 
 	msgs = add(msgs, "rolled log file")
+
+	//  tack on messages returned by post roll callback
 	if log.post_roll_callback != nil {
-		msgs = append(msgs, log.post_roll_callback(log.client_data)...)
+		for msg := range log.post_roll_callback(log.client_data) {
+			msgs = add(msgs, "%s", msg)
+		}
 	}
 	return
 }
 
 func OpenLogger(roll *Roller, options ...log_option) (*Logger, error) {
 	if roll.pre_roll_callback != nil {
-		return nil, errors.New("roll.PreRollCalback must be nil")
+		return nil, errors.New("Roller.PreRollCalback must be nil")
 	}
 	if roll.post_roll_callback != nil {
-		return nil, errors.New("roll.PostRollCalback must be nil")
+		return nil, errors.New("Roller.PostRollCalback must be nil")
 	}
 
 	//  set custom callbacks invoked by roller

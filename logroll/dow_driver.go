@@ -28,7 +28,7 @@ func (roll *Roller) dow_path(now time.Time) string {
 
 func (roll *Roller) dow_open() (err error) {
 
-	dow := time.Now().Weekday().String()[0:3]
+	roll.driver_data = time.Now().Weekday().String()[0:3]
 	path := roll.dow_path(time.Now())
 
 	mode := os.O_APPEND | os.O_CREATE | os.O_WRONLY
@@ -37,8 +37,6 @@ func (roll *Roller) dow_open() (err error) {
 		return err
 	}
 	roll.path = path
-
-	roll.driver_data = dow
 	return nil
 }
 
@@ -63,6 +61,8 @@ func (roll *Roller) dow_poll_roll(now time.Time) (bool, error) {
 
 func (roll *Roller) dow_roll(now time.Time) error {
 
+	roll.driver_data = now.Weekday().String()[0:3]
+
 	err := roll.Close()
 	if err != nil {
 		return err
@@ -75,6 +75,5 @@ func (roll *Roller) dow_roll(now time.Time) error {
 		return err
 	}
 	roll.path = path
-	roll.driver_data = now.Weekday().String()[0:3]
 	return nil
 }

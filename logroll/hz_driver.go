@@ -44,7 +44,6 @@ func (roll *Roller) hz_open() (err error) {
 		return err
 	}
 	roll.path = path
-
 	roll.driver_data = time.Now().Add(roll.hz_tick)
 	return nil
 }
@@ -55,7 +54,7 @@ func (roll *Roller) hz_close() error {
 		return nil
 	}
 	f := roll.file
-	roll.driver_data = zero_time
+	roll.driver_data = nil
 	err := f.Close()
 	if err != nil {
 		return err
@@ -80,6 +79,8 @@ func tzo2file_name(sec int) string {
 
 func (roll *Roller) hz_roll(now time.Time) error {
 
+	roll.driver_data = now.Add(roll.hz_tick)
+
 	err := roll.file.Close()
 	if err != nil {
 		return err
@@ -98,7 +99,6 @@ func (roll *Roller) hz_roll(now time.Time) error {
 	if err != nil {
 		return err
 	}
-	roll.driver_data = now.Add(roll.hz_tick)
 	return nil
 }
 
