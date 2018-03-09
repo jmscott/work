@@ -37,8 +37,8 @@ func ExampleRoller() (err error) {
 	//  write a "CLOSE-TXN" record
 	err = roll.Write([]byte(
 		time.Now().Format("2006/01/02 15:04:05") +
-		"\t" +
-		"CLOSE-TXN\n",
+			"\t" +
+			"CLOSE-TXN\n",
 	))
 
 	return roll.Close()
@@ -55,8 +55,8 @@ func ExampleOpenLogger() (*logroll.Logger, error) {
 	//	log/example-Wed.log
 	//
 	roll, err := logroll.OpenRoller("example", "Dow",
-			logroll.Directory("log"),
-			logroll.FileSuffix("log"),
+		logroll.Directory("log"),
+		logroll.FileSuffix("log"),
 	)
 	if err != nil {
 		return nil, err

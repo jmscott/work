@@ -29,10 +29,10 @@ type Roller struct {
 	driver      *driver
 	driver_data interface{}
 
-	pre_roll_callback	roll_callback
-	post_roll_callback	roll_callback
+	pre_roll_callback  roll_callback
+	post_roll_callback roll_callback
 
-	client_data		interface{}
+	client_data interface{}
 }
 
 type roll_option func(roll *Roller) roll_option
@@ -46,7 +46,7 @@ var roller_default = Roller{
 }
 
 //  A client callback invoked by Roller.
-type roll_callback	func(client_data interface{}) (msgs [][]byte)
+type roll_callback func(client_data interface{}) (msgs [][]byte)
 
 type driver struct {
 	name      string
@@ -55,7 +55,6 @@ type driver struct {
 	roll      func(*Roller, time.Time) error
 	poll_roll func(*Roller, time.Time) (bool, error)
 }
-
 
 // Atomically read messages from a channel and write to rollable file.
 func (roll *Roller) read() {
@@ -68,7 +67,7 @@ func (roll *Roller) read() {
 		for _, msg := range cb(roll.client_data) {
 			_, err := roll.file.Write(msg)
 			if err != nil {
-				roll.panic("roll(" + what + ").Write", err)
+				roll.panic("roll("+what+").Write", err)
 			}
 		}
 	}
@@ -257,7 +256,7 @@ func OpenRoller(
 	// start background to read requests for messages
 	go roll.read()
 
-	//  
+	//
 	go roll.poll_roll()
 
 	return roll, nil

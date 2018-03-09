@@ -8,15 +8,15 @@ import (
 
 // a rollable log file typical for server process
 type Logger struct {
-	roll           *Roller
-	heartbeat_tick time.Duration
-	client_data		interface{}
-	pre_roll_callback	log_callback
-	post_roll_callback	log_callback
+	roll               *Roller
+	heartbeat_tick     time.Duration
+	client_data        interface{}
+	pre_roll_callback  log_callback
+	post_roll_callback log_callback
 }
 
 //  A client callback invoked by Logger.
-type log_callback	func(client_data interface{}) (msgs [][]byte)
+type log_callback func(client_data interface{}) (msgs [][]byte)
 
 // variadic options passed to function OpenLogger()
 type log_option func(log *Logger) log_option
@@ -33,6 +33,7 @@ func LogClientData(client_data interface{}) log_option {
 		return LogClientData(previous)
 	}
 }
+
 // Validate a heartbeat tick.
 // The tick must be validated before calling HeartbeatTick()
 func ValidHeartbeatTick(tick time.Duration) error {
@@ -86,9 +87,9 @@ func PostLogRollCallback(callback log_callback) log_option {
 func (log *Logger) record(format string, args ...interface{}) []byte {
 	return []byte(
 		time.Now().Format("2006/01/02 15:04:05") +
-		": " +
-		fmt.Sprintf(format, args...) +
-		"\n",
+			": " +
+			fmt.Sprintf(format, args...) +
+			"\n",
 	)
 }
 
@@ -99,10 +100,10 @@ func call_log_roll_pre(client_data interface{}) (msgs [][]byte) {
 	//  tack final messages onto slice returned to roller
 	add := func(m [][]byte, format string, args ...interface{}) [][]byte {
 		return append(m, log.record(
-			log.roll.base_name + ": " +format, args...),
+			log.roll.base_name+": "+format, args...),
 		)
 	}
-	if log.pre_roll_callback != nil { 
+	if log.pre_roll_callback != nil {
 		msgs = append(msgs, log.pre_roll_callback(log.client_data)...)
 	}
 	msgs = add(msgs, "rolling log file")
@@ -116,12 +117,12 @@ func call_log_roll_post(client_data interface{}) (msgs [][]byte) {
 	//  tack first messages onto slice returned to roller
 	add := func(m [][]byte, format string, args ...interface{}) [][]byte {
 		return append(m, log.record(
-			log.roll.base_name + ": " + format, args...),
+			log.roll.base_name+": "+format, args...),
 		)
 	}
 
 	msgs = add(msgs, "rolled log file")
-	if log.post_roll_callback != nil { 
+	if log.post_roll_callback != nil {
 		msgs = append(msgs, log.post_roll_callback(log.client_data)...)
 	}
 	return
@@ -187,9 +188,9 @@ func (log *Logger) INFO(format string, args ...interface{}) {
 }
 
 func (log *Logger) ERROR(format string, args ...interface{}) {
-	log.roll.Write(log.record("ERROR: " + format, args...))
+	log.roll.Write(log.record("ERROR: "+format, args...))
 }
 
 func (log *Logger) WARN(format string, args ...interface{}) {
-	log.roll.Write(log.record("WARN: " + format, args...))
+	log.roll.Write(log.record("WARN: "+format, args...))
 }
