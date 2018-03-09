@@ -185,6 +185,7 @@ func (log *Logger) Close() error {
 	if log.roll == nil {
 		return nil
 	}
+	log.INFO("good bye, cruel world")
 	err := log.roll.Close()
 	log.roll = nil
 	return err
