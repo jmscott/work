@@ -17,13 +17,14 @@ func log_init(name string) {
 		logroll.FileSuffix("log"),
 	)
 	if err != nil {
-		fmt.Printf("logroll.OpenRoller() failed: %s", err)
+		fmt.Fprintf(os.Stderr, "logroll.OpenRoller() failed: %s", err)
 		os.Exit(1)
 	}
 	log, err = logroll.OpenLogger(roll,
-		logroll.HeartbeatTick(10*time.Second))
+		logroll.HeartbeatTick(10*time.Second),
+	)
 	if err != nil {
-		fmt.Printf("logroll.OpenLogger() failed: %s", err)
+		fmt.Fprintf(os.Stderr, "logroll.OpenLogger() failed: %s", err)
 		os.Exit(1)
 	}
 }
