@@ -36,47 +36,51 @@ func boot() {
 	INFO("process id: %d", os.Getpid())
 	INFO("go version: %s", runtime.Version())
 
+	// load the config from json file
 	cf.load(os.Args[1])
+
+	// parse the sql queries
 	cf.SQLQuerySet.open()
 
+	// install the url to list all sql queries.
+	// the path is /<rest-path-prefix.
 	INFO("path sql query index: %s", cf.RESTPathPrefix)
 	http.HandleFunc(
 		cf.RESTPathPrefix,
 		cf.handle_query_index_json,
 	)
 
-	//  install sql query handlers
+	//  for each sql query install four urls to handle the query
 	//
 	//	/<rest-path-prefix>/<sql-query>
 	//	/<rest-path-prefix>/csv/<sql-query>
 	//	/<rest-path-prefix>/tsv/<sql-query>
 	//	/<rest-path-prefix>/html/<sql-query>
 	//
-
 	for n, q := range cf.SQLQuerySet {
 
-		//  json handler, the default
+		// json handler, the default
 
 		http.HandleFunc(
 			fmt.Sprintf("%s/%s", cf.RESTPathPrefix, n),
 			cf.new_handler_query_json(q),
 		)
 
-		//  tsv handler
+		//  tab separated data handler
 
 		http.HandleFunc(
 			fmt.Sprintf("%s/tsv/%s", cf.RESTPathPrefix, n),
 			cf.new_handler_query_tsv(q),
 		)
 
-		//  csv handler
+		//  comma separated handler
 
 		http.HandleFunc(
 			fmt.Sprintf("%s/csv/%s", cf.RESTPathPrefix, n),
 			cf.new_handler_query_csv(q),
 		)
 
-		//  html handler
+		//  html table handler
 
 		http.HandleFunc(
 			fmt.Sprintf("%s/html/%s", cf.RESTPathPrefix, n),
@@ -84,6 +88,12 @@ func boot() {
 		)
 	}
 
+	if cf.HTTPListen == "" && cf.TLSHTTPListen == "" {
+		WARN("no listener on either http or https")
+		leave(0)
+	}
+
+	//  start clear text http server
 	if cf.HTTPListen != "" {
 		INFO("listening: %s%s", cf.HTTPListen, cf.RESTPathPrefix)
 		go func() {
@@ -91,6 +101,8 @@ func boot() {
 			die("http listen error: %s", err)
 		}()
 	}
+
+	//  start ssl http server
 	if cf.TLSHTTPListen != "" {
 		if cf.TLSCertPath == "" {
 			die("http listen tls: missing tls-cert-path")
