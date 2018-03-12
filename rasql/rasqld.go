@@ -24,7 +24,6 @@ func reply_ERROR(
 	format string,
 	args ...interface{},
 ) {
-
 	ERROR(r.RemoteAddr+": "+format, args...)
 	http.Error(w, fmt.Sprintf(format, args...), status)
 }

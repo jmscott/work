@@ -46,7 +46,7 @@ type SQLQuery struct {
 
 type JSONQueryReply struct {
 	Status   string          `json:"status"`
-	Duration time.Duration   `json:"duration"`
+	Duration float64	 `json:"duration"`
 	Columns  []string        `json:"columns"`
 	Rows     [][]interface{} `json:"rows"`
 }
@@ -496,7 +496,7 @@ func (q *SQLQuery) handle_query_json(
 
 	reply := JSONQueryReply{
 		Status:   "ok",
-		Duration: time.Duration(duration),
+		Duration: time.Duration(duration).Seconds(),
 		Columns:  columns,
 	}
 	buf, err := json.Marshal(reply)

@@ -3,13 +3,13 @@ package main
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
 
 //  Note: added SQLQuerySetFileFilter for slurping all matching sql files
@@ -291,81 +291,35 @@ func (cf *Config) handle_query_index_json(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-	if !cf.check_basic_auth(w, r) {
-		return
-	}
-	putf := func(format string, args ...interface{}) {
-		fmt.Fprintf(w, format, args...)
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-
-	//  write bytes string to client
-
-	putb := func(b []byte) {
-		_, err := w.Write(b)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	puts := func(s string) {
-		putb([]byte(s))
-	}
-
-	// put json string to client
-
-	putjs := func(s string) {
-		b, err := json.Marshal(s)
-		if err != nil {
-			panic(err)
-		}
-		putb(b)
-	}
-
-	//  write a json array to the client
-
-	puta := func(a []string) {
-		b, err := json.Marshal(a)
-		if err != nil {
-			panic(err)
-		}
-		putb(b)
-	}
-
-	puts(`[
-    "duration,colums,rows",
-    0.0,
-    `,
-	)
-
-	//  write the columns
-
 	var columns = [...]string{
-		"path",
 		"synopsis",
 		"description",
 	}
 
-	puta(columns[:])
-	puts(",\n\n    [\n")
-
-	count := uint64(0)
-	for n, q := range cf.SQLQuerySet {
-
-		if count > 0 {
-			putf(",\n")
-		}
-		count++
-
-		puts("[")
-		putjs(n)
-		puts(",")
-		putjs(q.synopsis)
-		puts(",")
-		putjs(q.description)
-
-		putf("]")
+	now := time.Now()
+	if !cf.check_basic_auth(w, r) {
+		return
 	}
-	putf("\n    ]\n]\n")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	reply := &JSONQueryReply{
+		Status:		"ok",
+		Columns:	columns[:],
+	}
+	for _, q := range cf.SQLQuerySet {
+		var r [2]interface{}
+
+		r[0], r[1] = q.synopsis, q.description
+		reply.Rows = append(reply.Rows, r[:])
+	}
+	reply.Duration = time.Since(now).Seconds()
+
+	buf, err := json.Marshal(reply)
+	if err != nil {
+		panic(err)
+	}
+	_, err = w.Write(buf)
+	if err != nil {
+		ERROR("write(handle_query_json) failed: %s", err)
+		return
+	}
 }
