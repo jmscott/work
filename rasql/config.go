@@ -352,7 +352,11 @@ const query_index_tr = `
 
 const query_index_tfoot = `
  </tbody>
- <tfoot>%s to Execute Query</tfoot>
+ <tfoot>
+  <tr>
+   <td>%s to Execute Query</td>
+  </tr>
+ </tfoot>
 </table>
 `
 
