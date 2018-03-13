@@ -37,8 +37,8 @@ type SQLQuery struct {
 	name           string
 	synopsis       string
 	description    string
-	SourcePath     string `json:"source-path"`
-	SQLQueryArgSet `json:"query-arg-set"`
+	SourcePath     string `json:"source_path"`
+	SQLQueryArgSet `json:"query_arg_set"`
 	sql_text       string
 	stmt           *sql.Stmt
 	argv           []*SQLQueryArg

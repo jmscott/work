@@ -9,7 +9,7 @@ type HTTPQueryArg struct {
 	Default    string `json:"default"`
 	Matches    string `json:"matches"`
 	matches_re *regexp.Regexp
-	SQLAlias   string `json:"sql-alias"`
+	SQLAlias   string `json:"sql_alias"`
 }
 
 type HTTPQueryArgSet map[string]*HTTPQueryArg

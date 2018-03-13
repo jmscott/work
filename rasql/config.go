@@ -19,25 +19,25 @@ type Config struct {
 	source_path string
 
 	Synopsis        string `json:"synopsis"`
-	HTTPListen      string `json:"http-listen"`
-	RESTPathPrefix  string `json:"rest-path-prefix"`
-	SQLQuerySet     `json:"sql-query-set"`
-	HTTPQueryArgSet `json:"http-query-arg-set"`
+	HTTPListen      string `json:"http_listen"`
+	RESTPathPrefix  string `json:"rest_path_prefix"`
+	SQLQuerySet     `json:"sql_query_set"`
+	HTTPQueryArgSet `json:"http_query_arg_set"`
 
-	BasicAuthPath string `json:"basic-auth-path"`
+	BasicAuthPath string `json:"basic_auth_path"`
 
 	basic_auth map[string]string
 
 	//  Note:  also want to log slow http requests!
 	//         consider moving into WARN section.
 
-	WarnSlowSQLQueryDuration float64 `json:"warn-slow-sql-query-duration"`
+	WarnSlowSQLQueryDuration float64 `json:"warn_slow_sql_query_duration"`
 
 	//  https paramters
 
-	TLSHTTPListen string `json:"tls-http-listen"`
-	TLSCertPath   string `json:"tls-cert-path"`
-	TLSKeyPath    string `json:"tls-key-path"`
+	TLSHTTPListen string `json:"tls_http_listen"`
+	TLSCertPath   string `json:"tls_cert_path"`
+	TLSKeyPath    string `json:"tls_key_path"`
 }
 
 func (cf *Config) load(path string) {
