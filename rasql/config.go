@@ -352,6 +352,7 @@ const query_index_tr = `
 
 const query_index_tfoot = `
  </tbody>
+ <tfoot>%s to Execute Query</tfoot>
 </table>
 `
 
@@ -359,6 +360,8 @@ func (cf *Config) handle_query_index_html(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
+	now := time.Now()
+
 	if !cf.check_basic_auth(w, r) {
 		return
 	}
@@ -385,7 +388,9 @@ func (cf *Config) handle_query_index_html(
 	}
 
 	// build the <table> footer
-	buf.Write([]byte(query_index_tfoot))
+	buf.Write([]byte(fmt.Sprintf(query_index_tfoot,
+			time.Since(now),
+	)))
 
 	//  write full html to client
 	_, err := w.Write(buf.Bytes())
