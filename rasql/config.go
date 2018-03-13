@@ -350,6 +350,7 @@ const query_index_tr = `
   </tr>
 `
 
+// Note: is a colspan=3 needed?
 const query_index_tfoot = `
  </tbody>
  <tfoot>
