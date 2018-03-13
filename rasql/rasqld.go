@@ -45,13 +45,21 @@ func boot() {
 	// the path is /<rest-path-prefix.
 	INFO("path sql query index: %s", cf.RESTPathPrefix)
 	http.HandleFunc(
-		cf.RESTPathPrefix,
+		cf.RESTPathPrefix + "/json",
 		cf.handle_query_index_json,
+	)
+	http.HandleFunc(
+		cf.RESTPathPrefix + "/html",
+		cf.handle_query_index_html,
+	)
+	http.HandleFunc(
+		cf.RESTPathPrefix,
+		cf.handle_query_index_html,
 	)
 
 	//  for each sql query install four urls to handle the query
 	//
-	//	/<rest-path-prefix>/<sql-query>
+	//	/<rest-path-prefix>/json/<sql-query>
 	//	/<rest-path-prefix>/csv/<sql-query>
 	//	/<rest-path-prefix>/tsv/<sql-query>
 	//	/<rest-path-prefix>/html/<sql-query>
@@ -61,7 +69,7 @@ func boot() {
 		// json handler, the default
 
 		http.HandleFunc(
-			fmt.Sprintf("%s/%s", cf.RESTPathPrefix, n),
+			cf.RESTPathPrefix + "/json/" + n,
 			cf.new_handler_query_json(q),
 		)
 

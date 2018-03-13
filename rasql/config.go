@@ -2,7 +2,10 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"html"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -285,13 +288,12 @@ func (cf *Config) load_auth() {
 	INFO("loaded %d password entries", len(cf.basic_auth))
 }
 
-//  Note: why only json output?  Need to generalize!
-
 func (cf *Config) handle_query_index_json(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
 	var columns = [...]string{
+		"name",
 		"synopsis",
 		"description",
 	}
@@ -306,9 +308,9 @@ func (cf *Config) handle_query_index_json(
 		Columns:	columns[:],
 	}
 	for _, q := range cf.SQLQuerySet {
-		var r [2]interface{}
+		var r [3]interface{}
 
-		r[0], r[1] = q.synopsis, q.description
+		r[0], r[1], r[2] = q.name, q.synopsis, q.description
 		reply.Rows = append(reply.Rows, r[:])
 	}
 	reply.Duration = time.Since(now).Seconds()
@@ -319,7 +321,79 @@ func (cf *Config) handle_query_index_json(
 	}
 	_, err = w.Write(buf)
 	if err != nil {
-		ERROR("write(handle_query_json) failed: %s", err)
+		ERROR("write(handle_query_json) to %s failed: %s",
+			r.RemoteAddr,
+			err,
+		)
+		return
+	}
+}
+
+const query_index_thead = `
+<table>
+ <caption>Index of %d REST Quer%s</caption>
+ <thead>
+  <tr>
+   <th>Name</th>
+   <th>Synopsis</th>
+   <th>Description</th>
+  </tr>
+ </thead>
+ <tbody>
+`
+
+const query_index_tr = `
+  <tr>
+   <td>%s</td>
+   <td>%s</td>
+   <td>%s</td>
+  </tr>
+`
+
+const query_index_tfoot = `
+ </tbody>
+</table>
+`
+
+func (cf *Config) handle_query_index_html(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	if !cf.check_basic_auth(w, r) {
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html;  charset=utf-8")
+
+	var plural = "ies"
+	if len(cf.SQLQuerySet) == 1 {
+		plural = "y"
+	}
+	buf := bytes.NewBufferString(fmt.Sprintf(
+			query_index_thead,
+			len(cf.SQLQuerySet),
+			plural,
+	))
+
+	// build the <tr> row set
+	for _, q := range cf.SQLQuerySet {
+		buf.Write([]byte(fmt.Sprintf(query_index_tr,
+				html.EscapeString(q.name),
+				html.EscapeString(q.synopsis),
+				html.EscapeString(q.description),
+		)))
+	}
+
+	// build the <table> footer
+	buf.Write([]byte(query_index_tfoot))
+
+	//  write full html to client
+	_, err := w.Write(buf.Bytes())
+	if err != nil {
+		ERROR("write(handle_query_json) to %s failed: %s",
+			r.RemoteAddr,
+			err,
+		)
 		return
 	}
 }
