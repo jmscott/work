@@ -354,7 +354,7 @@ const query_index_tfoot = `
  </tbody>
  <tfoot>
   <tr>
-   <td>%s to Execute Query</td>
+   <th>%s to Execute</th>
   </tr>
  </tfoot>
 </table>
@@ -391,7 +391,7 @@ func (cf *Config) handle_query_index_html(
 		)))
 	}
 
-	// build the <table> footer
+	// build the <tfoot> footer
 	buf.Write([]byte(fmt.Sprintf(query_index_tfoot,
 			time.Since(now),
 	)))
