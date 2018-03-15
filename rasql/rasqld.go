@@ -49,6 +49,14 @@ func boot() {
 		cf.handle_query_index_json,
 	)
 	http.HandleFunc(
+		cf.RESTPathPrefix + "/tsv",
+		cf.handle_query_index_tsv,
+	)
+	http.HandleFunc(
+		cf.RESTPathPrefix + "/csv",
+		cf.handle_query_index_csv,
+	)
+	http.HandleFunc(
 		cf.RESTPathPrefix + "/html",
 		cf.handle_query_index_html,
 	)

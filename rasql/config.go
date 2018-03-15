@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"html"
@@ -401,6 +402,79 @@ func (cf *Config) handle_query_index_html(
 	_, err := w.Write(buf.Bytes())
 	if err != nil {
 		ERROR("write(handle_query_json) to %s failed: %s",
+			r.RemoteAddr,
+			err,
+		)
+		return
+	}
+}
+
+func (cf *Config) handle_query_index_tsv(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	if !cf.check_basic_auth(w, r) {
+		return
+	}
+
+	w.Header().Set("Content-Type",
+				"text/tab-separated-values; charset=utf-8")
+
+	buf := bytes.NewBufferString("name\tsynopsis\tdescription\n")
+
+	// build the row set
+	for _, q := range cf.SQLQuerySet {
+		buf.Write([]byte(q.name))
+		buf.Write([]byte("\t"))
+		buf.Write([]byte(q.synopsis))
+		buf.Write([]byte("\t"))
+		buf.Write([]byte(q.description))
+		buf.Write([]byte("\n"))
+	}
+
+	//  write full tsv to client
+	_, err := w.Write(buf.Bytes())
+	if err != nil {
+		ERROR("write(handle_query_tsv) to %s failed: %s",
+			r.RemoteAddr,
+			err,
+		)
+		return
+	}
+}
+
+func (cf *Config) handle_query_index_csv(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	if !cf.check_basic_auth(w, r) {
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/csv; charset=utf-8")
+
+	var buf bytes.Buffer
+	csv := csv.NewWriter(&buf)
+
+	var row [3]string
+	row[0] = "name"
+	row[1] = "synopsis"
+	row[2] = "description"
+	csv.Write(row[:])
+
+	for _, q := range cf.SQLQuerySet {
+		row[0], row[1], row[2] = q.name, q.synopsis, q.description
+		err := csv.Write(row[:])
+		if err != nil {
+			panic(err)
+		}
+	}
+	csv.Flush()
+
+	//  write full csv to client
+	_, err := w.Write(buf.Bytes())
+	if err != nil {
+		ERROR("write(handle_query_csv) to %s failed: %s",
 			r.RemoteAddr,
 			err,
 		)
