@@ -1,6 +1,6 @@
 /*
  *  Synopsis:
- *	Select count of queries in a certain state.
+ *	Select count of queries in a particular state.
  *
  *  Command Line Variables:
  *	state	text

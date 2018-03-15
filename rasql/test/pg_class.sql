@@ -1,6 +1,10 @@
 /*
  *  Synopsis:
- *	Fetch all classes in a pg_catalog.pg_class
+ *	Fetch all classes in the table pg_catalog.pg_class
+ *
+ *  Description:
+ *	Fetch all attributes for all classes in the table pg_catalog.pg_class.
+ *	The rows are ascendingly ordered by name space, then table name.
  *
  *  Command Line Variables:
  *
@@ -45,5 +49,6 @@ SELECT
   	pg_catalog.pg_class c
 	  JOIN pg_catalog.pg_namespace n ON (n.oid = c.relnamespace)
   ORDER BY
-  	n.nspname asc, c.relname asc
+  	n.nspname ASC,
+	c.relname ASC
 ;

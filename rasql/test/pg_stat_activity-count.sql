@@ -1,6 +1,6 @@
 /*
  *  Synopsis:
- *	Select all queries in table pg_stat_activity.
+ *	Select all query processes in the server, regardless of state.
  *
  *  Command Line Variables:
  *
@@ -9,7 +9,7 @@
  */
 
 SELECT
-	count(*) as "activity_count"
+	count(*) AS "activity_count"
   FROM
   	pg_catalog.pg_stat_activity
 ;

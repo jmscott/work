@@ -1,8 +1,14 @@
 /*
  *  Synopsis:
  *	Fetch all classes in a particular name space
+ *
+ *  Description:
+ *	Fetch all the classes for a particular name space.
+ *	The classses are ascendingly ordered by the relation name.
+ *
  *  Command Line Variables:
  *	nspname	text
+ *
  *  Usage:
  *	psql -f pg_class-by-nsname.sql --set nspname="'pg_catalog'"
  */
@@ -46,5 +52,5 @@ SELECT
   WHERE
   	n.nspname = :nspname
   ORDER BY
-  	c.relname
+  	c.relname ASC
 ;

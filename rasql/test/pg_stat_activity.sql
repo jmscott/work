@@ -1,6 +1,10 @@
 /*
  *  Synopsis:
- *	Select all tuples from pg_stat_activity
+ *	Select attributes for processes in table pg_catalog.pg_stat_activity.
+ *  Description:
+ *	Select attributes for processes in table pg_catalog.pg_stat_activity.
+ *	The rows are ascendingly ordered by the database name, the process
+ *	state, the application name and the query start time.
  *
  *  Command Line Variables:
  *
