@@ -67,40 +67,54 @@ func boot() {
 
 	//  for each sql query install four urls to handle the query
 	//
-	//	/<rest-path-prefix>/json/<sql-query>
-	//	/<rest-path-prefix>/csv/<sql-query>
-	//	/<rest-path-prefix>/tsv/<sql-query>
-	//	/<rest-path-prefix>/html/<sql-query>
+	//	/<rest-path-prefix>/<sql-query>/json
+	//	/<rest-path-prefix>/<sql-query>/csv
+	//	/<rest-path-prefix>/<sql-query>/tsv
+	//	/<rest-path-prefix>/<sql-query>/html
 	//
 	for n, q := range cf.SQLQuerySet {
 
-		// json handler, the default
-
+		// json handler
 		http.HandleFunc(
-			cf.RESTPathPrefix + "/json/" + n,
+			cf.RESTPathPrefix +
+				string(os.PathSeparator) +
+				n +
+				string(os.PathSeparator) +
+				"json",
 			cf.new_handler_query_json(q),
 		)
 
 		//  tab separated data handler
-
 		http.HandleFunc(
-			fmt.Sprintf("%s/tsv/%s", cf.RESTPathPrefix, n),
+			cf.RESTPathPrefix +
+				string(os.PathSeparator) +
+				n +
+				string(os.PathSeparator) +
+				"tsv",
 			cf.new_handler_query_tsv(q),
 		)
 
 		//  comma separated handler
-
 		http.HandleFunc(
-			fmt.Sprintf("%s/csv/%s", cf.RESTPathPrefix, n),
+			cf.RESTPathPrefix +
+				string(os.PathSeparator) +
+				n +
+				string(os.PathSeparator) +
+				"csv",
 			cf.new_handler_query_csv(q),
 		)
 
 		//  html table handler
-
 		http.HandleFunc(
-			fmt.Sprintf("%s/html/%s", cf.RESTPathPrefix, n),
+			cf.RESTPathPrefix +
+				string(os.PathSeparator) +
+				n +
+				string(os.PathSeparator) +
+				"html",
 			cf.new_handler_query_html(q),
 		)
+
+		//  Note: default ought to be html index into qhole query!
 	}
 
 	if cf.HTTPListen == "" && cf.TLSHTTPListen == "" {
