@@ -307,7 +307,7 @@ func (q *SQLQuery) db_query(
 			"%s: [%d]: %s: ",
 			r.RemoteAddr,
 			status,
-			r.URL,
+			strings.Replace(r.URL.String(), "%", "%%", -1),
 		) + format
 
 		ERROR(fmt, args...)
@@ -347,7 +347,8 @@ func (q *SQLQuery) db_query(
 				http.StatusBadRequest,
 				"query arg: "+
 					ha.name+
-					": ",
+					": "+
+					format,
 				args...,
 			)
 		}
