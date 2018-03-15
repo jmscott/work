@@ -499,6 +499,18 @@ func (q *SQLQuery) handle_query_json(
 		Duration: time.Duration(duration).Seconds(),
 		Columns:  columns,
 	}
+	for i := range vals {
+                vals[i] = new(interface{})
+        }
+	for rows.Next() {
+
+		err := rows.Scan(vals...)
+		if err != nil {
+			panic(err)
+		}
+		reply.Rows = append(reply.Rows, vals)
+	}
+
 	buf, err := json.Marshal(reply)
 	if err != nil {
 		panic(err)
