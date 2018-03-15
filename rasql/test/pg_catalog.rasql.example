@@ -31,6 +31,9 @@
 		},
 		"pg_stat_activity-state-count":	{
 			"source_path":	"pg_stat_activity-state-count.sql"
+		},
+		"pg_settings": {
+			"source_path":	"pg_settings.sql"
 		}
 	},
 
