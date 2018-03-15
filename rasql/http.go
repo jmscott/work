@@ -46,7 +46,7 @@ func (qa HTTPQueryArgSet) load() {
 		a.matches_re, err = regexp.Compile(a.Matches)
 
 		if err != nil {
-			die("query-arg: %s: Compile(matches) failed: %s",
+			die("query arg: %s: Compile(matches) failed: %s",
 				a.name,
 				err,
 			)
