@@ -48,6 +48,7 @@ type JSONQueryReply struct {
 	Status   string          `json:"status"`
 	Duration float64	 `json:"duration"`
 	Columns  []string        `json:"columns"`
+	ColumnDatabaseTypes[]string	 `json:"column_database_types"`
 	Rows     [][]interface{} `json:"rows"`
 }
 
@@ -479,37 +480,81 @@ func (q *SQLQuery) handle_query_json(
 	r *http.Request,
 	cf *Config,
 ) {
-	duration, columns, rows, vals := q.db_query(w, r, cf)
+	var err error
+
+	duration, columns, rows, scan_vals := q.db_query2text(w, r, cf)
 
 	//  Note: need to reply with status error!
-	if vals == nil {
+	if scan_vals == nil {
 		return
 	}
 	defer rows.Close()
-
-	//  json needs raw sql base types to properly marshal
-
-	for i := range vals {
-		vals[i] = new(interface{})
-	}
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 	reply := JSONQueryReply{
 		Status:   "ok",
-		Duration: time.Duration(duration).Seconds(),
+		Duration: duration,
 		Columns:  columns,
+		ColumnDatabaseTypes: make([]string, len(scan_vals)),
 	}
-	for i := range vals {
-                vals[i] = new(interface{})
-        }
-	for rows.Next() {
+	column_types, err := rows.ColumnTypes()
+	if err != nil {
+		panic(err)
+	}
+	for i, ct := range column_types {
+		switch ct.ScanType().String() {
+		case "bool":
+			scan_vals[i] = &sql.NullBool{}
+		case "int8", "uint8",
+		     "int16", "uint16",
+		     "int32", "uint32",
+		     "int64":
+			scan_vals[i] = &sql.NullInt64{}
 
-		err := rows.Scan(vals...)
+		//  Note: pq driver does not return floats!!!
+
+		default:
+			scan_vals[i] = &sql.NullString{}
+		}
+		reply.ColumnDatabaseTypes[i] = ct.ScanType().String()
+	}
+	for rows.Next() {
+		row := make([]interface{}, len(scan_vals))
+		vals := make([]interface{}, len(scan_vals))
+		copy(vals, scan_vals)
+		err = rows.Scan(vals...)
 		if err != nil {
 			panic(err)
 		}
-		reply.Rows = append(reply.Rows, vals)
+		for i, v := range scan_vals {
+			switch v.(type) {
+			case *sql.NullString:
+				s := v.(*sql.NullString)
+				if s.Valid {
+					row[i] = s.String
+				} else {
+					row[i] = nil
+				}
+			case *sql.NullInt64:
+				i64 := v.(*sql.NullInt64)
+				if i64.Valid {
+					row[i] = i64.Int64
+				} else {
+					row[i] = nil
+				}
+			case *sql.NullBool:
+				b := v.(*sql.NullBool)
+				if b.Valid {
+					row[i] = b.Bool
+				} else {
+					row[i] = nil
+				}
+			default:
+				panic("impossible scan type")
+			}
+		}
+		reply.Rows = append(reply.Rows, row)
 	}
 
 	buf, err := json.Marshal(reply)
@@ -672,8 +717,10 @@ func (q *SQLQuery) handle_query_html(
 
 	w.Header().Set("Content-Type", "text/html;  charset=utf-8")
 
+	var buf bytes.Buffer
+
 	put := func(s string) {
-		w.Write([]byte(s))
+		buf.Write([]byte(s))
 	}
 
 	put_row := func(element string, row []string) {
@@ -702,7 +749,7 @@ func (q *SQLQuery) handle_query_html(
 
 		err := rows.Scan(vals...)
 		if err != nil {
-			panic(err)
+			panic(err)	// Note: need to return html error
 		}
 		for i, si := range vals {
 			s := si.(*sql.NullString)
@@ -715,6 +762,15 @@ func (q *SQLQuery) handle_query_html(
 		put_row(`td`, row)
 	}
 	put(`</table>`)
+	w.Header().Set(
+		"Content-Length",
+		fmt.Sprintf("Content-Length: %s", buf.Len()),
+	) 
+	_, err := w.Write(buf.Bytes())
+	if err != nil {
+		ERROR("Write(->%s): failed: %s", r.RemoteAddr, err)
+		return
+	}
 }
 
 //  parse a typical postgres sql file into a string suitable for Prepare()
