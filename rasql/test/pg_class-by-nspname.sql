@@ -10,7 +10,7 @@
  *	nspname	text
  *
  *  Usage:
- *	psql -f pg_class-by-nsname.sql --set nspname="'pg_catalog'"
+ *	psql -f pg_class-by-nspname.sql --set nspname="'pg_catalog'"
  */
 SELECT
 	n.nspname,
