@@ -1,6 +1,9 @@
 /*
  *  Synopsis:
  *	Select various postgres types for testing.
+ *
+ *  Command Line:
+ *
  *  Usage:
  *	psql --file test-type
  */

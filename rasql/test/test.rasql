@@ -11,6 +11,9 @@
 	"sql_query_set": {
 		"test-type": {
 			"source_path":	"test-type.sql"
+		},
+		"test-2row": {
+			"source_path":	"test-2row.sql"
 		}
 	},
 
