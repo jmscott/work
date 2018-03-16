@@ -1,5 +1,5 @@
 {
-	"synopsis":		"PostgreSQL 9.6 System Catalog Schema",
+	"synopsis":		"PostgreSQL 10 System Catalog Schema",
 	"http_listen":		"localhost:8080",
 
 	"REMOVE-basic_auth_path":	"password-rasql.example",
@@ -34,6 +34,9 @@
 		},
 		"pg_settings": {
 			"source_path":	"pg_settings.sql"
+		},
+		"pg_namespace": {
+			"source_path":	"pg_namespace.sql"
 		}
 	},
 
