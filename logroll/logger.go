@@ -5,6 +5,7 @@ package logroll
 import (
 	"errors"
 	"fmt"
+	"os"
 	"time"
 )
 
@@ -110,7 +111,11 @@ func call_log_roll_pre(client_data interface{}) (msgs [][]byte) {
 			msgs = add(msgs, "%s", msg)
 		}
 	}
+	for _, msg := range log.raw_preamble() {
+		msgs = append(msgs, msg)
+	}
 	msgs = add(msgs, "rolling log file")
+
 	return
 }
 
@@ -126,6 +131,9 @@ func call_log_roll_post(client_data interface{}) (msgs [][]byte) {
 	}
 
 	msgs = add(msgs, "rolled log file")
+	for _, msg := range log.raw_preamble() {
+		msgs = append(msgs, msg)
+	}
 
 	//  tack on messages returned by post roll callback
 	if log.post_roll_callback != nil {
@@ -134,6 +142,35 @@ func call_log_roll_post(client_data interface{}) (msgs [][]byte) {
 		}
 	}
 	return
+}
+
+func (log *Logger) raw_preamble() (msg [][]byte) {
+
+	roll := log.roll
+
+	ep, err := os.Executable()
+	if err == nil {
+		msg = append(msg, log.record("rasqld path: %s", ep))
+	} else {
+		msg = append(msg, log.record("os.Executable() failed: %s", err))
+	}
+	msg = append(msg, log.record("roll directory: %s", roll.directory))
+	msg = append(msg, log.record("roll log path: %s", roll.path))
+	msg = append(msg, log.record("hz tick: %s", roll.hz_tick))
+	msg = append(msg, log.record("heartbeat tick: %s", log.heartbeat_tick))
+
+	env := os.Environ()
+	msg = append(msg, log.record("process environment: %d vars", len(env)))
+	for _, kv := range env {
+		msg = append(msg, log.record("	%s", kv))
+	}
+	return
+}
+
+func (log *Logger) preamble() {
+	for _, msg := range log.raw_preamble() {
+		log.roll.Write(msg)
+	}
 }
 
 func OpenLogger(roll *Roller, options ...log_option) (*Logger, error) {
@@ -159,11 +196,8 @@ func OpenLogger(roll *Roller, options ...log_option) (*Logger, error) {
 	}
 
 	log.INFO("hello, world")
-	log.INFO("roll directory: %s", roll.directory)
-	log.INFO("roll log path: %s", roll.path)
-	log.INFO("hz tick: %s", roll.hz_tick)
+	log.preamble()
 
-	log.INFO("heartbeat tick: %s", log.heartbeat_tick)
 	go log.heartbeat()
 
 	return log, nil
