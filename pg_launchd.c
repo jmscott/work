@@ -16,21 +16,17 @@
  *			-D /usr/local/pgsql/data
  *
  *	#  contents of /Library/LaunchDaemons/org.postgresql.plist
- *	<ProgramArguments>
- *	  <array>
- *	    <string>/usr/local/sbin/pg_launchd</string>
- *
- *	    <string>--SIGINT-pause</string>
- *	    <string>5</string>
- *	    <string>--pid-path</string>
- *	    <string>/usr/local/pgsql/data/postmaster.pid</string>
- *
- *	    <string>/usr/local/pgsql/bin/postgres</string>
- *	    <string>-D</string>
- *	    <string>/usr/local/pgsql/data</string>
- *
- *	  </array>
- *	</ProgramArguments>
+ *	<key>ProgramArguments</key>
+ *	<array>
+ *		<string>/Users/postgres/sbin/pg_launchd</string>
+ *		<string>--SIGINT-pause</string>
+ *		<string>30</string>
+ *		<string>--pid-path</string>
+ *		<string>/usr/local/pgsql/data/postmaster.pid</string>
+ *		<string>/usr/local/pgsql/bin/postgres</string>
+ *		<string>-D</string>
+ *		<string>/usr/local/pgsql/data</string>
+ *	</array>
  *
  *  Exit Status:
  *	0	clean shutdown of postmaster with SIGINT
