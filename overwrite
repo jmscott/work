@@ -48,7 +48,7 @@ fi
 test $# -ne 1 && die "wrong number of arguments"
 
 FILE=$1
-test -w $FILE || die "can't write to $FILE"
+test -e $FILE -a ! -w $FILE && die "can't write to $FILE"
 
 cat >$NEW
 STATUS=$?
