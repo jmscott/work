@@ -1,29 +1,34 @@
-#!/bin/sh
+#!/bin/bash
 #
 #  Synopsis:
-#	From a simple configuration file, bundle a tar file in the typical SystemV unix file system layout.
+#	Create a tar distro for a typical SystemV unix file system layout.
 #  Usage:
 #	make-dist --help
-#	make-dist --template >setspace.conf
-#	vi setspace.con
+#	make-dist --template >setspace.dist
+#	vi setspace.dist
 #
-#	make-dist setspace.conf
+#	make-dist setspace.dist
 #	D=$(pwd)
-#	cd /path/to/product/root && tar xvf $D/setspace-20140403_1213.tar
+#	cd /path/to/product/root && tar xvf $D/setspace-20140403_1213.tar.bz2
 #  See:
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
+#  Note:
+#	At least one file must exist in the *.dist file.	
+#
+#	What about moving the dynamic directories like tmp/ spool/
+#	into var/?  Perhaps a variable VAR_DIR="spool data"?
 #
 
 PROG=$(basename $0)
-USAGE="$PROG [--help] [--template] <configuration-file>"
+USAGE="$PROG [--help] [--template] <distribution-file>"
 
 help()
 {
 	cat <<END
 
 Synopsis:
-	Build a tar archive for unpacking into a SystemV file system layout .
+	Create a tar distro for a typical SystemV unix file system layout.
 Usage:
 	$USAGE
 Description:
@@ -43,8 +48,10 @@ Description:
 	     htdocs/	#  htdoc scripts for web server
 		
 	In the configuration file are environment variables BINs, CGIBINs, 
-	LIBs, CGIBINs, SBINs and HTDOCs that contain the source file list for
-	each target directory.
+	LIBs, SBINs and HTDOCs that contain the source file list for
+	each target directory.  Also, empty directories may be created
+	when the variables SPOOL, RUN, ETC, LOG, TMP, DATA and CACHE exist.
+	Do make-dist --template for the list of all variables recognized.
 
 	The compressed tar file is written into a file named 
 
@@ -62,22 +69,10 @@ Description:
 		ssh \$PRODUCT@host
 		cd <target-dir>
 		bzcat /tmp/\$PRODUCT-YYMMDD_HHMM.tar.bz2 | tar xvf -
-Depends:
-	tar, a popular gnu archiver, gnu xargs, and bzip2.
-	Needs write permission in current directory.
 Exit Status:
 	0	no error
 	1	error, temp build directory, named ./tmp/make-dist.\$\$,
 			left intact.
-Note:
-	Need to use mtree format for directory layout.
-
-	Need to document additional directories
-		
-		etc/
-		log/
-		run/
-		spool/
 END
 }
 
@@ -103,11 +98,10 @@ is_readable()
 #
 #  Recursively copy files defined in a shell variable to a target directory
 #  in the staging tree.
-#	
 #
 copy_files()
 {
-	VAR=$1;		shift	
+	VAR=$1;		shift
 	DIR=$1;		shift
 	PERMD=$1;	shift
 	PERMF=$1;	shift
@@ -125,7 +119,8 @@ copy_files()
 	#
 	#  Make the staging directory.
 	#
-	mkdir -p $TMP/$DIR || die "$VAR: mkdir $TMP/$DIR failed"
+	echo "+$DIR"
+	mkdir -p $WORK_TMP/$DIR || die "$VAR: mkdir $WORK_TMP/$DIR failed"
 	#
 	#  Copy the files and directories into the staging directory
 	#
@@ -135,8 +130,8 @@ copy_files()
 		#  so just make the directory.
 		#
 		if [ -d $F ];  then
-			echo ">$DIR/$F/"
-			DN=$TMP/$DIR/$F
+			echo "+$DIR/$F/"
+			DN=$WORK_TMP/$DIR/$F
 			mkdir -p $DN || die "mkdir -p $DN failed"
 			continue
 		fi
@@ -145,9 +140,9 @@ copy_files()
 		#  The file lives in an uncreated directory.
 		#
 		DN=$(dirname $F | sed "s/^$DIR\///" | sed "s/^$DIR$//")
-		if [ "$DN" -a ! -d $TMP/$DIR/$DN ];  then
-			echo ">$DIR/$DN/"
-			D="$TMP/$DIR/$DN"
+		if [ "$DN" -a ! -d $WORK_TMP/$DIR/$DN ];  then
+			echo "+$DIR/$DN/"
+			D="$WORK_TMP/$DIR/$DN"
 			mkdir -p $D || die "mkdir -p $D failed"
 		fi
 		#
@@ -167,12 +162,45 @@ copy_files()
 		#  Ought to check fo existence of file before copy?
 		#
 		echo ">$D/$(basename $F)"
-		cp $F $TMP/$D || die "cp $F $TMP/$D failed"
+		cp $F $WORK_TMP/$D || die "cp $F $WORK_TMP/$D failed"
 	done
-	find $TMP/$DIR -type d -print | xargs chmod $PERMD
+
+	#  Note:  need to test for error!
+
+	find $WORK_TMP/$DIR -type d -print | xargs chmod $PERMD
 	if [ "$FILEs" ];  then
-		find $TMP/$DIR -type f -print | xargs chmod $PERMF
+		find $WORK_TMP/$DIR -type f -print | xargs chmod $PERMF
 	fi
+}
+
+#  Makefile an empty directory, typical not for static data
+make_dir()
+{
+	VAR=$1;		shift
+	PERMD=$1;	shift
+
+	DIR=$(echo $VAR | tr A-Z a-z)
+	EXISTS=$(eval "echo \${$VAR+$VAR}")
+	case "$EXISTS" in
+	$VAR)
+		echo "+$DIR"
+		;;
+	'')
+		echo "-$DIR"
+		return
+		;;
+	*)
+		die "make_dir: unexpected eval: $EXISTS"
+		;;
+	esac
+
+	#
+	#  Make the staging directory.
+	#
+	#  Note:  need to test for error!
+	#
+	mkdir -p $WORK_TMP/$DIR || die "$VAR: mkdir $WORK_TMP/$DIR failed"
+	find $WORK_TMP/$DIR -type d -print | xargs chmod $PERMD
 }
 
 test $# = 0 && die "wrong number of arguments"
@@ -196,6 +224,10 @@ case "$1" in
 #  See Also:
 #	https://github.com/jmscott/work/blob/master/make-dist
 #
+
+#  Define PRODUCT to change from \$(basename \$(pwd))
+#PRODUCT=foobar
+
 LIBs="
 "
 
@@ -214,17 +246,26 @@ HTDOCs="
 SRCs="
 "
 
-ETC="
-"
+#  Uncomment to create etc/ directory
+#ETC=""
 
-SPOOL="
-"
+#  Uncomment to create spool/ directory
+#SPOOL=""
 
-RUN="
-"
+#  Uncomment to create data/ directory
+#DATA=""
 
-LOG="
-"
+#  Uncomment to create run/ directory
+#RUN=""
+
+#  Uncomment to create log/ directory
+#LOG=""
+
+#  Uncomment to create cache/ directory
+#CACHE=""
+
+#  Uncomment to create tmp/ directory
+#TMP=""
 
 END
 	exit 0
@@ -263,10 +304,10 @@ is_readable HTDOCs
 #
 #  Make temporary work directory.
 #
-TMP=tmp/$PROG.$$
-test -d $TMP && die "tmp directory $TMP already exists"
-mkdir -p $TMP || die "mkdir -p $TMP failed"
-echo ">$TMP"
+WORK_TMP=tmp/$PROG.$$
+test -d $WORK_TMP && die "tmp directory $WORK_TMP already exists"
+mkdir -p $WORK_TMP || die "mkdir -p $WORK_TMP failed"
+echo ">$WORK_TMP"
 
 #
 #  Copy files in various staging directories
@@ -287,24 +328,34 @@ copy_files LIBs lib u=rwx,g=rx,o= ug=r,o=
 copy_files SRCs src u=rwx,g=rx,o= ug=r,o=
 copy_files HTDOCs htdocs u=wrx,g=rx,o= ug=r,o=
 
+#  make directories, if variables defined in distribution file
+
+make_dir TMP ug=wrx,o=
+make_dir SPOOL u=wrx,go=
+make_dir RUN u=wrx,go=
+make_dir DATA u=wrx,go=
+make_dir CACHE u=wrx,go=
+make_dir ETC u=wrx,g=rx,o=
+make_dir LOG u=wrx,g=rx,o=
+
 #
 #  Tar up files into $PRODUCT-YYYYMMDD_HHmm.tar.bz2
 #
 TAR_FILE=$PRODUCT-$(date +'%Y%m%d_%H%M').tar.bz2
 echo ">$TAR_FILE"
 (
-	cd $TMP || die "cd $TMP failed"
+	cd $WORK_TMP || die "cd $WORK_TMP failed"
 	#
 	#  Tar up files in scratch directory.
 	#  Need to check tar error status with ${PIPSTATUS[]}.
 	#
-	tar cf - $(ls | egrep '^(bin|sbin|cgi-bin|lib|src|htdocs)$')
+	tar cf - $(find . -type d -mindepth 1 -maxdepth 1)
 ) | bzip2 --best >$TAR_FILE
 test -s $TAR_FILE || die "empty tar file $TAR_FILE"
 
 #
 #  Zap the temporary scratch dir.
 #
-find $TMP -print | xargs chmod +x
-rm -rf $TMP || die "rm -rf $TMP failed"
+find $WORK_TMP -print | xargs chmod +x
+rm -rf $WORK_TMP || die "rm -rf $WORK_TMP failed"
 exit 0
