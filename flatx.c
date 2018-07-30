@@ -1,9 +1,10 @@
 /*
  *  Synopsis:
- *   	Flatten a simple xml document for easy parsing in unix scripts. 
- *
+ *   	Pretty Print a Structured Vector Graphics stream.
+ *  Usage:
+ *	svg_pp <compass.svg >compass_pp.svg
  *  Description:
- * 	Convert a well formed xml document to a flattened, row oriented format
+ * 	Format an xml svg document thusly:
  * 	suitable for easy parsing by simple scripts and database loaders.
  * 	Also, text that descends from a single node can be extracted.
  * 	Mutiple text nodes can not be extracted.
