@@ -1,9 +1,9 @@
 #!/bin/bash
 #
 #  Synopsis:
-#	Push precious files to user@host.rsync.net:sunk/host/$(hostname)/root
+#	Push dir $SOURCE to user@rsync.net:sunk/host/$(hostname -f)/root$SOURCE
 #  Description:
-#  	Rsync precious, stable files/directories to an off site server and send
+#  	Rsync precious, stable directorie to an off site server and send
 #  	daily status email.  Files that change during the sync will generate
 #  	an error, unless given te option --ignore-24.
 # 
@@ -66,7 +66,7 @@ RSYNC_ARGS='
 	--itemize-changes
 	--human-readable
 '
-TARGET_PATH=sunk/host/$(hostname)/root
+TARGET_PATH=sunk/host/$(hostname -f)/root$SOURCE_PATH
 RSYNC_OUT=
 RSYNC_TEE=cat
 ITEMIZE=no
@@ -179,22 +179,13 @@ while [ "$1" ];  do
 		test -n "$SSH_AUTH" ||
 				die 'option --ssh-auth: missing user@host'
 		;;
-	--source-dir)		#  file path
+	--source-path)		#  file path
+		test -z "$SOURCE_PATH" || die
+				'option --source-path: given more than once'
 		shift
-		S="$1"
-		test -n "$S" || die 'option --source: missing /file/path'
-		#
-		#  Build source list.
-		#
-		#  Note:
-		#	I (jmscott) am having troubles passing the unescaped
-		#	--source file pattern to rsync.  In other words, doing
-		#
-		#		--source '*.sql'
-		#
-		#	will still be expanded before calling rsync.
-		#
-		SOURCE_PATH="$SOURCE_PATH $S"
+		SOURCE_PATH="$1"
+		test -n "$SOURCE_PATH" ||
+			die 'option --source-path: missing /file/path'
 		;;
 	--one-file-system)
 		RSYNC_ARGS="$RSYNC_ARGS --one-file-system"
