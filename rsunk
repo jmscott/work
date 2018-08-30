@@ -5,15 +5,16 @@
 #  Description:
 #  	Rsync precious, stable files/directories to an off site server and send
 #  	daily status email.  Files that change during the sync will generate
-#  	an error.
+#  	an error, unless given te option --ignore-24.
 # 
-#  	Files are sunk to remote:sunk/host/$(hostname). Stale files on the
-#  	remote server are deleted.  An itemized summary of all sunk files
-#  	is mailed to those who want to know (see option --notify).
+#  	Files are sunk in archive mode to user@rsync.net:sunk/host/$(hostname).
+#	Directories are	created as needed.  Stale files on the remote server
+#	are deleted.  An itemized summary of all sunk files is mailed to those
+#	who want to know (see option --notify).
 #
 #  	Directory level filter rules in .rsunk-filter are observed.
 #	Remember, paths in .rsunk-filter are relative to directory
-#	containing the .rsunk-filer file .  In other words, absolute paths 
+#	containing the .rsunk-filter file .  In other words, absolute paths 
 #	are meaningless.
 #
 #  	Obviously, the script assumes the remote server supports an rsync.net
@@ -21,11 +22,23 @@
 #  	server,	like du, mkdir, find.
 #
 #	For more pedestrian file-system level rsync backups, see
-#	svn://svn.setspace.com/jmscott/rsync-fs
+#	https://github.com/jmscott/work/rsync-fs
 #  Usage:
+#	rsunk								\
+#		--ignore-24						\
+#		--notify jmscott@setspace.com				\
+#		--notify jmscott@rj2tech.com				\
+#		--ssh-auth 8008@usw-s008.rsync.net			\
+#		--source /						\
+#			>>/usr/local/log/rsunk-root.log
 #	rsunk --notify jmscott --source /home/svn --ssh-auth jmscott
 #	rsunk --notify jmscott --source /home/jmscott/backup 		\
 #		--ssh-auth jmscott --itemize
+#  Options:
+#	--source <dir>		Root source directory
+#	--ignore-24		Ignore rsnc exit status 24 (file disappeared)
+#	--notify <email>	Send summary report to <email>.  Multiple ok.
+#	--ssh-auth		Authorization at rsync.net
 #  See:
 #	https://github.com/jmscott/work/rsunk
 #	https://rsync.net
@@ -34,7 +47,7 @@
 #
 
 PROG=$(basename $0)
-SOURCE=
+SOURCE_PATH=
 TARGET=
 SSH_AUTH=
 DU=
@@ -83,13 +96,13 @@ do_mail()
 
 Begin Process:
 
-       Script Path: $0
-	Start Time: $RSYNC_START_TIME
-	  End Time: $(date)
-	  SSH Auth: $SSH_AUTH
-	    Source: $SOURCE
-	    Target: $TARGET
-	Rsync Args: $RSYNC_ARGS
+    Script Path: $0
+     Start Time: $RSYNC_START_TIME
+       End Time: $(date)
+       SSH Auth: $SSH_AUTH
+    Source Path: $SOURCE_PATH
+         Target: $TARGET
+     Rsync Args: $RSYNC_ARGS
 END
 	#
 	#  Tack on disk usage, start end times
@@ -166,7 +179,7 @@ while [ "$1" ];  do
 		test -n "$SSH_AUTH" ||
 				die 'option --ssh-auth: missing user@host'
 		;;
-	--source)		#  file path
+	--source-dir)		#  file path
 		shift
 		S="$1"
 		test -n "$S" || die 'option --source: missing /file/path'
@@ -181,10 +194,13 @@ while [ "$1" ];  do
 		#
 		#	will still be expanded before calling rsync.
 		#
-		SOURCE="$SOURCE $S"
+		SOURCE_PATH="$SOURCE_PATH $S"
 		;;
 	--one-file-system)
 		RSYNC_ARGS="$RSYNC_ARGS --one-file-system"
+		;;
+	--dry-run)
+		RSYNC_ARGS="$RSYNC_ARGS --dry-run"
 		;;
 	--ignore-24)
 		IGNORE_24=yes
@@ -214,9 +230,8 @@ log "ssh auth: $SSH_AUTH"
 log "rsync args: $RSYNC_ARGS"
 log "ignore exit status 24: $IGNORE_24"
 
-test -n "$SOURCE" || die 'missing option: --source'
-log "local source: $SOURCE"
-log "rsync source: $SOURCE"
+test -n "$SOURCE_PATH" || die 'missing option: --source-dir'
+log "local source: $SOURCE_PATH"
 log "itemize: $ITEMIZE"
 
 log "target path: $TARGET_PATH"
@@ -236,8 +251,8 @@ set -x
 #
 #	See gripe at top of file.
 #
-env time rsync --filter='dir-merge /.rsunk-filter' 			\
-	$RSYNC_ARGS $SOURCE $TARGET 2>&1 | $RSYNC_TEE
+time rsync --filter='dir-merge /.rsunk-filter' 				\
+		$RSYNC_ARGS $SOURCE_PATH $TARGET 2>&1 | $RSYNC_TEE
 STATUS="${PIPESTATUS[*]}"
 set +x
 case $STATUS in
