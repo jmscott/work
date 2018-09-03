@@ -64,7 +64,7 @@ RSYNC_ARGS='
 	--itemize-changes
 	--human-readable
 '
-TARGET_PATH=sunk/host/$(hostname -f)/root$SOURCE_PATH
+TARGET_PATH=
 RSYNC_OUT=
 RSYNC_TEE=cat
 ITEMIZE=no
@@ -223,13 +223,14 @@ test -n "$SOURCE_PATH" || die 'missing option: --source-path'
 log "source path: $SOURCE_PATH"
 log "itemize: $ITEMIZE"
 
+TARGET_PATH=sunk/host/condor.setspace.com/root$SOURCE_PATH
 log "target path: $TARGET_PATH"
+
 TARGET="$SSH_AUTH:$TARGET_PATH"
 log "rsync target: $TARGET"
 log 'starting rsync ...'
 
 RSYNC_START_TIME=$(date)
-set -x
 #
 #
 #
@@ -247,6 +248,7 @@ ssh $SSH_AUTH "mkdir -p $TARGET_PATH" ||
 #
 #	See gripe at top of file.
 #
+set -x
 time rsync --filter='dir-merge /.rsunk-filter' 				\
 		$RSYNC_ARGS $SOURCE_PATH $TARGET 2>&1 | $RSYNC_TEE
 STATUS="${PIPESTATUS[*]}"
