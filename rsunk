@@ -1,10 +1,10 @@
 #!/bin/bash
 #
 #  Synopsis:
-#	Push dir $SOURCE to user@rsync.net:sunk/host/$(hostname -f)/root$SOURCE
+#	Push /d1/d2/... to user@rsync.net:sunk/host/$(hostname -f)/root/d1/d2
 #  Description:
-#  	Rsync precious, stable directorie to an off site server and send
-#  	daily status email.  Files that change during the sync will generate
+#  	Rsync a precious, stable directory to an rsync.net server and send
+#  	status email.  Files that change during the sync will generate
 #  	an error, unless given te option --ignore-24.
 # 
 #  	Files are sunk in archive mode to user@rsync.net:sunk/host/$(hostname).
@@ -29,21 +29,19 @@
 #		--notify jmscott@setspace.com				\
 #		--notify jmscott@rj2tech.com				\
 #		--ssh-auth 8008@usw-s008.rsync.net			\
-#		--source /						\
+#		--source-path /						\
 #			>>/usr/local/log/rsunk-root.log
-#	rsunk --notify jmscott --source /home/svn --ssh-auth jmscott
-#	rsunk --notify jmscott --source /home/jmscott/backup 		\
+#	rsunk --notify jmscott --source-path /home/svn --ssh-auth jmscott
+#	rsunk --notify jmscott --source-path /home/jmscott/backup 	\
 #		--ssh-auth jmscott --itemize
 #  Options:
-#	--source <dir>		Root source directory
+#	--source-path <dir>	Path to root of source directory
 #	--ignore-24		Ignore rsnc exit status 24 (file disappeared)
 #	--notify <email>	Send summary report to <email>.  Multiple ok.
 #	--ssh-auth		Authorization at rsync.net
 #  See:
 #	https://github.com/jmscott/work/rsunk
 #	https://rsync.net
-#  Note:
-#	Should --source really be --source-dir ?
 #
 
 PROG=$(basename $0)
@@ -221,8 +219,8 @@ log "ssh auth: $SSH_AUTH"
 log "rsync args: $RSYNC_ARGS"
 log "ignore exit status 24: $IGNORE_24"
 
-test -n "$SOURCE_PATH" || die 'missing option: --source-dir'
-log "local source: $SOURCE_PATH"
+test -n "$SOURCE_PATH" || die 'missing option: --source-path'
+log "source path: $SOURCE_PATH"
 log "itemize: $ITEMIZE"
 
 log "target path: $TARGET_PATH"
@@ -232,6 +230,13 @@ log 'starting rsync ...'
 
 RSYNC_START_TIME=$(date)
 set -x
+#
+#
+#
+log "make sure target path $TARGET_PATH exists on rsync.net"
+ssh $SSH_AUTH "mkdir -p $TARGET_PATH" ||
+			die "rsync.net mkdir -p failed: exit status=$?"
+
 #
 #  Call rsync.
 #
