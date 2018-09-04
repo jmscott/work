@@ -281,7 +281,7 @@ case $STATUS in
 esac
 
 log 'calculating disk usage'
-DU=$(ssh $SSH_AUTH du -sh $TARGET_PATH/$(basename $SOURCE_PATH))
+DU=$(ssh $SSH_AUTH du -sh $TARGET_PATH$(basename $SOURCE_PATH))
 log "disk usage: $DU"
 
 echo 'Done. No Errors.' | do_mail "OK: $PROG: disk usage: $DU"
