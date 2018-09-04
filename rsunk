@@ -54,7 +54,6 @@ DU=
 IGNORE_24=no
 
 RSYNC_ARGS='
-	--relative
 	--numeric-ids
 	--verbose
 	--exclude tmp/
