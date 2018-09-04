@@ -168,6 +168,7 @@ while [ "$1" ];  do
 		N="$1"
 		test -n "$N" || die 'option --notify: missing user@host'
 		NOTIFY="$NOTIFY $N"
+		shift
 		;;
 	--ssh-auth)				# user@host
 		test -z "$SSH_AUTH" ||
@@ -175,6 +176,7 @@ while [ "$1" ];  do
 		test -n "$1" || die 'option --ssh-auth: missing auth'
 
 		SSH_AUTH="$1"
+		shift
 		;;
 	--source-path)		#  file path
 		test -z "$SOURCE_PATH" || die
@@ -193,6 +195,7 @@ while [ "$1" ];  do
 			;;
 		esac
 		SOURCE_PATH="$1"
+		shift
 		;;
 	--one-file-system)
 		RSYNC_ARGS="$RSYNC_ARGS --one-file-system"
