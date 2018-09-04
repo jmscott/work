@@ -162,9 +162,9 @@ trap leave EXIT
 
 while [ "$1" ];  do
 	ARG="$1"
+	shift
 	case "$ARG" in
 	--notify)
-		shift
 		N="$1"
 		test -n "$N" || die 'option --notify: missing user@host'
 		NOTIFY="$NOTIFY $N"
@@ -172,18 +172,27 @@ while [ "$1" ];  do
 	--ssh-auth)				# user@host
 		test -z "$SSH_AUTH" ||
 				die 'option --ssh-auth: given more than once'
-		shift 
+		test -n "$1" || die 'option --ssh-auth: missing auth'
+
 		SSH_AUTH="$1"
-		test -n "$SSH_AUTH" ||
-				die 'option --ssh-auth: missing user@host'
 		;;
 	--source-path)		#  file path
 		test -z "$SOURCE_PATH" || die
 				'option --source-path: given more than once'
-		shift
+		case "$1" in
+		'')
+			die 'option --source-path: missing /d1/d2/...'
+			;;
+		*/)
+			die 'option --source-path: path can not end in /'
+			;;
+		/*)
+			;;
+		*)
+			die "option --source-path: not full path: $SOURCE_PATH"
+			;;
+		esac
 		SOURCE_PATH="$1"
-		test -n "$SOURCE_PATH" ||
-			die 'option --source-path: missing /file/path'
 		;;
 	--one-file-system)
 		RSYNC_ARGS="$RSYNC_ARGS --one-file-system"
@@ -206,7 +215,6 @@ while [ "$1" ];  do
 		die "unknown argument: $ARG"
 		;;
 	esac
-	shift
 done
 
 log 'hello, world'
@@ -223,7 +231,7 @@ test -n "$SOURCE_PATH" || die 'missing option: --source-path'
 log "source path: $SOURCE_PATH"
 log "itemize: $ITEMIZE"
 
-TARGET_PATH=sunk/host/condor.setspace.com/root$SOURCE_PATH
+TARGET_PATH=sunk/host/condor.setspace.com/root$(dirname $SOURCE_PATH)
 log "target path: $TARGET_PATH"
 
 TARGET="$SSH_AUTH:$TARGET_PATH"
