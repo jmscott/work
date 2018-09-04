@@ -62,6 +62,7 @@ RSYNC_ARGS='
 	--delete-excluded
 	--itemize-changes
 	--human-readable
+	--compress
 '
 TARGET_PATH=
 RSYNC_OUT=
