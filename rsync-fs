@@ -77,7 +77,7 @@
 #	Why not exit with rsync's error code?
 #
 PROG=$(basename $0)
-HOST=$(hostname)
+HOST=$(hostname -f)
 MOUNT_POINT=
 SUNK_ROOT=
 FAULT=
@@ -248,7 +248,7 @@ log "ignore rsync error 24 (files vanished): $IGNORE_24"
 #
 case $MOUNT_POINT in
 /)
-	SUNK=$SUNK_ROOT/$HOST/root
+	SUNK=$SUNK_ROOT/host/$HOST/root
 	FILTER='dir-merge /.rsync-filter'
 	;;
 /*)
