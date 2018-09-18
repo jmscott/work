@@ -169,6 +169,10 @@ while [ "$1" ];  do
 		test -z "$INPLACE" || die 'option --inplace set again'
 		INPACE='--inplace'
 		;;
+	--dry-run)
+		test -z "$DRY_RUN" || die 'option --dry-run set again'
+		DRY_RUN='--dry-run'
+		;;
 	--mount-point)
 		test -z "$MOUNT_POINT" || die 'option --mount-point redefined'
 		MOUNT_POINT=$1;  shift
@@ -269,7 +273,7 @@ log "target backup sunk directory: $SUNK"
 log "rsync filter: $FILTER"
 
 log 'starting rsync ...'
-time rsync $INPLACE							\
+time rsync $INPLACE $DRY_RUN						\
 	--numeric-ids							\
 	--filter="$FILTER"						\
 	"--exclude=$SUNK_ROOT/*"					\
