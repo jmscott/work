@@ -237,9 +237,9 @@ trap leave INT QUIT TERM EXIT
 log 'hello, world'
 
 if [ -z "$FAULT" ];  then
-	log "fault file: $FAULT"
-else
 	log 'no fault file given (ok): see option --fault'
+else
+	log "fault file: $FAULT"
 fi
 log "hostname: $HOST"
 log "sunk root: $SUNK_ROOT"
