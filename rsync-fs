@@ -32,14 +32,12 @@
 #	message will be appended to the <path> file, allowing for easy
 #	snmp monitoring of process failures.
 #
-#	rsync-fs MUST be run as root user.
-#
 #	Files that disappear during the rsync will generate a fault, since
 #	rsync exits with code 24.  To ignore such rsync errors (and not fault)
 #	add the command line option --ignore-24.
 #  Usage:
 #	LOG=/var/local/log/rsync-fs-root.log
-#	FAULT=/var/log/rsync-fs-var.fault
+#	FAULT=/var/run/rsync-fs-var.fault
 #
 #	rsync-fs --sunk-root /sunk --mount-point / >$LOG
 #	rsync-fs --mount-point /var --sunk-root /backup/sunk
@@ -57,24 +55,7 @@
 #	0	rsync exited 0
 #	127	failure (not rsync error)
 #  See:
-#  	svn://svn.setspace.com/jmscott/rsync-fs
-#  	rsync manpage for --filter option
-#	GNU dirname command
-#  Blame:
-#	jmscott@setspace.com
-#  Note:
-#	Need to insure the fault directory path is writable.
-#
-#	I (jmscott) have issues with the proper application of any filter file
-#	other than the <mount>/.rsync-filter.
-#	Need to investigate.
-#
-#	Why the strict requirment to run as user root?
-#
-#	Sometime the Mac OS rsync -x includes files outside of the /Root file
-#	systems.
-#
-#	Why not exit with rsync's error code?
+#	https://github.com/jmscott/work/blob/master/rsync-fs
 #
 PROG=$(basename $0)
 HOST=$(hostname -f)
