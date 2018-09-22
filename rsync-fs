@@ -243,7 +243,7 @@ else
 fi
 log "hostname: $HOST"
 log "PATH: $PATH"
-log "rsync: $(rsync -version | head -1)"
+log "rsync version: $(rsync --version | head -1)"
 log "sunk root: $SUNK_ROOT"
 log "source file system mount directory: $MOUNT_POINT"
 log "ignore rsync error 24 (files vanished): $IGNORE_24"
