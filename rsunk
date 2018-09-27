@@ -140,7 +140,7 @@ END
 
 die()
 {
-	log $@ >&2
+	log "ERROR: $@" >&2
 
 	#
 	#
