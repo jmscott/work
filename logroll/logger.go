@@ -150,7 +150,7 @@ func (log *Logger) raw_preamble() (msg [][]byte) {
 
 	ep, err := os.Executable()
 	if err == nil {
-		msg = append(msg, log.record("rasqld path: %s", ep))
+		msg = append(msg, log.record("executable path: %s", ep))
 	} else {
 		msg = append(msg, log.record("os.Executable() failed: %s", err))
 	}
