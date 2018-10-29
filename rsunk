@@ -145,7 +145,11 @@ die()
 	#
 	#
 	#
-	do_mail "ERROR: $PROG: $@" <<END
+	MSG="$@"
+	if [ -n "$SOURCE_PATH" ];  then
+		MSG=$(basename $SOURCE_PATH)
+	fi
+	do_mail "ERROR: $PROG: $MSG" <<END
 In process $PROG#$$ the following error occured:
 
     $@
@@ -281,7 +285,7 @@ case $STATUS in
 esac
 
 log 'calculating disk usage'
-DU=$(ssh $SSH_AUTH du -sh $TARGET_PATH/$(basename $SOURCE_PATH))
+DU=$(ssh $SSH_AUTH du -sh $(basename $SOURCE_PATH))
 log "disk usage: $DU"
 
 echo 'Done. No Errors.' | do_mail "OK: $PROG: disk usage: $DU"
