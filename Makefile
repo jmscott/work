@@ -22,6 +22,3 @@ halloc.o: halloc.c
 
 fork-me: fork-me.c
 	cc -Wall -Wextra -o fork-me fork-me.c
-
-pg_launchd: pg_launchd.c
-	cc -Wall -Wextra -o pg_launchd pg_launchd.c
