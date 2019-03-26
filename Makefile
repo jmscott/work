@@ -4,7 +4,7 @@
 #  See:
 #	https://github.com/jmscott/work
 #
-COMPILED=fork-me halloc.o idiff istext pg_launchd
+COMPILED=fork-me halloc.o idiff istext
 
 all: $(COMPILED)
 
