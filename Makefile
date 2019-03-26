@@ -3,6 +3,8 @@
 #	Makefile for compiling jmscott tools from github.com/jmscott/work
 #  See:
 #	https://github.com/jmscott/work
+#  Note:
+#	Need to add a recipe for "install".
 #
 COMPILED=fork-me halloc.o idiff istext
 
