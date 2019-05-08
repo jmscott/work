@@ -349,7 +349,7 @@ echo ">$TAR_FILE"
 	#  Tar up files in scratch directory.
 	#  Need to check tar error status with ${PIPSTATUS[]}.
 	#
-	tar cf - $(find . -type d -mindepth 1 -maxdepth 1)
+	tar cf - $(find . -mindepth 1 -maxdepth 1 -type d)
 ) | bzip2 --best >$TAR_FILE
 test -s $TAR_FILE || die "empty tar file $TAR_FILE"
 
