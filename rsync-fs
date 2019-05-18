@@ -1,11 +1,11 @@
 #!/bin/bash
 #
 #  Synopsis:
-#	rsync an entire file system to /<sunk>/$(hostname)/root/<mount>
+#	rsync an entire file system to /<sunk>/host/$(hostname)/root/<mount>
 #  Description:
 #  	Create a full rsunk snapshot of a single file system to a local
 #
-#	  	/<sunk>/$(hostname)/root/<mount>
+#	  	/<sunk>/host/$(hostname)/root/<mount>
 #
 #	Typically the file system <mount> directory is / or /var and the
 #	<sunk> directory is /backup/sunk or /sunk.
@@ -56,6 +56,8 @@
 #	127	failure (not rsync error)
 #  See:
 #	https://github.com/jmscott/work/blob/master/rsync-fs
+#  Note:
+#	Need to add notify.
 #
 PROG=$(basename $0)
 HOST=$(hostname -f)
