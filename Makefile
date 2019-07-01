@@ -17,7 +17,7 @@ install: all
 		-d $(DIST_ROOT)
 	install -g $(DIST_GROUP) -o $(DIST_USER) -m u=rwx,go=rx		\
 		-d $(DIST_ROOT)/bin
-	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=r		\
+	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=xr		\
 		idiff							\
 		istext							\
 		overwrite						\
