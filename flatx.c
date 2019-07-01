@@ -60,6 +60,8 @@
  *  Blame:
  *  	jmscott@setspace.com
  *  Note:
+ *	Does not compile in strict c99.
+ *
  *  	I (jmscott) have not investigated how well the clib strlib functions
  *  	work with utf8 encoding.
  *

@@ -2,4 +2,5 @@ fork-me
 halloc.o
 idiff
 istext
+local.mk
 pg_launchd
