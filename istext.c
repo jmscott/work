@@ -7,7 +7,9 @@
  *  See:
  *	https://github.com/jmscott/work/istext.c
  *  Note:
- *	This program should have been named 'isascii'
+ *	This program should have been named "isascii".
+ *	A true "istext" would consult the locale and use icu, rendering a quite
+ *	complex piece of code.  A less ambitious is supporting utf8 and utf16.
  */
 
 #include <sys/types.h>
