@@ -1,7 +1,9 @@
 #
 #  Synopsis:
-#	Makefile for compiling jmscott tools from github.com/jmscott/work
+#	Makefile for compiling jmscott tools into $PREFIX
 #  See:
+#	local-linux.mk.example
+#	local-darwin.mk.example
 #	https://github.com/jmscott/work
 #  Note:
 #	See local-<os>.mk.example
