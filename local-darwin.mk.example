@@ -6,5 +6,5 @@
 #	vi local.mk
 #	make world
 #
-#DIST_ROOT?=/usr/local/jmscott
-DIST_ROOT?=$(HOME)/opt/jmscott
+DIST_ROOT?=/usr/local/jmscott
+#DIST_ROOT?=$(HOME)/opt/jmscott

@@ -1,10 +1,10 @@
 #
 #  Synospsis:
-#	Template for local.mk required by Makefile
+#	Template for local.mk required by global Makefile
 #  Usage:
 #	cp local-linux.mk.example local.mk
 #	vi local.mk
 #	make world
 #
-#DIST_ROOT?=/usr/local/jmscott
-DIST_ROOT?=$(HOME)/opt/jmscott
+DIST_ROOT?=/usr/local/jmscott
+#DIST_ROOT?=$(HOME)/opt/jmscott
