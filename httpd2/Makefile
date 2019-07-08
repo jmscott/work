@@ -3,19 +3,24 @@
 #	Development or Instalation Makefile
 #
 
-include local.mk
-
-DIST_ROOT?=$(PREFIX)/jmscott
-
-HTTPD2_ROOT?=$(DIST_ROOT)/httpd2
-HTTPD2_LIB?=$(HTTPD2_ROOT)/lib
+include ../local.mk
+include ../jmscott.mk
 
 COMPILED=	env env.d/help.pl 					\
 		form form.d/help.pl
 
-#  Note: be paranoid about removing $(DIST_ROOT)
+all: $(COMPILED)
+
 distclean:
-	rm -rf $(HTTPD2_LIB)
+	rm -f $(DIST_ROOT)/lib/env.cgi
+	rm -rf $(DIST_ROOT)/lib/env.d
+	rm -rf $(DIST_ROOT)/cgi-bin/env
+
+	rm -f $(DIST_ROOT)/lib/form.cgi
+	rm -rf $(DIST_ROOT)/lib/form.d
+	rm -rf $(DIST_ROOT)/cgi-bin/form
+
+	rm -rf $(DIST_ROOT)/lib/httpd2.d
 	rm -f $(DIST_ROOT)/bin/cgi-inherit
 	rm -f $(DIST_ROOT)/bin/cgi-inherit-merge
 	rm -f $(DIST_ROOT)/bin/cgi-manifest
@@ -28,15 +33,15 @@ install: all
 	install -g $(DIST_GROUP) -o $(DIST_USER)			\
 		-d $(DIST_ROOT)/bin
 	install -g $(DIST_GROUP) -o $(DIST_USER)			\
-		-d $(HTTPD2_ROOT)
+		-d $(DIST_ROOT)/cgi-bin
 	install -g $(DIST_GROUP) -o $(DIST_USER)			\
-		-d $(HTTPD2_LIB)
+		-d $(DIST_ROOT)/lib
 	install -g $(DIST_GROUP) -o $(DIST_USER)			\
-		-d $(HTTPD2_LIB)/httpd2.d
+		-d $(DIST_ROOT)/lib/httpd2.d
 	install -g $(DIST_GROUP) -o $(DIST_USER)			\
-		-d $(HTTPD2_LIB)/env.d
+		-d $(DIST_ROOT)/lib/env.d
 	install -g $(DIST_GROUP) -o $(DIST_USER)			\
-		-d $(HTTPD2_LIB)/form.d
+		-d $(DIST_ROOT)/lib/form.d
 
 	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=r		\
 		local-linux.mk.example					\
@@ -44,7 +49,7 @@ install: all
 		env.cgi							\
 		form.cgi						\
 		httpd2.cgi						\
-		$(HTTPD2_LIB)
+		$(DIST_ROOT)/lib
 
 	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=r		\
 		env.d/div.pl						\
@@ -52,7 +57,7 @@ install: all
 		env.d/help.pl						\
 		env.d/input.pl						\
 		env.d/text.pl						\
-		$(HTTPD2_LIB)/env.d
+		$(DIST_ROOT)/lib/env.d
 
 	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=r		\
 		httpd2.d/GET.pl						\
@@ -62,12 +67,13 @@ install: all
 		httpd2.d/multipart-form-data.pl				\
 		httpd2.d/system.pl					\
 		httpd2.d/www-form-urlencoded.pl				\
-		$(HTTPD2_LIB)/httpd2.d
+		$(DIST_ROOT)/lib/httpd2.d
 
 	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=r		\
 		form.d/post.dump.pl					\
 		form.d/religion.pl					\
-		$(HTTPD2_LIB)/httpd2.d
+		form.d/help.pl						\
+		$(DIST_ROOT)/lib/form.d
 
 	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=r		\
 		env.d/div.pl						\
@@ -75,7 +81,7 @@ install: all
 		env.d/help.pl						\
 		env.d/input.pl						\
 		env.d/text.pl						\
-		$(HTTPD2_LIB)/env.d
+		$(DIST_ROOT)/lib/env.d
 
 	install -g $(DIST_GROUP) -o $(DIST_USER) -m u=rwx,go=rx		\
 		cgi-inherit						\
@@ -85,7 +91,10 @@ install: all
 		cgi2perl5						\
 		$(DIST_ROOT)/bin
 
-all: $(COMPILED)
+	install -g $(DIST_GROUP) -o $(DIST_USER) -m u=rwx,go=rx		\
+		env							\
+		form							\
+		$(DIST_ROOT)/cgi-bin
 
 clean:
 	rm -f $(COMPILED)

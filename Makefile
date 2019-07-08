@@ -14,6 +14,7 @@ include jmscott.mk
 COMPILED=fork-me halloc.o idiff istext
 
 all: $(COMPILED)
+	cd httpd2 && $(MAKE) $(MAKEFLAGS) all
 install: all
 	install -g $(DIST_GROUP) -o $(DIST_USER) -m u=rwx,go=rx		\
 		-d $(DIST_ROOT)
@@ -44,10 +45,13 @@ install: all
 		idiff.c							\
 		istext.c						\
 		$(DIST_ROOT)/src
+	cd httpd2 && $(MAKE) $(MAKEFLAGS) install
 
 clean:
+	cd httpd2 && $(MAKE) $(MAKEFLAGS) clean
 	rm -f $(COMPILED)
 distclean:
+	cd httpd2 && $(MAKE) $(MAKEFLAGS) distclean
 	rm -rf $(DIST_ROOT)/bin $(DIST_ROOT)/src 
 
 idiff: idiff.c
@@ -63,6 +67,7 @@ fork-me: fork-me.c
 	cc -Wall -Wextra -o fork-me fork-me.c
 
 world:
+	cd httpd2 && $(MAKE) $(MAKEFLAGS) world
 	$(MAKE) $(MFLAGS) clean
 	$(MAKE) $(MFLAGS) all
 	$(MAKE) $(MFLAGS) distclean
