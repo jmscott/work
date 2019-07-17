@@ -23,6 +23,7 @@ install: all
 	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=xr		\
 		idiff							\
 		istext							\
+		make-dist						\
 		overwrite						\
 		pdf-merge						\
 		pg2pg							\
