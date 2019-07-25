@@ -46,7 +46,7 @@
 ##  Standalone C Programs
 
 ### stale-mtime.c
-	How recently has a file been modified
+	Is a file "stale" based upon recent modifications?
 
 ###  idiff.c
 	Interactive diff (based on rob & bwk code)
