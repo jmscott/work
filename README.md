@@ -45,6 +45,9 @@
 
 ##  Standalone C Programs
 
+### stale-mtime.c
+	Is a the mtime of a file indicate staleness (not update to data).
+
 ###  idiff.c
 	Interactive diff (based on rob & bwk code)
 
