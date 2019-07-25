@@ -4,3 +4,4 @@ idiff
 istext
 local.mk
 pg_launchd
+stale-mtime

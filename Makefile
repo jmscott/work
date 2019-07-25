@@ -11,7 +11,7 @@
 include local.mk
 include jmscott.mk
 
-COMPILED=fork-me halloc.o idiff istext
+COMPILED=fork-me halloc.o idiff istext stale-mtime
 
 all: $(COMPILED)
 	cd httpd2 && $(MAKE) $(MFLAGS) all
@@ -45,6 +45,7 @@ install: all
 		hexdump.c						\
 		idiff.c							\
 		istext.c						\
+		stale-mtime.c						\
 		$(DIST_ROOT)/src
 	cd httpd2 && $(MAKE) $(MFLAGS) install
 
@@ -66,6 +67,9 @@ halloc.o: halloc.c
 
 fork-me: fork-me.c
 	cc -Wall -Wextra -o fork-me fork-me.c
+
+stale-mtime: stale-mtime.c
+	cc -Wall -Wextra -o stale-mtime stale-mtime.c
 
 world:
 	cd httpd2 && $(MAKE) $(MFLAGS) world
