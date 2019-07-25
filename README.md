@@ -49,7 +49,7 @@
 	Is a file "stale" based upon recent modifications?
 
 ###  idiff.c
-	Interactive diff (based on rob & bwk code)
+	Simple interactive diff (based on rob & bwk code)
 
 ###  istext.c
 	Is a file ascii text?
