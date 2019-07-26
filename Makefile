@@ -30,6 +30,7 @@ install: all
 		rsunk							\
 		rsync-fs						\
 		ssh-host						\
+		stale-mtime						\
 		strip-cr						\
 		strswap							\
 		svn-commit-notify					\
