@@ -36,6 +36,7 @@ install: all
 		svn-commit-notify					\
 		svn-ignore						\
 		xtitle							\
+		zap-proc						\
 		$(DIST_ROOT)/bin
 	install -g $(DIST_GROUP) -o $(DIST_USER) -m u=rwx,go=rx		\
 		-d $(DIST_ROOT)/src

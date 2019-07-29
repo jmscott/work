@@ -1,0 +1,106 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	Safe, chatty zap of process using variations of pkill.
+#  Description:
+#	Zap a process whose id is stored in a file.  Should the file not
+#	exist or not disappear after pkill -F, then force killing process
+#	with an explicit list of process names.  Explicit process names
+#	are used to prevent killing invocing scripts with names similar
+#	to victim processes.
+#  Usage:
+#	zap <pid-file>
+#	zap-proc <pid-file> <exact-proc1> <exact-proc2> ...
+#  Exit Status:
+#	0	no processes running
+#	1	unexpected error
+#
+
+PROG=$(basename $0)
+PROC_OWNER=$(id -nu)
+PROC_PAUSE=3
+
+log()
+{
+	if [ -z "$PROC_NAME" ];  then
+		PROC_WHO="$PROG#$$: $PROC_SUFFIX"
+	else
+		PROC_WHO="$PROG#$$"
+	fi
+	echo "$(date +'%Y/%m/%d %H:%M:%S'): $PROC_WHO: $@"
+}
+
+die()
+{
+	log "ERROR: $@" >&2
+	exit 1
+}
+
+_exact_zap()
+{
+	test $# = 0 && exit 0
+	log "exact: forcing the kill of $#"
+	for EXACT_PROC in $@;  do
+		log "force kill process: $EXACT_PROC"
+		pkill -u $USER -x $EXACT_PROC
+		STATUS=$?
+		case $STATUS in
+		0)
+			log "process matched and killed: $EXACT_PROC"
+			;;
+		1)
+			log "no process matched: $EXACT_PROC"
+			;;
+		*)
+			die "pkill $EXACT_PROC failed: exit status=$STATUS"
+			;;
+		esac
+	done
+	exit 0
+}
+
+test $# = 0 && die 'no arguments: pid file must be first argument'
+
+PID_PATH=$1
+shift
+PROC_NAME=$(basename $(basename $PID_PATH) .pid)
+log "process owner: $PROC_OWNER"
+
+if [ ! -e $PID_PATH ];  then
+	log "no pid file (ok): $PID_PATH"
+	log "process $PROC_NAME may not be running"
+	_exact_zap
+	exit
+fi
+
+log "pid file exists: $PID_PATH"
+PID=$(cat $PID_PATH)
+log "process to kill: $PROC_NAME#$PID owned by $PROC_OWNER"
+
+pkill -F $PID_PATH -u $PROC_OWNER
+STATUS=$?
+case "$STATUS" in
+0)
+	;;
+1)
+	log "no process matches with pid #$PID"
+	rm -f $PID_PATH || die "rm -f $PID_PATH failed: exit status=$?"
+	;;
+*)
+	die "pkill TERM $PID failed; exit status=$?"
+	;;
+esac
+
+log "zapped $PROC_NAME process with pid #$PID"
+log "sleeping $PROC_PAUSE sec while process #$PID exits ..."
+sleep $PROC_PAUSE
+test -e $PID_PATH || exit 0
+
+log "pid file still exists, so force exact kill"
+_exact_kill
+test -e $PID_PATH || exit 0
+
+log "hmm, pid still exists, so nuke $PID with -9 and remove pid file"
+kill -9 $PID
+rm -f $PID_PATH || die "rm -f $PID_PATH failed: exit status=$?"
+exit 0
