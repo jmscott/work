@@ -1,17 +1,16 @@
 /*
  *  Synopsis:
- *   	Pretty Print a Structured Vector Graphics stream.
+ *   	Flatten and xml file for easy extraction from shell scrips.
  *  Usage:
- *	svg_pp <compass.svg >compass_pp.svg
+ *	flatx <compass.svg | grep '^[0-9]*	\/root\/movies'
  *  Description:
- * 	Format an xml svg document thusly:
- * 	suitable for easy parsing by simple scripts and database loaders.
- * 	Also, text that descends from a single node can be extracted.
- * 	Mutiple text nodes can not be extracted.
+ * 	Flatten an xml into row oriented tuples suitable for easy parsing by
+ *	scripts and database loaders.  Also, text that descends from a single
+ *	node can be extracted.  Mutiple text nodes can not be extracted.
  *
  * 	The definition of a well formed document is what libexpat can parse.
  * 	Errors encounter by libexpat cause flatx to abort with an error.
- * 	The entire xml document is always read (but not buffered).
+ * 	The entire xml document is always scanned (but not buffered).
  *
  * 	The default output flattens xml input thusly:
  *
@@ -25,7 +24,7 @@
  * 	The XML document is always parsed to completion.  A malformed document
  * 	is always an error.
  *
- *  	Element order is an unsigned, 64bit value with a minimum of 1.
+ *  	Element order is an unsigned, 64bit integer with a minimum value of 1.
  *
  *  	Using --char-byte-index with other options is an error.
  *
@@ -713,7 +712,7 @@ main(int argc, char **argv)
 			/*
 			 *  Unfortunatly we can pass a byte index > 2^64.
 			 */
-			if (sscanf(p, "%llu", &char_byte_index) != 1)
+			if (sscanf(p, "%lu", &char_byte_index) != 1)
 				die3(EXIT_CLIARG, o, "can't scan index", p);
 			char_state = CHAR_STATE_SEARCH;
 		} else if (strcmp(a, "--help") == 0)
@@ -809,7 +808,7 @@ main(int argc, char **argv)
 	if (char_state != CHAR_STATE_OFF) {
 		char buf[MAX_MSG_SIZE];
 
-		snprintf(buf, sizeof buf, "byte index: %llu", char_byte_index);
+		snprintf(buf, sizeof buf, "byte index: %lu", char_byte_index);
 		switch (char_state) {
 		case CHAR_STATE_SEARCH:
 			die(EXIT_NO_ELEMENT, buf);
