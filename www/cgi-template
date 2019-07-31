@@ -1,0 +1,314 @@
+#!/usr/bin/perl
+#
+#  Synopsis:
+#	Generate an xml template for a cgi specification vocabulary.
+#  Usage:
+#	cgi-template name [--option ...]
+#  Blame:
+#	jmscott@setspace.com
+#  Note:
+#	An interactive mode would be nice.
+#
+#	Need to be able to put multiple --putter flags.
+#
+
+my $PROG;
+($PROG = $0) =~ s#[^/]*/(.*)$#$1#;
+
+my $USAGE = 'cgi-template name [--help] [--option ...]';
+
+$SIG{__DIE__} = sub
+{
+	my $msg = join('', @_);
+	#
+	#  Strip out the 
+	#
+	$msg =~ s/ at .*$PROG.* line \d+\.$//;
+	print STDERR "$PROG: ERROR: $msg\n";
+	print STDERR "usage: $USAGE\n";
+	exit 1;
+};
+
+sub help()
+{
+	print <<END;
+Synosis:
+	Generate an xml template for a cgi specification vocabulary.
+Usage:
+	$USAGE
+	where --option matches
+
+	--GET			Generate /cgi/GET template twig
+	--POST			Generate /cgi/POST template twig
+	--content-type		Set content type for current twig
+	--putter name		Output <putter> element
+	--query-arg name	Output <query-arg> element
+	--help			This
+END
+}
+
+#
+#  %CGI hold entire /cgi tree.
+#
+my $CGI;
+
+#
+#  Script name must be first argument.
+#
+die "wrong number of arguments" unless @ARGV >= 1;
+if ($ARGV[0] eq '--help') {
+	help;
+	exit 0;
+}
+$CGI->{_name} = shift @ARGV;
+die "unexpected pattern for name: $CGI->{_name}"
+				unless $CGI->{_name} =~ /^\w(?:[\w.-]){0,31}$/;
+$CGI->{title} = "/cgi-bin/$CGI->{_name}";
+$CGI->{synopsis} = "HTTP CGI Script /cgi-bin/$CGI->{_name}";
+$CGI->{blame} = $ENV{USER};
+
+my ($putter, $request);
+
+#
+#  Parse the command line options.
+#
+while (my $arg = shift @ARGV) {
+	if ($arg eq '--GET') {
+		$request = $CGI->{GET} = {};
+		$putter = undef;
+	} elsif ($arg eq '--POST') {
+		$request = $CGI->{POST} = {};
+		$putter = undef;
+	} elsif ($arg eq '--help') {
+		help();
+		exit 0;
+	} elsif ($arg eq '--content-type') {
+		my $ct = shift @ARGV;
+
+		die "missing content-type" unless $ct;
+		die "unexpected pattern in content-type: $ct"
+					unless $ct =~ /^\w[\w.-\/]{1,128}$/;
+		$CGI->{GET}->{out}->{'@content-type'} = " content-type=\"$ct\"";
+	} elsif ($arg eq '--putter') {
+		my $n = shift @ARGV;
+		die 'missing name for putter' unless $n;
+		die "unexpected pattern for putter name: $n"
+						unless $n =~ /^\w[\w-.]{0,16}$/;
+		die "option --GET or --POST must come before putter: $n"
+						unless defined $request;
+		my $dir;
+		if (defined $CGI->{GET}) {
+			$dir = 'out';
+		} else {
+			$dir = 'in';		# POST
+		}
+		$request->{$dir}->{putter}->{'@name'} = $n;
+		$putter = $request->{$dir}->{putter};
+	} elsif ($arg eq '--query-arg') {
+		my $n = shift @ARGV;
+		die 'missing name for query argument' unless $n;
+		die "unexpected pattern for query arg name: $n"
+						unless $n =~ /^\w[\w-.]{0,16}$/;
+		die "no putter for query arg: $n" unless defined $putter;
+		$putter->{'query-args'}->{arg}->{$n} =
+			{
+				name	=>	$n
+			};
+	} elsif ($arg =~ /^--/) {
+		die "unknown option: $arg";
+	} else {
+		die "unknown argument: $arg";
+	}
+}
+
+#
+#  Open <cgi>
+#	  <synopsis>
+#	  <subversion>
+#	  <blame>
+#
+print <<END;
+<?xml version="1.0" encoding="UTF-8"?>
+<cgi name="$CGI->{_name}">
+ <title>$CGI->{title}</title>
+ <synopsis>$CGI->{synopsis}</synopsis>
+ <subversion id="\$Id\$" />
+ <blame>$CGI->{blame}</blame>
+END
+
+#
+#  Put /cgi/GET
+#
+if (defined $CGI->{GET}) {
+	#
+	#  Open <GET>
+	#
+	print <<END;
+ <GET>
+  <examples>
+   <example
+   	query="/cgi-bin/$CGI->{_name}?help"
+   >
+    Generate This Help Page for the CGI Script /cgi-bin/$CGI->{_name}
+   </example>
+  </examples>
+END
+	#
+	#  Put /cgi/GET/out
+	#
+	if (my $out = $CGI->{GET}->{out}) {
+		#
+		#  Open <out>
+		#
+		print <<END;
+  <out$out->{'@content-type'}>
+END
+		#
+		#  Put the <putter>s.
+		#
+		if (my $putter = $out->{putter}) {
+			my $n = $putter->{'@name'};
+			print <<END;
+   <putter name="$n">
+END
+
+			#
+			#  Put the <query-args>
+			#
+			if (defined $putter->{'query-args'}) {
+				my $query_args = $putter->{'query-args'};
+				#
+				#  Open <query-args>
+				#
+				print <<END;
+    <query-args>
+END
+				#
+				#  Put <query-arg>
+				#
+				for (keys %{$query_args->{arg}}) {
+					my $arg = $query_args->{arg}->{$_};
+					#
+					#  Open/Close <arg>
+					#
+					print <<END;
+     <arg name="$arg->{name}" />
+END
+				}
+				#
+				#  Close <query-args>
+				#
+				print <<END;
+    </query-args>
+END
+			}
+			#
+			#  Close <putter>
+			#
+			print <<END;
+   </putter>
+END
+			}
+		#
+		#  Close <out>
+		#
+		print <<END;
+  </out>
+END
+	}
+
+	#
+	#  Close <GET>
+	#
+	print <<END;
+ </GET>
+END
+}
+#
+#  Put /cgi/POST
+#
+if (defined $CGI->{POST}) {
+	#
+	#  Open <POST>
+	#
+	print <<END;
+ <POST>
+END
+	#
+	#  Put /cgi/POST/in
+	#
+	if (my $in = $CGI->{POST}->{in}) {
+		#
+		#  Open <in>
+		#
+		print <<END;
+  <in>
+END
+		#
+		#  Put the <putter>s.
+		#
+		if (my $putter = $in->{putter}) {
+			my $n = $putter->{'@name'};
+			print <<END;
+   <putter name="$n">
+END
+
+			#
+			#  Put the <query-args>
+			#
+			if (defined $putter->{'vars'}) {
+				my $vars = $putter->{'var'};
+				#
+				#  Open <query-args>
+				#
+				print <<END;
+    <vars>
+END
+				#
+				#  Put <query-arg>
+				#
+				for (keys %{$vars->{var}}) {
+					my $var = $vars->{var}->{$_};
+					#
+					#  Open/Close <var>
+					#
+					print <<END;
+     <var name="$var->{name}" />
+END
+				}
+				#
+				#  Close <query-args>
+				#
+				print <<END;
+    </vars>
+END
+			}
+			#
+			#  Close <putter>
+			#
+			print <<END;
+   </putter>
+END
+			}
+		#
+		#  Close <out>
+		#
+		print <<END;
+  </in>
+END
+	}
+
+	#
+	#  Close <GET>
+	#
+	print <<END;
+ </POST>
+END
+}
+
+#
+#  Close <cgi>
+#
+print <<END;
+</cgi>
+END

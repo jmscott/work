@@ -1,0 +1,9 @@
+<div id="footer">
+ <ul>
+  <li>
+   <a
+   	class="active"
+   	href="/">Home</a>
+  </li>
+ </ul>
+</div>

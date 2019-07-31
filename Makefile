@@ -5,22 +5,20 @@
 #	local-linux.mk.example
 #	local-darwin.mk.example
 #	https://github.com/jmscott/work
-#  Note:
-#	See local-<os>.mk.example
 #
 include local.mk
 include jmscott.mk
 
-COMPILED=fork-me halloc.o idiff istext stale-mtime
+COMPILED=flatx fork-me halloc.o idiff istext stale-mtime
 
 all: $(COMPILED)
-	cd httpd2 && $(MAKE) $(MFLAGS) all
+	cd www && $(MAKE) $(MFLAGS) all
 install: all
-	install -g $(DIST_GROUP) -o $(DIST_USER) -m u=rwx,go=rx		\
-		-d $(DIST_ROOT)
-	install -g $(DIST_GROUP) -o $(DIST_USER) -m u=rwx,go=rx		\
-		-d $(DIST_ROOT)/bin
-	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=xr		\
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
+		-d $(JMSCOTT_PREFIX)
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
+		-d $(JMSCOTT_PREFIX)/bin
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		idiff							\
 		istext							\
 		make-dist						\
@@ -37,10 +35,10 @@ install: all
 		svn-ignore						\
 		xtitle							\
 		zap-proc						\
-		$(DIST_ROOT)/bin
-	install -g $(DIST_GROUP) -o $(DIST_USER) -m u=rwx,go=rx		\
-		-d $(DIST_ROOT)/src
-	install -g $(DIST_GROUP) -o $(DIST_USER) -m ugo=r		\
+		$(JMSCOTT_PREFIX)/bin
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
+		-d $(JMSCOTT_PREFIX)/src
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r		\
 		flatx.c							\
 		fork-me.c						\
 		halloc.c						\
@@ -48,33 +46,36 @@ install: all
 		idiff.c							\
 		istext.c						\
 		stale-mtime.c						\
-		$(DIST_ROOT)/src
-	cd httpd2 && $(MAKE) $(MFLAGS) install
+		$(JMSCOTT_PREFIX)/src
+	cd www && $(MAKE) $(MFLAGS) install
 
 clean:
-	cd httpd2 && $(MAKE) $(MFLAGS) clean
+	cd www && $(MAKE) $(MFLAGS) clean
 	rm -f $(COMPILED)
 distclean:
-	cd httpd2 && $(MAKE) $(MFLAGS) distclean
-	rm -rf $(DIST_ROOT)/bin $(DIST_ROOT)/src 
+	cd www && $(MAKE) $(MFLAGS) distclean
+	rm -rf $(JMSCOTT_PREFIX)/bin $(JMSCOTT_PREFIX)/src 
 
 idiff: idiff.c
-	cc -Wall -Wextra -o idiff idiff.c
+	cc $(CFLAGS) -o idiff idiff.c
 
 istext: istext.c
-	cc -Wall -Wextra -o istext istext.c
+	cc $(CFLAGS) -o istext istext.c
 
 halloc.o: halloc.c
-	cc -Wall -Wextra -c halloc.c
+	cc $(CFLAGS) -c halloc.c
 
 fork-me: fork-me.c
-	cc -Wall -Wextra -o fork-me fork-me.c
+	cc $(CFLAGS) -o fork-me fork-me.c
 
 stale-mtime: stale-mtime.c
-	cc -Wall -Wextra -o stale-mtime stale-mtime.c
+	cc $(CFLAGS) -o stale-mtime stale-mtime.c
+
+flatx: flatx.c
+	cc $(CFLAGS) -o flatx flatx.c -lexpat
 
 world:
-	cd httpd2 && $(MAKE) $(MFLAGS) world
+	cd www && $(MAKE) $(MFLAGS) world
 	$(MAKE) $(MFLAGS) clean
 	$(MAKE) $(MFLAGS) all
 	$(MAKE) $(MFLAGS) distclean

@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+#
+#  Synopsis:
+#	Implements argument processing for /cgi-bin/form.
+#  Source Path:
+#	form.cgi
+#  Source SHA1 Digest:
+#	No SHA1 Calculated
+#  GitHub:
+#	https://github.com/jmscott/work/tree/master/httpd2
+#  Note:
+#	/cgi-bin/form was generated automatically by cgi2perl5.
+#
+#	Do not make changes directly to this script.
+#
+die "SERVER_ROOT environment variable not defined"
+				unless defined $ENV{SERVER_ROOT};
+
+#
+#  Prepend the $SERVER_ROOT/lib directory
+#  to the load path.
+#
+unshift @INC, "$ENV{SERVER_ROOT}/lib";
+
+our (%CGI);
+
+require 'httpd2.d/common.pl';
+$CGI{name} = 'form';
+
+#
+#  BEGIN: /cgi/POST/in/putter[@name='post.dump']
+#
+$CGI{POST}->{in}->{putter}->{'post.dump'}->{name} = 'post.dump';
+#
+#  END: /cgi/POST/in/putter[@name='post.dump']
+#
+
+
+#
+#  BEGIN: /cgi/POST/in/putter[@name='religion']
+#
+$CGI{POST}->{in}->{putter}->{'religion'}->{name} = 'religion';
+$CGI{POST}->{in}->{putter}->{'religion'}->{vars}->{var}->{religion} = {
+	perl5_re	=>	'jewish|christian|muslim|hindu|buddhist|agnostic|atheist',
+	required	=>	'yes',
+};
+#
+#  END: /cgi/POST/in/putter[@name=religion]/vars
+#
+
+#
+#  END: /cgi/POST/in/putter[@name='religion']
+#
+
+$CGI{GET}->{out}->{putter}->{help}->{name} = 'help';
+$CGI{GET}->{out}->{putter}->{help}->{'content-type'} = 'text/html';
+
+require "httpd2.d/$ENV{REQUEST_METHOD}.pl";

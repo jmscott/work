@@ -1,0 +1,327 @@
+#!/usr/local/bin/perl
+#
+#  Synopsis:
+#	Splice default elements into a <cgi> document from an inherited tree.
+#  Usage:
+#	cgi-inherit to-transform.cgi inherit.cgi
+#  Depends:
+#	perl module XML::Parser
+#	perl module Digest;
+#
+#  Description:
+#	Rewrite <cgi>//* elements with the atttribute
+#
+#		inherit="yes"
+#
+#	set.  Currently only <arg inherit="yes"> elements are rewritten.
+#
+#  Note:
+#	Both the transformable cgi and inherit cgi documents are assumed 
+#	to have been verified against a DTD.  That DTD has not been written.
+#	Come the revolution.
+#
+use XML::Parser;
+use Digest;
+
+my $PROG = 'cgi-inherit';
+
+my $USAGE = "$PROG script.cgi default.cgi";
+my ($default_tree, $default_path, $default_sha);
+
+$SIG{__DIE__} = sub
+{
+	chop(my $msg = join('', @_));
+	#
+	#  Strip off trailing ' at ./file.pl line 123.'
+	#
+	$msg =~ s/ at [\w\/.-]+ line \d+\.$//;
+	print STDERR "$PROG: $msg\n";
+	print STDERR "usage: $USAGE\n";
+	exit 1;
+};
+
+sub encode_xml_entities
+{
+	my $e = $_[0];
+
+	$e =~ s/&/\&amp;/g;		#  #38;
+	$e =~ s/</\&lt;/g;		#  #60;
+	$e =~ s/>/\&gt;/g;		#  #62;
+	$e =~ s/"/\&quot;/g;		#  #34;
+	$e =~ s/'/\&apos;/g;		#  #39;
+
+	return $e;
+}
+
+sub open_element
+{
+	my ($element, $atts) = @_;
+
+	print '<', $element, "\n";
+	for my $a (keys %{$atts}) {
+		printf("\t%s=\"%s\"\n", $a, encode_xml_entities($atts->{$a}));
+	}
+	print "\n>";
+}
+
+sub find_element
+{
+	my ($element, $kids) = @_;
+
+	for (my $i = 1;  defined $kids->[$i];  $i += 2) {
+		return $kids->[$i + 1] if $kids->[$i] eq $element;
+	}
+	return undef;	
+}
+
+sub put_twig
+{
+	my %arg = @_;
+	my (
+		$name,
+		$twig,
+		$depth,
+		$atts
+	) = (
+		$arg{name},
+		$arg{twig},
+		$arg{depth},
+		$arg{atts},
+	);
+
+	print "<$name";
+
+	#
+	#  Write any extra attributes defined by the caller.
+	#
+	if (defined $atts) {
+		print "\n";
+		for my $a (keys %$atts) {
+			printf "	$a=\"$atts->{$a}\"\n";
+		}
+	}
+
+	#
+	#  Write the attributes defined in the twig.
+	#
+	if (my $att = $twig->[0]) {
+		print "\n" unless defined $atts;
+		for my $a (keys %$att) {
+			printf "	$a=\"$att->{$a}\"\n";
+		}
+	}
+	
+	print ">";
+
+	for (my $i = 1;  defined $twig->[$i];  $i += 2) {
+		if ($twig->[$i] eq '0') {
+			print encode_xml_entities($twig->[$i + 1]);
+		} else {
+			put_twig(
+				name	=>	$twig->[$i],
+				twig	=>	$twig->[$i + 1],
+				depth	=>	$depth + 1,
+			);
+		}
+	}
+	print "</$name>\n" if $depth > 0;
+}
+
+sub put_GET_arg
+{
+	my ($atts) = $_[0];
+	my $name = $atts->{name};
+
+	my ($arg, $GET, $out, $query_args);
+
+	#
+	#  Find GET/out/query-args/arg.
+	#
+	if (($GET = find_element('GET', $default_tree->[1])) &&
+	    ($out = find_element('out', $GET)) &&
+	    ($query_args = find_element('query-args', $out))) {
+		#
+		#  Find the <arg name="$name"
+		#
+		for (my $i = 1;  defined $query_args->[$i];  $i += 2) {
+			if ($query_args->[$i] eq 'arg' &&
+			    $query_args->[$i + 1]->[0]->{name} eq $name) {
+				$arg = $query_args->[$i + 1];
+				last;
+			}
+		}
+	}
+	die "can't find <arg [\@name=$name" unless $arg;
+	#
+	#  Write the entire <arg> twig.
+	#
+	put_twig(
+		name	=>	'arg',
+		twig	=>	$arg,
+		depth	=>	0,
+		#
+		#  Added the 'required' attribute.
+		#  Really need to add all attributes in current
+		#  element not equal to default or name.
+		#
+		atts	=>	$atts->{required} eq 'yes' ?
+				{
+					required => 'yes'
+				} : {},
+	);
+}
+
+sub put_POST_var
+{
+	my ($atts) = $_[0];
+	my $name = $atts->{name};
+
+	my ($var, $POST, $in, $vars);
+
+	#
+	#  Find POST/in/vars/var.
+	#
+	if (($POST = find_element('POST', $default_tree->[1])) &&
+	    ($in = find_element('in', $POST)) &&
+	    ($vars = find_element('vars', $in))) {
+		#
+		#  Find the <var name="$name"
+		#
+		for (my $i = 1;  defined $vars->[$i];  $i += 2) {
+			if ($vars->[$i] eq 'var' &&
+			    $vars->[$i + 1]->[0]->{name} eq $name) {
+				$var = $vars->[$i + 1];
+				last;
+			}
+		}
+	}
+	die "can't find <var [\@name=$name" unless $var;
+	#
+	#  Write the entire <var> twig.
+	#
+	put_twig(
+		name	=>	'var',
+		twig	=>	$var,
+		depth	=>	0,
+		#
+		#  Added the 'required' attribute.
+		#  Really need to add all attributes in current
+		#  element not equal to default or name.
+		#
+		atts	=>	$atts->{required} eq 'yes' ?
+				{
+					required => 'yes'
+				} : {},
+	);
+}
+
+sub start
+{
+	my ($p, $element, %att) = @_;
+
+	#
+	#  If the element is not //arg|var[@inherit="yes"]
+	#  then just put the xml file.
+	#
+	if (($element ne 'arg' && $element ne 'var') || $att{inherit} ne 'yes'){
+		open_element($element, \%att);
+		#
+		#  Add /cgi/inherit/source to /cgi
+		#
+		if ($element eq 'cgi') {
+			my $p = encode_xml_entities($default_path);
+			my $s = encode_xml_entities($default_sha);
+			print <<END;
+<inherit>
+ <source
+ 	path="$p"
+	sha1="$s"
+ />
+</inherit>
+END
+		}
+		return;
+	}
+
+	#
+	#  The element matches //arg|var[@inherit="yes"
+	#
+	my $name = $att{name};
+
+	if ($element eq 'arg') {
+		put_GET_arg(\%att);
+	} elsif ($element eq 'var') {
+		put_POST_var(\%att);
+	} else {
+		die "impossible element: $element";
+	}
+}
+
+sub end
+{
+	my ($p, $element) = @_;
+
+	print '</', $element, '>';
+}
+
+sub char
+{
+	print encode_xml_entities($_[1]);
+}
+
+die "missing arguments" if @ARGV == 0;
+die "wrong number of arguments" unless @ARGV == 2;
+
+#
+#  Load the <cgi> document into memory.
+#
+my $cgi_path = shift @ARGV;
+my $cgi = new XML::Parser(
+	Style		=>	'Stream',
+	Handlers	=> {
+				Start	=>	\&start,
+				End	=>	\&end,
+				Char	=>	\&char,
+			},
+) or die "new XML::Parser(cgi:$cgi_path) failed: $!";
+
+#
+#  Load <cgi> defaults into memory, parsing each default file into a tree.
+#
+my $path = shift @ARGV;
+my $p = new XML::Parser(
+		Style => 'Tree'
+) or die "new XML::Parser(default:$path) failed: $!";
+$default_path = $path;
+
+#
+#  Calculate the sha1 digest of the default source path.
+#  Note: some distros install Digest::SHA, other Digest::SHA1,
+#        so just use Digest() to be safe.
+#
+if (my $sha = new Digest('SHA-1')) {
+	my $fd;
+
+	open($fd, "<$path") or die "open(<$path) failed: $!";
+	$sha->addfile($fd);
+	close($fd) or die "close(<$path) failed: $!";
+	$default_sha = $sha->hexdigest;
+} else {
+	die "new Digest(SHA-1) failed: $!";
+}
+
+$default_tree = $p->parsefile($path);
+
+#
+#  Walk the <cgi> tree, replacing elements with the attribute.
+#
+#	<arg
+#		name="abc"
+#		inherit="yes"
+#	>
+#
+#  with the corresponding /cgi/GET/out/query-arg/arg.
+#
+$cgi->parsefile($cgi_path);
+
+exit 0;

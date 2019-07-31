@@ -17,9 +17,11 @@ endif
 
 SHELL?=/bin/bash
 
-DIST_USER?=$(USER)
+INSTALL_USER?=$(USER)
 ifeq "$(UNAME)" "Darwin"
-	DIST_GROUP?=staff
+	INSTALL_GROUP?=staff
 else
-	DIST_GROUP?=$(USER)
+	INSTALL_GROUP?=$(USER)
 endif
+
+JMSCOTT_PREFIX?=$(INSTALL_PREFIX)/jmscott
