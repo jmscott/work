@@ -7,8 +7,8 @@ include ../local.mk
 include ../jmscott.mk
 
 WWW_PREFIX?=$(JMSCOTT_PREFIX)/www
-WWW_USER=$(INSTALL_USER)
-WWW_GROUP=$(INSTALL_GROUP)
+WWW_USER?=$(INSTALL_USER)
+WWW_GROUP?=$(INSTALL_GROUP)
 
 COMPILED=	env env.d/help.pl 					\
 		form form.d/help.pl
