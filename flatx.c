@@ -813,6 +813,7 @@ main(int argc, char **argv)
 		case CHAR_STATE_SEARCH:
 			die(EXIT_NO_ELEMENT, buf);
 			/*NOTREACHED*/
+			break;
 
 		/*
 		 *  This error implies a syntactically incorrect document,
@@ -821,6 +822,7 @@ main(int argc, char **argv)
 		case CHAR_STATE_EXTRACTING:
 			die(EXIT_PANIC, "impossible CHAR_STATE_EXTRACTING");
 			/*NOTREACHED*/
+			break;
 
 		case CHAR_STATE_DONE:
 			break;
