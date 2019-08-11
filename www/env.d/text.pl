@@ -2,16 +2,18 @@
 #  Synopsis:
 #	Write the value of an environment variable or query argument as text.
 #  Usage:
-#	/cgi-bin/env?out=text&qarg=var
+#	/cgi-bin/env?out=text&qarg=blob
+#	/cgi-bin/env?out=text&earg=PATH
 #  Depends:
 #	&encode_html_entities(), %QUERY_ARG
 #
+require 'httpd2.d/common.pl';
 
 our (%QUERY_ARG, $left_RE, $right_RE);
 
 #
 #  Put the value of either an environment variable, named in
-#  the 'var' argument or put a query argument, named in the 'arg' query
+#  the 'evar' argument or put a query argument, named in the 'qarg' query
 #  variable.
 #
 if (my $evar = $QUERY_ARG{evar}) {
