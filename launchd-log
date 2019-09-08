@@ -1,0 +1,47 @@
+#/bin/bash
+#
+#  Synopsis:
+#	Trivial help script to log start/stop of process execed by launchd.
+#  Usage:
+#	launchd-log bin/flowd server etc/blobio.flow
+#  Note:
+#	The script is just a cheap replacement for a more proper syslog
+#	facility.
+#
+#  Exit Status:
+#	*	exit status of launched process
+#  	127	unexpected error in launchd-log
+#
+
+PROG=$(basename $0)
+
+log()
+{
+	echo "$PROG: $(date +'%Y/%m/%d %H:%M:%S'): $@"
+}
+
+leave()
+{
+	log 'good bye, cruel world'
+	exit
+}
+
+die()
+{
+	log "ERROR: $@" >&1
+	exit 127
+}
+
+test $# -gt 0 || die 'wrong number of arguments, expected > 0'
+PROG="$PROG: $(basename $1)"
+
+log "hello, world"
+trap leave EXIT TERM INT QUIT
+log "executing: $@"
+$@ 2>&1 | while read LINE;  do
+	log $LINE
+done
+STATUS=${PIPESTATUS[*]}
+log "process exited with status: $STATUS" 
+STATUS=$(echo $STATUS | awk '{print $1}')
+exit $STATUS

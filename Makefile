@@ -18,6 +18,11 @@ install: all
 		-d $(JMSCOTT_PREFIX)
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/bin
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
+		-d $(JMSCOTT_PREFIX)/sbin
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
+		launchd-log						\
+		$(JMSCOTT_PREFIX)/sbin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		idiff							\
 		istext							\
@@ -54,7 +59,9 @@ clean:
 	rm -f $(COMPILED)
 distclean:
 	cd www && $(MAKE) $(MFLAGS) distclean
-	rm -rf $(JMSCOTT_PREFIX)/bin $(JMSCOTT_PREFIX)/src 
+	rm -rf $(JMSCOTT_PREFIX)/bin
+	rm -rf $(JMSCOTT_PREFIX)/sbin
+	rm -rf $(JMSCOTT_PREFIX)/src
 
 idiff: idiff.c
 	cc $(CFLAGS) -o idiff idiff.c
