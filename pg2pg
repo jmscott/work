@@ -6,9 +6,17 @@
 #  	pg2pg [upgrade|dump|template] <config file>
 #	pg2pg upgrade 9.6beta4.conf
 #	pg2pg template >9.6rc1.conf
+#  Template:
+#	Generate template that describes upgrade from old db to new db.
+#
+#		pg2pg template >pg2pg.conf
+#
+#	Edit paramters in pg2pg.conf.  Typically only need to set
+#	OLD_PGHOME and NEW_PGHOME		
+#
 #  Checklist:
 #	upgrade:
-#  		Fresh initdb run against $NEW_PGHOME
+#  		Fresh $NEW_PGHOME/bin/initdb run to build new $NEW_PGHOME.
 #		Copy files $OLD_PGDATA/{postgresql,pg_hba}.conf to $NEW_PGDATA
 #  		In $OLD_PGDATA/postgresql.conf, 'port' GUC set to $OLD_PGPORT
 #  		In $NEW_PGDATA/postgresql.conf, 'port' GUC set to $NEW_PGPORT
@@ -19,10 +27,13 @@
 #	  	Both old and new servers not running
 #	dump:
 #		Old server is running, new server is NOT running
-#		New is bootable (initdb) but not running
+#		New is bootable (initdb) but not running.
 #  See:
 #	https://github.com/jmscott/work/pg2pg
 #  Note:
+#	pg_upgrade cannot upgrade reg* data types.  For example, text search
+#	using the regclass, so you must use pg2pg dump.
+#
 #  	Ought to convert the checklist to an actions
 #
 #  		pg2pg checklist
@@ -38,7 +49,7 @@ log()
 
 usage()
 {
-	log "usage: $PROG [dump|upgrade|template] <upgrade.conf>"
+	log "usage: $PROG [dump|upgrade|template] <upgrade.conf> [--link|clone]"
 }
 
 die()
@@ -55,7 +66,7 @@ leave()
 
 case $# in
 1)
-	test $1 = 'template' || die "unexpected action: $1"
+	test $1 = 'template' || die "expected action 'template'"
 	cat <<END
 #
 #  pg2pg configuration generated $(date)
@@ -82,7 +93,7 @@ OLD_PGHOME=/usr/local/postgres/pgsql-9.5.2
 OLD_PGDATA=\$OLD_PGHOME/data
 OLD_PGHOST=/tmp
 #
-#  OLD_PGPORT must match 'port' guc in $OLD_PGDATA/postgresql.conf
+#  OLD_PGPORT must match 'port' guc in \$OLD_PGDATA/postgresql.conf
 #
 OLD_PGPORT=50432
 
@@ -92,7 +103,7 @@ NEW_PGHOME=/usr/local/postgres/pgsql-9.6beta1
 NEW_PGDATA=\$NEW_PGHOME/data
 NEW_PGHOST=/tmp
 #
-#  NEW_PGPORT must match 'port' guc in $NEW_PGDATA/postgresql.conf
+#  NEW_PGPORT must match 'port' guc in \$NEW_PGDATA/postgresql.conf
 #
 NEW_PGPORT=5433
 END
@@ -101,6 +112,14 @@ END
 2)
 	ACTION=$1
 	CONF=$2
+	;;
+3)
+	ACTION=$1
+	CONF=$2
+	LINK=$3
+	if [ "$LINK" != '--link' -a "$LINK" != '--clone' ];  then
+		die "unknown option: $LINK"
+	fi
 	;;
 *)
 	die 'wrong number of arguments'
@@ -113,7 +132,7 @@ test -e $CONF || die "config file does not exist: $CONF"
 test -r $CONF || die "can not read config file: $CONF"
 . $CONF
 
-export PGUSER=postgres
+export PGUSER=${PGUSER:=postgres}
 
 #
 #  pg_upgrade parallel jobs
@@ -180,7 +199,7 @@ upgrade)
 
 	log "version: $($PG_UPGRADE --version)"
 
-	$PG_UPGRADE --verbose --jobs=$JOBS
+	$PG_UPGRADE $LINK --verbose --jobs=$JOBS
 	STATUS=$?
 	test $STATUS -eq 0 ||
 			die "ERROR: pg_upgrade failed: exit status=$STATUS"
