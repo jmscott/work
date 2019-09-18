@@ -31,6 +31,11 @@
 #  See:
 #	https://github.com/jmscott/work/pg2pg
 #  Note:
+#	pg2pg requires at least an empty the source database to exist
+#	on the target.  instead, the source db should be dumped with
+#	-C create option and the target should be conditionally dropped 
+#	or renamed first.
+#
 #	pg_upgrade cannot upgrade reg* data types.  For example, text search
 #	using the regclass, so you must use pg2pg dump.
 #
