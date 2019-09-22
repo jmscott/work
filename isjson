@@ -1,0 +1,6 @@
+python -m json.tool $@ >/dev/null 2>&1
+if [ $? = 0 ];  then
+	echo "YES: valid json"
+else
+	echo "NO: invalid json"
+fi
