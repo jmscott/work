@@ -78,23 +78,25 @@ print <<'END';
     <li><code>inherit:</code> yes</li>
    </ul>
   </dd>
-  <dt>inty</dt>
+  <dt>type</dt>
   <dd>
    <ul>
     <li><code>inherit:</code> yes</li>
+    <li><code>perl5_re:</code> text|hidden|submit</li>
     <li><code>required:</code> yes</li>
    </ul>
   </dd>
   <dt>evar</dt>
   <dd>
    <ul>
-    <li><code>inherit:</code> yes</li>
+    <li><code>perl5_re:</code> .{1,64}</li>
    </ul>
   </dd>
   <dt>qarg</dt>
   <dd>
    <ul>
-    <li><code>inherit:</code> yes</li>
+    <li><code>perl5_re:</code> .{1,64}</li>
+    <li><code>required:</code> yes</li>
    </ul>
   </dd>
   </dl>
@@ -109,7 +111,7 @@ print <<'END';
    <dt><a href="/cgi-bin/env?out=text&evar=REQUEST_METHOD">/cgi-bin/env?out=text&#38;evar=REQUEST_METHOD</a></dt>
    <dd>Write a text chunk that is the value of the REQUEST_METHOD 
 	environment variable.</dd>
-   <dt><a href="/cgi-bin/env?out=input&qarg=dog&dog=bark&id=pet&type=text&inro=yes&inty=text">/cgi-bin/env?out=input&#38;qarg=dog&#38;dog=bark&#38;id=pet&#38;type=text&#38;inro=yes&#38;inty=text</a></dt>
+   <dt><a href="/cgi-bin/env?out=input&qarg=dog&dog=bark&id=pet&type=text&inro=yes">/cgi-bin/env?out=input&#38;qarg=dog&#38;dog=bark&#38;id=pet&#38;type=text&#38;inro=yes</a></dt>
    <dd>Write an html &#60;input&#62; element using the query argument
 	dog for the value of the input.  The type attribute is set to text and
 	the readonly=&#34;readonly&#34; attribute is set.</dd>

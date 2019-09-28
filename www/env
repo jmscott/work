@@ -94,12 +94,16 @@ $CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{name} = {
 };
 $CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{inro} = {
 };
-$CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{inty} = {
+$CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{type} = {
+	perl5_re	=>	'text|hidden|submit',
 	required	=>	'yes',
 };
 $CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{evar} = {
+	perl5_re	=>	'.{1,64}',
 };
 $CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{qarg} = {
+	perl5_re	=>	'.{1,64}',
+	required	=>	'yes',
 };
 #
 #  END: /cgi/GET/out/putter[@name=input]/query-args

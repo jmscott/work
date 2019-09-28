@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Note:
+  	The requirement of both "evar" and "qarg" being define is broken.
+	Need to collapse "evar" and "qarg" into single require "var" and 
+	add required "source".
+-->
 <cgi
 	name="env"
  >
@@ -22,7 +28,7 @@
   </example>
   <example
 	query=
-"out=input&amp;qarg=dog&amp;dog=bark&amp;id=pet&amp;type=text&amp;inro=yes&amp;inty=text"
+"out=input&amp;qarg=dog&amp;dog=bark&amp;id=pet&amp;type=text&amp;inro=yes"
   >
   	Write an html &lt;input&gt; element using the query argument
 	dog for the value of the input.  The type attribute is set to text and
@@ -101,17 +107,19 @@
 	inherit="yes"
     />
     <arg
-    	name="inty"
+    	name="type"
 	inherit="yes"
+	perl5_re="text|hidden|submit"
 	required="yes"
     />
     <arg
     	name="evar"
-	inherit="yes"
+	perl5_re=".{1,64}"
     />
     <arg
     	name="qarg"
-	inherit="yes"
+	perl5_re=".{1,64}"
+	required="yes"
     />
    </query-args>
   </putter>
