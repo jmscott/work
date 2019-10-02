@@ -25,7 +25,7 @@ print <<'END';
 <dd>Unix Process Environment</dd>
 <dt>Synopsis</dt>
 <dd>Build html elements doing simple string transformations of 
- values in the unix process environment.</dd>
+   values in the apache/unix process environment.</dd>
 <dt>Blame</dt>
 <dd>John the Scott, jmscott@setspace.com</dd>
   </dl>
@@ -41,18 +41,18 @@ print <<'END';
 <div class="query-args">
  <h4>Query Args</h4>
  <dl>
-  <dt>evar</dt>
+  <dt>name</dt>
   <dd>
    <ul>
-    <li><code>inherit:</code> yes</li>
-    <li><code>perl5_re:</code> .{1,64}</li>
+    <li><code>perl5_re:</code> \w{1,64}</li>
+    <li><code>required:</code> yes</li>
    </ul>
   </dd>
-  <dt>qarg</dt>
+  <dt>src</dt>
   <dd>
    <ul>
-    <li><code>inherit:</code> yes</li>
-    <li><code>perl5_re:</code> .{1,64}</li>
+    <li><code>default:</code> env</li>
+    <li><code>perl5_re:</code> env|QS</li>
    </ul>
   </dd>
   </dl>
@@ -66,37 +66,37 @@ print <<'END';
 <div class="query-args">
  <h4>Query Args</h4>
  <dl>
-  <dt>name - Name of &#60;input&#62; attribute</dt>
+  <dt>iname - Name of &#60;input&#62; attribute</dt>
   <dd>
    <ul>
     <li><code>perl5_re:</code> \w{1,16}</li>
    </ul>
   </dd>
-  <dt>inro</dt>
+  <dt>ro</dt>
   <dd>
    <ul>
-    <li><code>inherit:</code> yes</li>
+    <li><code>default:</code> no</li>
+    <li><code>perl5_re:</code> yes|no</li>
    </ul>
   </dd>
   <dt>type</dt>
   <dd>
    <ul>
-    <li><code>inherit:</code> yes</li>
     <li><code>perl5_re:</code> text|hidden|submit</li>
     <li><code>required:</code> yes</li>
    </ul>
   </dd>
-  <dt>evar</dt>
+  <dt>name</dt>
   <dd>
    <ul>
-    <li><code>perl5_re:</code> .{1,64}</li>
+    <li><code>perl5_re:</code> \w{1,64}</li>
    </ul>
   </dd>
-  <dt>qarg</dt>
+  <dt>src</dt>
   <dd>
    <ul>
-    <li><code>perl5_re:</code> .{1,64}</li>
-    <li><code>required:</code> yes</li>
+    <li><code>default:</code> env</li>
+    <li><code>perl5_re:</code> env|QS</li>
    </ul>
   </dd>
   </dl>
@@ -108,17 +108,23 @@ print <<'END';
 <div class="examples">
  <h3>Examples</h3>
  <dl>
-   <dt><a href="/cgi-bin/env?out=text&evar=REQUEST_METHOD">/cgi-bin/env?out=text&#38;evar=REQUEST_METHOD</a></dt>
-   <dd>Write a text chunk that is the value of the REQUEST_METHOD 
-	environment variable.</dd>
-   <dt><a href="/cgi-bin/env?out=input&qarg=dog&dog=bark&id=pet&type=text&inro=yes">/cgi-bin/env?out=input&#38;qarg=dog&#38;dog=bark&#38;id=pet&#38;type=text&#38;inro=yes</a></dt>
-   <dd>Write an html &#60;input&#62; element using the query argument
-	dog for the value of the input.  The type attribute is set to text and
-	the readonly=&#34;readonly&#34; attribute is set.</dd>
-   <dt><a href="/cgi-bin/env?out=dl&class=system&id=process-env">/cgi-bin/env?out=dl&#38;class=system&#38;id=process-env</a></dt>
+   <dt><a href="/cgi-bin/jmscott/env?out=text&name=REQUEST_METHOD">/cgi-bin/jmscott/env?out=text&#38;name=REQUEST_METHOD</a></dt>
+   <dd>Write a text chunk that is the value of the REQUEST_METHOD environment
+    variable.</dd>
+   <dt><a href="/cgi-bin/jmscott/env?out=input&name=dog&src=QS&dog=bark&id=pet&type=text&ro=yes">/cgi-bin/jmscott/env?out=input&#38;name=dog&#38;src=QS&#38;dog=bark&#38;id=pet&#38;type=text&#38;ro=yes</a></dt>
+   <dd>Write an html &#60;input&#62; element of type &#34;text&#34;, seeding the input value
+    from the query argument &#34;dog&#34; parsed from the
+    environment variable QUERY_STRING.  The type attribute is set to
+    &#34;text&#34; and the readonly=&#34;yes&#34; attribute is set.</dd>
+   <dt><a href="/cgi-bin/jmscott/env?out=input&src=QS&type=hidden&name=state&state=TX">/cgi-bin/jmscott/env?out=input&#38;src=QS&#38;type=hidden&#38;name=state&#38;state=TX</a></dt>
+   <dd>Write an html &#60;input&#62; element of type &#34;hidden&#34; seeded the
+    &#34;value&#34; attribute with the value of the &#34;state&#34; query argument.
+    Typically type &#34;hidden&#34; is used forms &#60;form&#62; elements needing
+    query arguments.</dd>
+   <dt><a href="/cgi-bin/jmscott/env?out=dl&class=system&id=process-env">/cgi-bin/jmscott/env?out=dl&#38;class=system&#38;id=process-env</a></dt>
    <dd>Write out a &#60;dl&#62; of all the environment variables, 
-  tagged with id &#34;process-env&#34; and class &#34;system&#34;</dd>
-   <dt><a href="/cgi-bin/env?out=text&qarg=foo&foo=Bar">/cgi-bin/env?out=text&#38;qarg=foo&#38;foo=Bar</a></dt>
+    tagged with id &#34;process-env&#34; and class &#34;system&#34;</dd>
+   <dt><a href="/cgi-bin/jmscott/env?out=text&name=foo&foo=Bar">/cgi-bin/jmscott/env?out=text&#38;name=foo&#38;foo=Bar</a></dt>
    <dd>Write a text chunk that is the value of the foo query argument.</dd>
  </dl>
 </div>

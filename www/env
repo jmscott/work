@@ -55,11 +55,13 @@ $CGI{GET}->{out}->{putter}->{'text'}->{name} = 'text';
 #
 #  BEGIN: /cgi/GET/out/putter[@name=text]/query-args
 #
-$CGI{GET}->{out}->{putter}->{'text'}->{'query-args'}->{arg}->{evar} = {
-	perl5_re	=>	'.{1,64}',
+$CGI{GET}->{out}->{putter}->{'text'}->{'query-args'}->{arg}->{name} = {
+	perl5_re	=>	'\w{1,64}',
+	required	=>	'yes',
 };
-$CGI{GET}->{out}->{putter}->{'text'}->{'query-args'}->{arg}->{qarg} = {
-	perl5_re	=>	'.{1,64}',
+$CGI{GET}->{out}->{putter}->{'text'}->{'query-args'}->{arg}->{src} = {
+	perl5_re	=>	'env|QS',
+	default	=>	'env',
 };
 #
 #  END: /cgi/GET/out/putter[@name=text]/query-args
@@ -89,21 +91,23 @@ $CGI{GET}->{out}->{putter}->{'input'}->{name} = 'input';
 #
 #  BEGIN: /cgi/GET/out/putter[@name=input]/query-args
 #
-$CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{name} = {
+$CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{iname} = {
 	perl5_re	=>	'\w{1,16}',
 };
-$CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{inro} = {
+$CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{ro} = {
+	perl5_re	=>	'yes|no',
+	default	=>	'no',
 };
 $CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{type} = {
 	perl5_re	=>	'text|hidden|submit',
 	required	=>	'yes',
 };
-$CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{evar} = {
-	perl5_re	=>	'.{1,64}',
+$CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{name} = {
+	perl5_re	=>	'\w{1,64}',
 };
-$CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{qarg} = {
-	perl5_re	=>	'.{1,64}',
-	required	=>	'yes',
+$CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{src} = {
+	perl5_re	=>	'env|QS',
+	default	=>	'env',
 };
 #
 #  END: /cgi/GET/out/putter[@name=input]/query-args
