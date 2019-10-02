@@ -40,7 +40,7 @@
     tagged with id &quot;process-env&quot; and class &quot;system&quot;
   </example>
 
-  <example query="out=text&amp;name=foo&amp;foo=Bar">
+  <example query="out=text&amp;name=foo&amp;foo=Bar&amp;src=QS">
     Write a text chunk that is the value of the foo query argument.
   </example>
 
