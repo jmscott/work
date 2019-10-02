@@ -20,25 +20,25 @@ distclean:
 	rm -rf $(WWW_PREFIX)/cgi-bin
 
 install: all
-	install -g $(WWW_GROUP) -o $(WWW_USER)			\
+	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(JMSCOTT_PREFIX)
-	install -g $(WWW_GROUP) -o $(WWW_USER)			\
+	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(JMSCOTT_PREFIX)/bin
 
-	install -g $(WWW_GROUP) -o $(WWW_USER)			\
+	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)
-	install -g $(WWW_GROUP) -o $(WWW_USER)			\
+	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)/cgi-bin
-	install -g $(WWW_GROUP) -o $(WWW_USER)			\
+	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)/lib
-	install -g $(WWW_GROUP) -o $(WWW_USER)			\
+	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)/lib/env.d
-	install -g $(WWW_GROUP) -o $(WWW_USER)			\
+	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)/lib/form.d
-	install -g $(WWW_GROUP) -o $(WWW_USER)			\
+	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)/lib/httpd2.d
 
-	install -g $(WWW_GROUP) -o $(WWW_USER) -m ugo=r		\
+	install -g $(WWW_GROUP) -o $(WWW_USER) -m ugo=r			\
 		dbi-pg.pl						\
 		env.cgi							\
 		form.cgi						\
@@ -48,15 +48,7 @@ install: all
 		property.pl						\
 		$(WWW_PREFIX)/lib
 
-	install -g $(WWW_GROUP) -o $(WWW_USER) -m ugo=r		\
-		env.d/div.pl						\
-		env.d/dl.pl						\
-		env.d/help.pl						\
-		env.d/input.pl						\
-		env.d/text.pl						\
-		$(WWW_PREFIX)/lib/env.d
-
-	install -g $(WWW_GROUP) -o $(WWW_USER) -m ugo=r		\
+	install -g $(WWW_GROUP) -o $(WWW_USER) -m ugo=r			\
 		httpd2.d/GET.pl						\
 		httpd2.d/POST.pl					\
 		httpd2.d/common.pl					\
@@ -66,14 +58,13 @@ install: all
 		httpd2.d/www-form-urlencoded.pl				\
 		$(WWW_PREFIX)/lib/httpd2.d
 
-	install -g $(WWW_GROUP) -o $(WWW_USER) -m ugo=r		\
+	install -g $(WWW_GROUP) -o $(WWW_USER) -m ugo=r			\
 		form.d/post.dump.pl					\
 		form.d/religion.pl					\
 		form.d/help.pl						\
 		$(WWW_PREFIX)/lib/form.d
 
-	install -g $(WWW_GROUP) -o $(WWW_USER) -m ugo=r		\
-		env.d/div.pl						\
+	install -g $(WWW_GROUP) -o $(WWW_USER) -m ugo=r			\
 		env.d/dl.pl						\
 		env.d/help.pl						\
 		env.d/input.pl						\
