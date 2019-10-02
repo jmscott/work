@@ -471,10 +471,10 @@ END
 		my $example = $examples->[$i + 1];
 		my $query = $example->[0]->{query};
 		my $dd_text = &find_text($example);
-		my $href = "/cgi-bin/$name?$query";
+		my $href = "/cgi-bin/jmscott/$name?$query";
 		my $a_text = &encode_html_entities($href);
 		print HELP <<END;
-   <dt><a href="/cgi-bin/$name?$query">$a_text</a></dt>
+   <dt><a href="/cgi-bin/jmscott/$name?$query">$a_text</a></dt>
    <dd>$dd_text</dd>
 END
 	}
