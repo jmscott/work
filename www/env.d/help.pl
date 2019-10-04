@@ -124,7 +124,7 @@ print <<'END';
    <dt><a href="/cgi-bin/jmscott/env?out=dl&class=system&id=process-env">/cgi-bin/jmscott/env?out=dl&#38;class=system&#38;id=process-env</a></dt>
    <dd>Write out a &#60;dl&#62; of all the environment variables, 
     tagged with id &#34;process-env&#34; and class &#34;system&#34;</dd>
-   <dt><a href="/cgi-bin/jmscott/env?out=text&name=foo&foo=Bar">/cgi-bin/jmscott/env?out=text&#38;name=foo&#38;foo=Bar</a></dt>
+   <dt><a href="/cgi-bin/jmscott/env?out=text&name=foo&foo=Bar&src=QS">/cgi-bin/jmscott/env?out=text&#38;name=foo&#38;foo=Bar&#38;src=QS</a></dt>
    <dd>Write a text chunk that is the value of the foo query argument.</dd>
  </dl>
 </div>
