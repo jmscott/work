@@ -108,23 +108,23 @@ print <<'END';
 <div class="examples">
  <h3>Examples</h3>
  <dl>
-   <dt><a href="/cgi-bin/jmscott/env?out=text&name=REQUEST_METHOD">/cgi-bin/jmscott/env?out=text&#38;name=REQUEST_METHOD</a></dt>
+   <dt><a href="/cgi-bin/env?out=text&name=REQUEST_METHOD">/cgi-bin/env?out=text&#38;name=REQUEST_METHOD</a></dt>
    <dd>Write a text chunk that is the value of the REQUEST_METHOD environment
     variable.</dd>
-   <dt><a href="/cgi-bin/jmscott/env?out=input&name=dog&src=QS&dog=bark&id=pet&type=text&ro=yes">/cgi-bin/jmscott/env?out=input&#38;name=dog&#38;src=QS&#38;dog=bark&#38;id=pet&#38;type=text&#38;ro=yes</a></dt>
+   <dt><a href="/cgi-bin/env?out=input&name=dog&src=QS&dog=bark&id=pet&type=text&ro=yes">/cgi-bin/env?out=input&#38;name=dog&#38;src=QS&#38;dog=bark&#38;id=pet&#38;type=text&#38;ro=yes</a></dt>
    <dd>Write an html &#60;input&#62; element of type &#34;text&#34;, seeding the input value
     from the query argument &#34;dog&#34; parsed from the
     environment variable QUERY_STRING.  The type attribute is set to
     &#34;text&#34; and the readonly=&#34;yes&#34; attribute is set.</dd>
-   <dt><a href="/cgi-bin/jmscott/env?out=input&src=QS&type=hidden&name=state&state=TX">/cgi-bin/jmscott/env?out=input&#38;src=QS&#38;type=hidden&#38;name=state&#38;state=TX</a></dt>
+   <dt><a href="/cgi-bin/env?out=input&src=QS&type=hidden&name=state&state=TX">/cgi-bin/env?out=input&#38;src=QS&#38;type=hidden&#38;name=state&#38;state=TX</a></dt>
    <dd>Write an html &#60;input&#62; element of type &#34;hidden&#34; seeded the
     &#34;value&#34; attribute with the value of the &#34;state&#34; query argument.
     Typically type &#34;hidden&#34; is used forms &#60;form&#62; elements needing
     query arguments.</dd>
-   <dt><a href="/cgi-bin/jmscott/env?out=dl&class=system&id=process-env">/cgi-bin/jmscott/env?out=dl&#38;class=system&#38;id=process-env</a></dt>
+   <dt><a href="/cgi-bin/env?out=dl&class=system&id=process-env">/cgi-bin/env?out=dl&#38;class=system&#38;id=process-env</a></dt>
    <dd>Write out a &#60;dl&#62; of all the environment variables, 
     tagged with id &#34;process-env&#34; and class &#34;system&#34;</dd>
-   <dt><a href="/cgi-bin/jmscott/env?out=text&name=foo&foo=Bar&src=QS">/cgi-bin/jmscott/env?out=text&#38;name=foo&#38;foo=Bar&#38;src=QS</a></dt>
+   <dt><a href="/cgi-bin/env?out=text&name=foo&foo=Bar&src=QS">/cgi-bin/env?out=text&#38;name=foo&#38;foo=Bar&#38;src=QS</a></dt>
    <dd>Write a text chunk that is the value of the foo query argument.</dd>
  </dl>
 </div>

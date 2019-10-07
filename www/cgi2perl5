@@ -25,14 +25,16 @@ my (
 	$cgi_bin_dir,
 	$cgi_lib_dir,
 	$source_sha1,
+	$cgi_help_alias,
 	@CGI,
 	$source_path,
-	$SOURCE
+	$SOURCE,
 ) = (
 	'/usr/bin/env perl',
 	'.',
 	'.',
-	'No SHA1 Calculated'
+	'No SHA1 Calculated',
+	'/cgi-bin'
 );
 
 my $USAGE = "$PROG [--help] [--<option>] --source-path xml1.cgi";
@@ -66,6 +68,10 @@ Options:
 			  are built in a cgi-lib/product.d directory.
 			  Currently, the subdirectory is always built.
 			  Defaults to .
+	--cgi-help-alias
+			Prefix to cgi-bin in help examples.  Default is
+			/cgi-bin .
+			
 	--perl5-path	Path to perl5 put at head of generated main scripts.
 			  Defaults to '/usr/bin/env perl'
 	--help		Generate this message.
@@ -469,10 +475,10 @@ END
 		my $example = $examples->[$i + 1];
 		my $query = $example->[0]->{query};
 		my $dd_text = &find_text($example);
-		my $href = "/cgi-bin/jmscott/$name?$query";
+		my $href = "$cgi_help_alias/$name?$query";
 		my $a_text = &encode_html_entities($href);
 		print HELP <<END;
-   <dt><a href="/cgi-bin/jmscott/$name?$query">$a_text</a></dt>
+   <dt><a href="$cgi_help_alias/$name?$query">$a_text</a></dt>
    <dd>$dd_text</dd>
 END
 	}
@@ -550,6 +556,9 @@ while (my $arg = shift @ARGV) {
 	} elsif ($arg eq '--cgi-bin-dir') {
 		die "option --cgi-bin-dir missing path"
 					unless $cgi_bin_dir = shift @ARGV;
+	} elsif ($arg eq '--cgi-help-alias') {
+		die "option --cgi-help-alias: missing alias path"
+				unless $cgi_help_alias = shift @ARGV;
 	} elsif ($arg eq '--cgi-lib-dir') {
 		die "option --cgi-lib-dir missing path"
 					unless $cgi_lib_dir = shift @ARGV;
