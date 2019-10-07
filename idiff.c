@@ -12,6 +12,9 @@
  *	jmscott@setspace.com
  *	https://github.com/jmscott
  *  Notes:
+ *	The 'e' command fails when created temp file in Max OSX Mojave.
+ *	The pain never ends.
+ *
  *	The prompt doesn't appear to echo to terminal under Mac OSX 10.10.5.
  *
  *	UTF-8 is not supported.
