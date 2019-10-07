@@ -295,7 +295,7 @@ dump)
 	sleep $NEW_START_PAUSE
 
 	log "loading $DUMP_SQL_FILE into new cluster ..."
-	psql -f $DUMP_SQL_FILE
+	psql postgres -f $DUMP_SQL_FILE
 	STATUS=$?
 	test $STATUS -eq 0 ||
 		die "pgsql -f $DUMP_SQL_FILE failed: exit status=$STATUS"
