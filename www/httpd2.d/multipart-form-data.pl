@@ -70,7 +70,7 @@ for my $part (split(/(\r\n)?--$boundary(?:--)?\r\n/, $POST_DATA)) {
 	#
 	#  Extract content type for binary data
 	#
-	if ($headers =~m/.*Content-Type: ([^\r\n]+).*/i) {
+	if ($headers =~ m/.*Content-Type: ([^\r\n]+).*/i) {
 		$ct = $1;
 	} else {
 		$ct = '';
