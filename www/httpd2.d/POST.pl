@@ -9,41 +9,47 @@ our (
 	$POST_DATA,
 );
 
+binmode STDIN;
+
 my $MAX_CONTENT_LENGTH = 1048576;
 
 #
 #  Slurp up the contents of the POST into $POST_DATA.
 #
-my $ct = $ENV{CONTENT_LENGTH};
-if ($ct > 0) {
+my $CL = $ENV{CONTENT_LENGTH};
+if ($CL > 0) {
 	#
 	#  Insure the content is not too big.
 	#
-	die "CONTENT_LENGTH too large: " .
-			"$ENV{CONTENT_LENGTH} > $MAX_CONTENT_LENGTH"
-						if $ct > $MAX_CONTENT_LENGTH;
+	die "CONTENT_LENGTH too large: " .  "$ENV{CL} > $MAX_CONTENT_LENGTH"
+						if $CL > $MAX_CONTENT_LENGTH
+	;
 	#
 	#  Read the posted content from stdin.
 	#  Ought to timeout read() call.
 	#
 	my ($buf, $nread);
-	while ($ct > 0 && ($nread = read(STDIN, $buf, $ct)) > 0) {
-		$ct -= $nread;
+	while ($CL > 0 && ($nread = read(STDIN, $buf, $CL)) > 0) {
+		$CL -= $nread;
 		$POST_DATA .= $buf;
 	}
-	die "POST: read($ct) failed: $!" if $nread <= 0;
+	die "POST: read($CL) failed: $!" if $nread <= 0;
 } else {
-	die "http: POST: content length not > 0: length=$ct";
+	die "http: POST: content length not > 0: length=$CL";
 }
 
 #
 #  Call the appropriate parser to map the POST_DATA into 
 #  various POST_* variables.
 #
-if ($ENV{CONTENT_TYPE} eq 'application/x-www-form-urlencoded') {
+my $CT = $ENV{CONTENT_TYPE};
+
+if ($CT eq 'application/x-www-form-urlencoded') {
 	require 'httpd2.d/www-form-urlencoded.pl';
+} elsif ($CT eq 'application/multipart-form-data') {
+	require 'httpd2.d/multipart-form-data.pl';
 } else {
-	die "POST: unknown CONTENT_TYPE: $ENV{CONTENT_TYPE}";
+	die "POST: unknown CONTENT_TYPE: $CT";
 }
 
 #

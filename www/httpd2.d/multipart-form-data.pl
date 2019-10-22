@@ -11,7 +11,7 @@ our(
 	%POST_VAR_FILENAME
 );
 
-my $dump_parts = 0;
+my $dump_parts = 1;
 
 print <<END if $dump_parts;
 Content-Type: text/plain
@@ -44,28 +44,31 @@ for my $part (split(/(\r\n)?--$boundary(?:--)?\r\n/, $POST_DATA)) {
 
 	my $length = length($part);
 	my ($headers, $body, $cd, $name, $filename, $ct, $cl) =
-						split('\r\n\r\n', $part,2);
+						split('\r\n\r\n', $part,2)
+	;
 	$headers =~ s/^\s*|\s*$//g;
 
 	#
 	#  Extract content disposition and name.
 	#
 	die "can't extract content dispostion from mime headers: $headers"
-	    unless $headers =~m/.*Content-Disposition: form-data;([^\r\n]+).*/i;
+	    unless $headers =~m/.*Content-Disposition: form-data;([^\r\n]+).*/i
+	;
 	$cd = $1;
 
 	#
 	#  Extract the name.
 	#
 	die "can't extract name from mime headers"
-				unless $cd =~ m/(?:\W|\A)name="([^"]+)".*/i;
+				unless $cd =~ m/(?:\W|\A)name="([^"]+)".*/i
+	;
 	$name = $1;
 	#
 	#  Extract the filename.
 	#
-	if ($cd =~ m/(?:\W|\A)filename="([^"]+)".*/i) {
-		$POST_VAR_FILENAME{$name} = $1;
-	}
+	$POST_VAR_FILENAME{$name} = $1
+				if $cd =~ m/(?:\W|\A)filename="([^"]+)".*/i
+	;
 
 	#
 	#  Extract content type for binary data
