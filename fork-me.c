@@ -27,11 +27,11 @@ main(int argc, char **argv)
 	if (argc != 2) {
 		static char badargc[] = "ERROR: wrong number of arguments\n";
 
-		(void)write(2, badargc, sizeof badargc - 1);
+		write(2, badargc, sizeof badargc - 1);
 		_exit(1);
 	}
 
-	(void)write(1, blurb, sizeof blurb - 1);
+	write(1, blurb, sizeof blurb - 1);
 
 	path = argv[1];
 	while (i++ < 100000) {
@@ -56,16 +56,16 @@ main(int argc, char **argv)
 				static char notzero[] =
 					"ERROR: child exit status not 0\n";
 
-				(void)write(2, notzero, sizeof notzero - 1);
+				write(2, notzero, sizeof notzero - 1);
 				_exit(1);
 			}
 		} else {
 			static char badkid[] =
 				"ERROR: child process did not exit normally\n";
-			(void)write(2, badkid, sizeof badkid - 1);
+			write(2, badkid, sizeof badkid - 1);
 			_exit(1);
 		}
 	}
-	(void)write(1, done, sizeof done - 1);
+	write(1, done, sizeof done - 1);
 	return 0;
 }
