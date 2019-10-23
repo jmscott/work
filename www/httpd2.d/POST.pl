@@ -1,6 +1,11 @@
 #
 #  Synopsis:
 #	Handle a POST http method, invoking code based on %CGI contents.
+#  Note:
+#	Multipart mime is not supported, which is wrong.
+#	Need to investigate
+#
+#		https://metacpan.org/release/MIME-tools
 #
 
 our (
@@ -11,12 +16,43 @@ our (
 
 binmode STDIN;
 
-my $MAX_CONTENT_LENGTH = 1048576;
+my $CL = $ENV{CONTENT_LENGTH};
+my $CT = $ENV{CONTENT_TYPE};
+
+my $MAX_CONTENT_LENGTH = 100 * 1024 * 1024;	#  100meg
+
+#  Verify the absolute maximum length, regardless of encoding
+#  Specifc encodings may enforce stricter limits.
+
+die "Content-Length too big: $CL > $MAX_CONTENT_LENGTH"
+				if $CL > $MAX_CONTENT_LENGTH
+;
 
 #
-#  Slurp up the contents of the POST into $POST_DATA.
+#  Call the appropriate parser to map build the POST_* variables.
 #
-my $CL = $ENV{CONTENT_LENGTH};
+
+#
+#  Slurp stdin into variable POST_DATA, enforcing Content_Length
+#
+#  Note:
+#	Not sure how apache2 handles
+#
+sub slurp_POST_DATA
+{
+	my ($limit, $nread, $nr) = ($CT, 0, 0);
+
+	while (($nread < $limit)
+}
+
+if ($CT eq 'application/x-www-form-urlencoded') {
+	require 'httpd2.d/www-form-urlencoded.pl';
+} elsif ($CT eq 'application/multipart-form-data') {
+	require 'httpd2.d/multipart-form-data.pl';
+} else {
+	die "POST: unknown CONTENT_TYPE: $CT";
+}
+
 if ($CL > 0) {
 	#
 	#  Insure the content is not too big.
@@ -42,7 +78,6 @@ if ($CL > 0) {
 #  Call the appropriate parser to map the POST_DATA into 
 #  various POST_* variables.
 #
-my $CT = $ENV{CONTENT_TYPE};
 
 if ($CT eq 'application/x-www-form-urlencoded') {
 	require 'httpd2.d/www-form-urlencoded.pl';
