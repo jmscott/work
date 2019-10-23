@@ -1,6 +1,6 @@
 /*
  *  Synopsis:
- *	Interactive diff of two US_ASCII text files.
+ *	Interactive diff of two US_ASCII text files, inspiration from Pike book.
  *  Usage:
  *	idiff [-c diffcmd] [-o output] file1 file2
  *  History:
@@ -10,16 +10,16 @@
  *	Well known unix diff program
  *  Blame:
  *	jmscott@setspace.com
- *	https://github.com/jmscott
+ *	https://github.com/jmscott/work
  *  Notes:
+ *	Replace fprintf(stderr) with die() and exit() with leave().
+ *
  *	The 'e' command fails when created temp file in Max OSX Mojave.
  *	The pain never ends.
  *
  *	The prompt doesn't appear to echo to terminal under Mac OSX 10.10.5.
  *
- *	UTF-8 is not supported.
- *
- *	Need to change deprecated mktemp() function to mkstemp() or mkdtemp().
+ *	UTF-8 is not been tested.
  *
  *	The pain never ends.
  */
@@ -86,8 +86,7 @@ static char *strerror(int err)
 static char *prog;
 static char *diffcmd;
 static char *editor = 0;
-static char *tempfile = 0;
-static char temppath[128];
+static char tempfile[BUFSIZ] = {0};
 static char *ofile = 0;
 static int child_pid;
 
@@ -178,9 +177,9 @@ static void cleanup(int sig)
 {
 	signal(sig, SIG_IGN);
 
-	if (tempfile) {
+	if (tempfile[0]) {
 		unlink(tempfile);
-		tempfile = 0;
+		tempfile[0] = 0;
 	}
 	if (sig) {
 		if (child_pid)
@@ -197,8 +196,7 @@ static void cleanup(int sig)
 
 static void idiff(FILE *f1, FILE *f2, FILE *fin, FILE *fout)
 {
-	char buf[MAXLINE], ed[BUFSIZ];
-	FILE *ft;
+	char buf[MAXLINE], ed[2 * BUFSIZ];
 	int cmd, n, from1, to1, from2, to2, nf1, nf2, again;
 
 	nf1 = nf2 = 0;
@@ -235,36 +233,50 @@ static void idiff(FILE *f1, FILE *f2, FILE *fin, FILE *fout)
 				break;
 
 			case 'v':
-			case 'e':
-				strcpy(temppath, "/tmp/idiff.XXXXXX");
+			case 'e': {
+				/*
+				 *  Note:
+				 *	Which of the goofy temp functions in
+				 *	posix simply gives me a temp path,
+				 *	not a FILE *.  I can not reopen
+				 *	a FILE * for reading!
+				 */ 
+				char *TMPDIR;
+				TMPDIR = getenv("TMPDIR");
+				if (TMPDIR == NULL)
+					TMPDIR = "/tmp";
 
-				if (!tempfile)
-					tempfile = mkdtemp(temppath);
-				if (!tempfile) {
-					fprintf(stderr,
-					  "%s: could not construct temp file\n",
-					  prog);
-					exit(127);
-				}
-				if (!editor) {
+				snprintf(tempfile, sizeof tempfile - 1,
+					"%s/idiff-%ld-%ld",
+					TMPDIR,
+					(long)getpid(),
+					(long)random()
+				);
+				FILE *ft = efopen(tempfile, "w");
+
+				if (editor == NULL) {
 					editor = getenv("EDITOR");
-					if (!editor)
+					if (editor == NULL)
 						editor = default_editor;
 				}
 				ncopy(f1, from1 - 1 - nf1, fout);
 				nskip(f2, from2 - 1 - nf2);
-				ft = efopen(tempfile, "w");
 				ncopy(f1, to1 + 1 - from1, ft);
 				fprintf(ft, "---\n");
 				ncopy(f2, to2 + 1 - from2, ft);
 				fclose(ft);
-				sprintf(ed, "%s %s", editor, tempfile);
+				snprintf(ed, sizeof ed - 1,
+					"%s %s",
+					editor,
+					tempfile
+				);
 				system(ed);
 				ft = efopen(tempfile, "r");
 				ncopy(ft, -1, fout);
 				fclose(ft);
 				unlink(tempfile);
-				break;
+				tempfile[0] = 0;
+			}	break;
 			
 			case '!':
 				system(buf + 1);
