@@ -28,31 +28,6 @@ die "Content-Length too big: $CL > $MAX_CONTENT_LENGTH"
 				if $CL > $MAX_CONTENT_LENGTH
 ;
 
-#
-#  Call the appropriate parser to map build the POST_* variables.
-#
-
-#
-#  Slurp stdin into variable POST_DATA, enforcing Content_Length
-#
-#  Note:
-#	Not sure how apache2 handles
-#
-sub slurp_POST_DATA
-{
-	my ($limit, $nread, $nr) = ($CT, 0, 0);
-
-	while (($nread < $limit)
-}
-
-if ($CT eq 'application/x-www-form-urlencoded') {
-	require 'httpd2.d/www-form-urlencoded.pl';
-} elsif ($CT eq 'application/multipart-form-data') {
-	require 'httpd2.d/multipart-form-data.pl';
-} else {
-	die "POST: unknown CONTENT_TYPE: $CT";
-}
-
 if ($CL > 0) {
 	#
 	#  Insure the content is not too big.
@@ -72,6 +47,19 @@ if ($CL > 0) {
 	die "POST: read($CL) failed: $!" if $nread <= 0;
 } else {
 	die "http: POST: content length not > 0: length=$CL";
+}
+
+#
+#  Call the appropriate parser to map build the POST_* variables.
+#
+
+
+if ($CT eq 'application/x-www-form-urlencoded') {
+	require 'httpd2.d/www-form-urlencoded.pl';
+} elsif ($CT eq 'application/multipart-form-data') {
+	require 'httpd2.d/multipart-form-data.pl';
+} else {
+	die "POST: unknown CONTENT_TYPE: $CT";
 }
 
 #
