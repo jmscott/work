@@ -10,7 +10,9 @@ WWW_PREFIX?=$(JMSCOTT_PREFIX)/www
 WWW_USER?=$(INSTALL_USER)
 WWW_GROUP?=$(INSTALL_GROUP)
 
-COMPILED=	env env.d/help.pl 					\
+COMPILED=								\
+		parse-http-rfc2388					\
+		env env.d/help.pl 					\
 		form form.d/help.pl
 
 all: $(COMPILED)
@@ -18,6 +20,9 @@ all: $(COMPILED)
 distclean:
 	rm -rf $(WWW_PREFIX)/lib
 	rm -rf $(WWW_PREFIX)/cgi-bin
+
+parse-http-rfc2388: parse-http-rfc2388.go
+	$(GODIST)/bin/go build parse-http-rfc2388.go
 
 install: all
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
@@ -27,6 +32,8 @@ install: all
 
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)
+	install -g $(WWW_GROUP) -o $(WWW_USER)				\
+		-d $(WWW_PREFIX)/sbin
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)/cgi-bin
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
@@ -78,6 +85,10 @@ install: all
 		cgi-template						\
 		cgi2perl5						\
 		$(JMSCOTT_PREFIX)/bin
+
+	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=rwx,go=rx		\
+		parse-http-rfc2388.go					\
+		$(JMSCOTT_PREFIX)/sbin
 
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=rwx,go=rx		\
 		env							\
