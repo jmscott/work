@@ -8,3 +8,5 @@
 #
 INSTALL_PREFIX?=/usr/local
 #INSTALL_PREFIX?=$(HOME)/opt
+
+GODIST=/usr/local/go
