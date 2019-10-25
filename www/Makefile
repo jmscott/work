@@ -11,7 +11,7 @@ WWW_USER?=$(INSTALL_USER)
 WWW_GROUP?=$(INSTALL_GROUP)
 
 COMPILED=								\
-		parse-http-rfc2388					\
+		bust-http-rfc2388					\
 		env env.d/help.pl 					\
 		form form.d/help.pl
 
@@ -21,8 +21,8 @@ distclean:
 	rm -rf $(WWW_PREFIX)/lib
 	rm -rf $(WWW_PREFIX)/cgi-bin
 
-parse-http-rfc2388: parse-http-rfc2388.go
-	$(GODIST)/bin/go build parse-http-rfc2388.go
+bust-http-rfc2388: bust-http-rfc2388.go
+	$(GODIST)/bin/go build bust-http-rfc2388.go
 
 install: all
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
@@ -87,7 +87,7 @@ install: all
 		$(JMSCOTT_PREFIX)/bin
 
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=rwx,go=rx		\
-		parse-http-rfc2388.go					\
+		bust-http-rfc2388.go					\
 		$(JMSCOTT_PREFIX)/sbin
 
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=rwx,go=rx		\
