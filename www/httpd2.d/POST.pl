@@ -63,19 +63,6 @@ if ($CT eq 'application/x-www-form-urlencoded') {
 }
 
 #
-#  Call the appropriate parser to map the POST_DATA into 
-#  various POST_* variables.
-#
-
-if ($CT eq 'application/x-www-form-urlencoded') {
-	require 'httpd2.d/www-form-urlencoded.pl';
-} elsif ($CT eq 'application/multipart-form-data') {
-	require 'httpd2.d/multipart-form-data.pl';
-} else {
-	die "POST: unknown CONTENT_TYPE: $CT";
-}
-
-#
 #  Check for any missing POST values.
 #
 #  Why is "in" required.  If not defined, why not default to the
