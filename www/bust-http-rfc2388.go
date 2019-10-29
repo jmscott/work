@@ -2,10 +2,10 @@
  *  Synopsis
  *	Parse stdin as multipart mime message according to RFC2388 to json.
  *  Usage:
- *	WORK_DIR=/tmp/parse-http-rfc2388-$$.d
+ *	WORK_DIR=/tmp/bust-http-rfc2388-$$.d
  *	mkdir $WORK_DIR
  *	cd $WORK_DIR
- *	parse-http-rfc2388 <boundary> >request.json
+ *	bust-http-rfc2388 <boundary> >request.json
  *  Note:
  *	Ought to rename to bust-http-rfc2388.go
  */
@@ -21,7 +21,7 @@ import (
 )
 
 var (
-	prog = "parse-http-rfc2388"
+	prog = "bust-http-rfc2388"
 	stderr = os.NewFile(uintptr(syscall.Stderr), "/dev/stderr")
 	stdin = os.NewFile(uintptr(syscall.Stdin), "/dev/stdin")
 )
@@ -45,10 +45,10 @@ func main() {
 	for {
 		p, err := mr.NextPart()
 		if err == io.EOF {
-			return
+			break
 		}
 		if err != nil {
-			die("multipart.Reader() failed: %s", err)
+			die("multipart.NextPart() failed: %s", err)
 		}
 		slurp, err := ioutil.ReadAll(p)
 		if err != nil {
