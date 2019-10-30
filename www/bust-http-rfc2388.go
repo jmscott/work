@@ -24,6 +24,7 @@ var (
 	prog = "bust-http-rfc2388"
 	stderr = os.NewFile(uintptr(syscall.Stderr), "/dev/stderr")
 	stdin = os.NewFile(uintptr(syscall.Stdin), "/dev/stdin")
+	stdout = os.NewFile(uintptr(syscall.Stdout), "/dev/stdout")
 )
 
 func die(format string, args ...interface{}) {
@@ -54,7 +55,7 @@ func main() {
 		if err != nil {
 			die("ioutil.ReadAll(mime part) failed: %s", err)
 		}
-		print("slurp: %q\n", slurp)
+		fmt.Fprintf(stdout, "slurp: %q\n", slurp);
 	}
 	os.Exit(0)
 }
