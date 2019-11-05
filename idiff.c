@@ -12,8 +12,6 @@
  *	jmscott@setspace.com
  *	https://github.com/jmscott/work
  *  Notes:
- *	Prompt does not echo properly on fedora linux.
- *
  *	Replace fprintf(stderr) with die() and exit() with leave().
  *
  *	The 'e' command fails when created temp file in Max OSX Mojave.
