@@ -33,9 +33,11 @@ install: all
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
-		-d $(WWW_PREFIX)/sbin
+		-d $(WWW_PREFIX)/bin
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)/cgi-bin
+	install -g $(WWW_GROUP) -o $(WWW_USER)				\
+		-d $(WWW_PREFIX)/src
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)/lib
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
@@ -87,8 +89,12 @@ install: all
 		$(JMSCOTT_PREFIX)/bin
 
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=rwx,go=rx		\
+		bust-http-rfc2388					\
+		$(WWW_PREFIX)/sbin
+
+	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=rwx,go=rx		\
 		bust-http-rfc2388.go					\
-		$(JMSCOTT_PREFIX)/sbin
+		$(WWW_PREFIX)/src
 
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=rwx,go=rx		\
 		env							\
