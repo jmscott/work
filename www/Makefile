@@ -19,6 +19,7 @@ all: $(COMPILED)
 
 distclean:
 	rm -rf $(WWW_PREFIX)/lib
+	rm -rf $(WWW_PREFIX)/bin
 	rm -rf $(WWW_PREFIX)/cgi-bin
 
 bust-http-rfc2388: bust-http-rfc2388.go
@@ -90,7 +91,7 @@ install: all
 
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=rwx,go=rx		\
 		bust-http-rfc2388					\
-		$(WWW_PREFIX)/sbin
+		$(WWW_PREFIX)/bin
 
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=rwx,go=rx		\
 		bust-http-rfc2388.go					\
