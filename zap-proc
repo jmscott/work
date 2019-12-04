@@ -74,7 +74,9 @@ if [ ! -e $PID_PATH ];  then
 fi
 
 log "pid file exists: $PID_PATH"
-PID=$(cat $PID_PATH)
+
+#  first line of pid contains the process id
+PID=$(cat $PID_PATH | head -1)
 log "process to kill: $PROC_NAME#$PID owned by $PROC_OWNER"
 
 pkill -F $PID_PATH -u $PROC_OWNER
