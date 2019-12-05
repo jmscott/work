@@ -71,7 +71,6 @@ main(int argc, char **argv)
 	char *sec = argv[1];
 	if (strlen(sec) > 9)
 		die("too many chars in seconds: expected <= 9", EXIT_BAD_INVO);
-
 	for (char *p = sec;  *p;  p++) {
 		char c = *p;
 
