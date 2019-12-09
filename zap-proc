@@ -99,7 +99,7 @@ sleep $PROC_PAUSE
 test -e $PID_PATH || exit 0
 
 log "pid file still exists, so force exact kill"
-_exact_kill
+_exact_zap
 test -e $PID_PATH || exit 0
 
 log "hmm, pid still exists, so nuke $PID with -9 and remove pid file"
