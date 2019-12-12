@@ -12,12 +12,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"os"
 	"syscall"
+	"time"
 )
 
 var (
@@ -27,6 +27,26 @@ var (
 	stdout = os.NewFile(uintptr(syscall.Stdout), "/dev/stdout")
 )
 
+type ProcessSignature struct {
+	Hostname	string		`json:"hostname"`
+	Executable	string		`json:"executable"`
+	Args		[]string
+	StartTime	time.Time	`json:"start_time"`
+	ProcessId	int		`json:"process_id"`
+	ParentProcessId	int		`json:"parent_process_id"`
+	Environment	[]string	`json:"environment"`	
+	GroupId		int		`json:"group_id"`
+	UserId		int		`json:"user_id"`
+}
+
+type json_response struct {
+
+	Signature	ProcessSignature	`json:"process_signature"`
+	BoundaryString	string			`json:"mime_boundary_string"`
+	Form		*multipart.Form		`json:"form"`
+	TmpFilePath	map[string]string	`json:"tmp_file_path"`
+}
+
 func die(format string, args ...interface{}) {
 
 	fmt.Fprintf(
@@ -35,6 +55,7 @@ func die(format string, args ...interface{}) {
 		prog,
 		fmt.Sprintf(format, args...),
 	)
+	fmt.Fprintf(stderr, "usage: %s <boundary-string>\n", prog)
 	os.Exit(1)
 }
 
@@ -42,20 +63,46 @@ func main() {
 	if (len(os.Args) != 2) {
 		die("wrong number of args: got %d, expected 2", len(os.Args))
 	}
-	mr := multipart.NewReader(stdin, os.Args[1])
-	for {
-		p, err := mr.NextPart()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			die("multipart.NextPart() failed: %s", err)
-		}
-		slurp, err := ioutil.ReadAll(p)
-		if err != nil {
-			die("ioutil.ReadAll(mime part) failed: %s", err)
-		}
-		fmt.Fprintf(stdout, "slurp: %q\n", slurp);
+
+	res := json_response {
+		Signature:	ProcessSignature {
+			UserId:			os.Getuid(),
+			GroupId:		os.Getgid(),
+			ProcessId:		os.Getpid(),
+			ParentProcessId:	os.Getppid(),
+			StartTime:		time.Now(),
+			Environment:		os.Environ(),
+			Args:			os.Args,
+		},
+		BoundaryString:		os.Args[1],
+	}
+
+	if exe, err := os.Executable();  err != nil {
+		die("os.Executable() failed: %s", err)
+	} else {
+		res.Signature.Executable = exe
+	}
+
+	if host, err := os.Hostname();  err != nil {
+		die("os.Hostname() failed: %s", err)
+	} else {
+		res.Signature.Hostname = host
+	}
+
+	mr := multipart.NewReader(stdin, res.BoundaryString)
+	form, err := mr.ReadForm(int64(0))
+	if err != nil {
+		die("multipart.ReadForm(stdin) failed: %s", err)
+	}
+	res.Form = form
+
+	//  find the file paths for each part
+
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "\t")
+	enc.SetEscapeHTML(false)
+	if err := enc.Encode(&res);  err != nil {
+		die("json.Encode(stdout) failed: %s", err)
 	}
 	os.Exit(0)
 }
