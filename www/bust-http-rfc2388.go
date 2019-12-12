@@ -44,7 +44,7 @@ type json_response struct {
 	Signature	ProcessSignature	`json:"process_signature"`
 	BoundaryString	string			`json:"mime_boundary_string"`
 	Form		*multipart.Form		`json:"form"`
-	TmpFilePath	map[string]string	`json:"tmp_file_path"`
+	TmpFilePath	map[string][]string	`json:"tmp_file_path"`
 }
 
 func die(format string, args ...interface{}) {
@@ -97,6 +97,34 @@ func main() {
 	res.Form = form
 
 	//  find the file paths for each part
+	res.TmpFilePath = make(map[string][]string)
+	for key, val := range res.Form.File {
+
+		//  loop over the multiple file headers stored by os
+		for i, fh := range val {
+			what := fmt.Sprintf("%s:[%d]", key, i)
+			f, err := fh.Open()
+			if err != nil {
+				die("Open(mime:%s) failed: %s", what, err)
+			}
+			osf, ok := f.(*os.File)
+			if !ok {
+				die("mime:*os.File: type assertion failed")
+			}
+			st, err := osf.Stat()
+			if err != nil {
+				die("Stat(mime:%s) failed: %s",what,err)
+			}
+			res.TmpFilePath[key] = append(
+						res.TmpFilePath[key],
+						st.Name(),
+					)
+			err = osf.Close()
+			if err != nil {
+				die("mime:*os.File.Close() failed: %s", err)
+			}
+		}
+	}
 
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "\t")
