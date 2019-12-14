@@ -11,10 +11,31 @@
 ###  furl
 	Fault a failed URL fetch and alert the hordes on fault|clear state change.
 
+###  logroll
+	Roll log files via Day of Week or Sample Rate, written in go.
+
+### www
+	Various tools used for apache/ngix web development.
+
 ## Standalone Shell Scripts
 
 ###  pg2pg
 	Upgrade a postgresql database via pg_upgrade or pg_dump
+
+###  flatx
+	Flatten XML for simple extraction with shell scripts.
+
+###  hexdump
+	C function to format like command line tool 'hexdump -C'
+
+###  isjson
+	Is input valid json, based up python lib json.tool
+
+###  launchd-log
+	Trivial wrapper script called by mac launchd to do decent logging
+
+###  pdf-merge
+	Merge pdf files calling java classes in Apache pdfbox.
 
 ###  make-dist
 	Build a tar distribution using a simple config file.
