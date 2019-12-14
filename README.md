@@ -6,7 +6,7 @@
 	REST api built by parsing structured comments in PostgreSQL SQL files
 
 ###  pgsnap
-	Snapshot postgresql database with pg_dump and notify the hordes.
+	Snapshot postgresql database with pg_dump and notify the hordes
 
 ###  furl
 	Fault a failed URL fetch and alert the hordes on fault|clear state change.
@@ -14,7 +14,7 @@
 ## Standalone Shell Scripts
 
 ###  pg2pg
-	Upgrade a postgresql database via pg_upgrade or pg_dump.
+	Upgrade a postgresql database via pg_upgrade or pg_dump
 
 ###  make-dist
 	Build a tar distribution using a simple config file.
