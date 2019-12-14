@@ -64,6 +64,9 @@
 ###  svn-ignore
 	Set "ignore" properties of subversion repo.
 
+###  svn-commit-notify
+	Notify users of svn commits, called from repo hooks
+
 ##  Standalone C Programs
 
 ### stale-mtime.c
