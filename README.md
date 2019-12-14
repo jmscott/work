@@ -3,7 +3,7 @@
 ##  Tarballable Packages
 
 ### rasql
-	REST API for SQL - a simple REST server built by parsing PostgreSQL query files
+	REST api built by parsing structured comments in PostgreSQL SQL files
 
 ###  pgsnap
 	Snapshot postgresql database with pg_dump and notify the hordes.
@@ -55,7 +55,7 @@
 	Is a file ascii text?
 
 ###  halloc.c
-	Hierarchial memory allocator, a'la malloc().  Free a parent and you free the kids.
+	Free a parent and you free the kids, a'la malloc().
 
 ###  fork-me.c
 	Measure sequential fork/exec of a program
