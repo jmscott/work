@@ -65,7 +65,7 @@
 	Set "ignore" properties of subversion repo.
 
 ###  svn-commit-notify
-	Notify users of svn commits, called from repo hooks
+	Notify hordes of svn commits, called from post-commit script in dir hooks/
 
 ##  Standalone C Programs
 
