@@ -42,6 +42,19 @@ PROG="$PROG: $(basename $1)"
 log "hello, world"
 trap leave EXIT TERM INT QUIT
 
+log "working directory: $(pwd)"
+
+CONF=etc/launchd-log.conf
+if [ -r $CONF ];  then
+	log "sourcing conf file: $CONF"
+	. $CONF
+fi
+
+log "environment ..."
+env | while read LINE;  do
+	log "$LINE"
+done
+
 CONF=etc/launchd-log.conf
 if [ -r $CONF ];  then
 	log "sourcing conf file: $CONF"
