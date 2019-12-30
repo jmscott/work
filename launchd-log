@@ -1,16 +1,20 @@
 #/bin/bash
 #
 #  Synopsis:
-#	Trivial help script to log start/stop of process execed by launchd.
+#	Trivial script to init and log start/stop of process execed by launchd.
 #  Usage:
+#	cd /usr/local/blobio
+#	
+#	#  source in optional config script
+#	echo 'ulimit -n 2048' >>etc/launch-log.conf
+#
 #	launchd-log bin/flowd server etc/blobio.flow
-#  Note:
-#	The script is just a cheap replacement for a more proper syslog
-#	facility.
 #
 #  Exit Status:
 #	*	exit status of launched process
 #  	127	unexpected error in launchd-log
+#  Note:
+#	Consider renamed to launchd-helper.
 #
 
 PROG=$(basename $0)
@@ -37,6 +41,13 @@ PROG="$PROG: $(basename $1)"
 
 log "hello, world"
 trap leave EXIT TERM INT QUIT
+
+CONF=etc/launchd-log.conf
+if [ -r $CONF ];  then
+	log "sourcing conf file: $CONF"
+	. $CONF
+fi
+
 log "executing: $@"
 $@ 2>&1 | while read LINE;  do
 	log $LINE
