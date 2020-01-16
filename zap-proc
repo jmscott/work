@@ -9,7 +9,7 @@
 #	are used to prevent killing invocing scripts with names similar
 #	to victim processes.
 #  Usage:
-#	zap <pid-file>
+#	zap-proc <pid-file>
 #	zap-proc <pid-file> <exact-proc1> <exact-proc2> ...
 #  Exit Status:
 #	0	no processes running
