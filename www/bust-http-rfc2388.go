@@ -1,13 +1,23 @@
 /*
  *  Synopsis
- *	Parse stdin as multipart mime message according to RFC2388 to json.
+ *	Parse stdin and extract files in rfc2388 multipart mime message body.
+ *  Description:
+ *	Parse standard input as a multipart mime message, extracting the
+ *	mime parts as files in the current directory.  A json summary of the
+ *	http request is written to REQUEST.json.
+ *
+ *	bust-http-rfc2388 is intended for cgi-bin programs, invoked after
+ *	the outer-most mime headers have been parsed.
  *  Usage:
  *	WORK_DIR=/tmp/bust-http-rfc2388-$$.d
  *	mkdir $WORK_DIR
  *	cd $WORK_DIR
- *	bust-http-rfc2388 <boundary> >request.json
+ *	bust-http-rfc2388 <boundary> >REQUEST.json
+ *  Exit Status:
+ *	10	failure
  *  Note:
- *	Ought to rename to bust-http-rfc2388.go
+ *	The odd value of 10 for an exit status is used since go reserves
+ *	1-3 for panics.  golang does not insure all panics can be caught.
  */
 package main
 
@@ -17,7 +27,6 @@ import (
 	"mime/multipart"
 	"os"
 	"syscall"
-	"time"
 )
 
 var (
@@ -27,24 +36,11 @@ var (
 	stdout = os.NewFile(uintptr(syscall.Stdout), "/dev/stdout")
 )
 
-type ProcessSignature struct {
-	Hostname	string		`json:"hostname"`
-	Executable	string		`json:"executable"`
-	Args		[]string
-	StartTime	time.Time	`json:"start_time"`
-	ProcessId	int		`json:"process_id"`
-	ParentProcessId	int		`json:"parent_process_id"`
-	Environment	[]string	`json:"environment"`	
-	GroupId		int		`json:"group_id"`
-	UserId		int		`json:"user_id"`
-}
+type json_request struct {
 
-type json_response struct {
-
-	Signature	ProcessSignature	`json:"process_signature"`
-	BoundaryString	string			`json:"mime_boundary_string"`
+	Boundary	string			`json:"boundary"`
 	Form		*multipart.Form		`json:"form"`
-	TmpFilePath	map[string][]string	`json:"tmp_file_path"`
+	MimePartPath	map[string][]string	`json:"mime_part_path"`
 }
 
 func die(format string, args ...interface{}) {
@@ -56,49 +52,32 @@ func die(format string, args ...interface{}) {
 		fmt.Sprintf(format, args...),
 	)
 	fmt.Fprintf(stderr, "usage: %s <boundary-string>\n", prog)
-	os.Exit(1)
+	os.Exit(10)
 }
 
 func main() {
-	if (len(os.Args) != 2) {
+	if (len(os.Args) != 3) {
 		die("wrong number of args: got %d, expected 2", len(os.Args))
 	}
 
-	res := json_response {
-		Signature:	ProcessSignature {
-			UserId:			os.Getuid(),
-			GroupId:		os.Getgid(),
-			ProcessId:		os.Getpid(),
-			ParentProcessId:	os.Getppid(),
-			StartTime:		time.Now(),
-			Environment:		os.Environ(),
-			Args:			os.Args,
-		},
-		BoundaryString:		os.Args[1],
+	if os.Args[1] != "--boundary" {
+		die("unknown option: %s", os.Args[1])
 	}
 
-	if exe, err := os.Executable();  err != nil {
-		die("os.Executable() failed: %s", err)
-	} else {
-		res.Signature.Executable = exe
+	req := json_request{
+		Boundary: os.Args[1],
 	}
 
-	if host, err := os.Hostname();  err != nil {
-		die("os.Hostname() failed: %s", err)
-	} else {
-		res.Signature.Hostname = host
-	}
-
-	mr := multipart.NewReader(stdin, res.BoundaryString)
+	mr := multipart.NewReader(stdin, req.Boundary)
 	form, err := mr.ReadForm(int64(0))
 	if err != nil {
 		die("multipart.ReadForm(stdin) failed: %s", err)
 	}
-	res.Form = form
+	req.Form = form
 
 	//  find the file paths for each part
-	res.TmpFilePath = make(map[string][]string)
-	for key, val := range res.Form.File {
+	req.MimePartPath = make(map[string][]string)
+	for key, val := range req.Form.File {
 
 		//  loop over the multiple file headers stored by os
 		for i, fh := range val {
@@ -115,8 +94,8 @@ func main() {
 			if err != nil {
 				die("Stat(mime:%s) failed: %s",what,err)
 			}
-			res.TmpFilePath[key] = append(
-						res.TmpFilePath[key],
+			req.MimePartPath[key] = append(
+						req.MimePartPath[key],
 						st.Name(),
 					)
 			err = osf.Close()
@@ -129,7 +108,7 @@ func main() {
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "\t")
 	enc.SetEscapeHTML(false)
-	if err := enc.Encode(&res);  err != nil {
+	if err := enc.Encode(&req);  err != nil {
 		die("json.Encode(stdout) failed: %s", err)
 	}
 	os.Exit(0)
