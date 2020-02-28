@@ -11,7 +11,6 @@ WWW_USER?=$(INSTALL_USER)
 WWW_GROUP?=$(INSTALL_GROUP)
 
 COMPILED=								\
-		bust-http-rfc2388					\
 		env env.d/help.pl 					\
 		form form.d/help.pl
 
@@ -21,9 +20,6 @@ distclean:
 	rm -rf $(WWW_PREFIX)/lib
 	rm -rf $(WWW_PREFIX)/bin
 	rm -rf $(WWW_PREFIX)/cgi-bin
-
-bust-http-rfc2388: bust-http-rfc2388.go
-	$(GODIST)/bin/go build bust-http-rfc2388.go
 
 install: all
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
@@ -88,14 +84,6 @@ install: all
 		cgi-template						\
 		cgi2perl5						\
 		$(JMSCOTT_PREFIX)/bin
-
-	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=rwx,go=rx		\
-		bust-http-rfc2388					\
-		$(WWW_PREFIX)/bin
-
-	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=rwx,go=rx		\
-		bust-http-rfc2388.go					\
-		$(WWW_PREFIX)/src
 
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=rwx,go=rx		\
 		env							\
