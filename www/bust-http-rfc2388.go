@@ -14,7 +14,7 @@
  *	cd $WORK_DIR
  *	bust-http-rfc2388 <boundary> >REQUEST.json
  *  Exit Status:
- *	10	failure
+ *	10	failure		#  golang snatches codes 1-3 for panic()
  *  Note:
  *	The odd value of 10 for an exit status is used since go reserves
  *	1-3 for panics.  golang does not insure all panics can be caught.
@@ -65,43 +65,15 @@ func main() {
 	}
 
 	req := json_request{
-		Boundary: os.Args[1],
+		Boundary: os.Args[2],
 	}
 
 	mr := multipart.NewReader(stdin, req.Boundary)
-	form, err := mr.ReadForm(int64(0))
-	if err != nil {
-		die("multipart.ReadForm(stdin) failed: %s", err)
-	}
-	req.Form = form
 
-	//  find the file paths for each part
-	req.MimePartPath = make(map[string][]string)
-	for key, val := range req.Form.File {
-
-		//  loop over the multiple file headers stored by os
-		for i, fh := range val {
-			what := fmt.Sprintf("%s:[%d]", key, i)
-			f, err := fh.Open()
-			if err != nil {
-				die("Open(mime:%s) failed: %s", what, err)
-			}
-			osf, ok := f.(*os.File)
-			if !ok {
-				die("mime:*os.File: type assertion failed")
-			}
-			st, err := osf.Stat()
-			if err != nil {
-				die("Stat(mime:%s) failed: %s",what,err)
-			}
-			req.MimePartPath[key] = append(
-						req.MimePartPath[key],
-						st.Name(),
-					)
-			err = osf.Close()
-			if err != nil {
-				die("mime:*os.File.Close() failed: %s", err)
-			}
+	for {
+		_, err := mr.NextRawPart()
+		if err != nil {
+			die("multipart.NextRawPart() failed: %s", err)
 		}
 	}
 
