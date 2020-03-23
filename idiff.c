@@ -17,7 +17,7 @@
  *	The 'e' command fails when created temp file in Max OSX Mojave.
  *	The pain never ends.
  *
- *	UTF-8 is not been tested.
+ *	UTF-8 not tested.
  *
  *	The pain never ends.
  */
