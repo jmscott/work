@@ -14,6 +14,8 @@
 #  Exit Status:
 #	0	no processes running
 #	1	unexpected error
+#  Note:
+#	Need to add -9 for stubborn processes.
 #
 
 PROG=$(basename $0)
@@ -30,34 +32,65 @@ log()
 	echo "$(date +'%Y/%m/%d %H:%M:%S'): $PROC_WHO: $@"
 }
 
-die()
+ERROR()
 {
 	log "ERROR: $@" >&2
+}
+
+die()
+{
+	ERROR "$@"
 	exit 1
 }
 
+_zap()
+{
+	WHAT=$1
+	shift
+
+	log "pkill: $WHAT: $@"
+	pkill -u $PROC_OWNER $@
+	STATUS=$?
+	case $STATUS in
+	0)
+		;;
+	1)
+		log "WARN: $WHAT: no process running (ok)"
+		;;
+	*)
+		die "pkill $WHAT failed: exit status=$STATUS"
+		;;
+	esac
+	rm -f $PID_PATH || die "rm -f pid file failed: exit status=$?"
+}
+
+#  zap list of processes with particular names
 _exact_zap()
 {
-	test $# = 0 && exit 0
-	log "exact: forcing the kill of $#"
+	if [ $# = 0 ];  then
+		_zap EXACT $PROC_NAME
+		exit
+	fi
+
+	log "EXACT: forcing the kill of $# processes"
 	for EXACT_PROC in $@;  do
-		log "force kill process: $EXACT_PROC"
-		pkill -u $USER -x $EXACT_PROC
-		STATUS=$?
-		case $STATUS in
-		0)
-			log "process matched and killed: $EXACT_PROC"
-			;;
-		1)
-			log "no process matched: $EXACT_PROC"
-			;;
-		*)
-			die "pkill exact: $EXACT_PROC failed: "		\
-			    "exit status=$STATUS"
-			;;
-		esac
+		_zap EXACT -x $EXACT_PROC || exit 1
 	done
 	exit 0
+}
+
+#  zap process when contents of pid file may be corrupt.
+
+_corrupt_zap()
+{
+	ERROR "corrupted pid file: $PID_PATH"
+	if [ -s $PID_PATH ];  then
+		ERROR "hex dump of pid file: $PID_PATH"
+		hexdump -C $PID_PATH
+	else
+		ERROR 'pid file is empty'
+	fi
+	_exact_zap || exit 1
 }
 
 test $# = 0 && die 'no arguments: pid file must be first argument'
@@ -76,23 +109,27 @@ fi
 
 log "pid file exists: $PID_PATH"
 
-#  first line of pid contains the process id
-PID=$(cat $PID_PATH | head -1)
-log "process to kill: $PROC_NAME#$PID owned by $PROC_OWNER"
+if [ ! -s $PID_PATH ];  then
+	log "WARN: empty pid file: $PID_PATH"
+	_exact_zap
+	exit
+fi
 
-pkill -F $PID_PATH -u $PROC_OWNER
-STATUS=$?
-case "$STATUS" in
-0)
-	;;
-1)
-	log "no process matches with pid #$PID"
-	rm -f $PID_PATH || die "rm -f $PID_PATH failed: exit status=$?"
+#  first line of pid contains the process id
+
+PID=$(cat $PID_PATH | head -1)
+case "$PID" in
+[0-9]*)
+	log "process to kill: $PROC_NAME#$PID owned by $PROC_OWNER"
 	;;
 *)
-	die "pkill TERM $PID failed; exit status=$STATUS"
-	;;
+	ERROR "first line of pid file is not number: $PID"
+	_corrupt_zap
+	exit
 esac
+
+_zap GRACEFUL -F $PID_PATH
+test $? -lt 2 || exit 1
 
 log "zapped $PROC_NAME process with pid #$PID"
 log "sleeping $PROC_PAUSE sec while process #$PID exits ..."
