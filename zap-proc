@@ -86,7 +86,9 @@ _corrupt_zap()
 	ERROR "corrupted pid file: $PID_PATH"
 	if [ -s $PID_PATH ];  then
 		ERROR "hex dump of pid file: $PID_PATH"
+		echo
 		hexdump -C $PID_PATH
+		echo
 	else
 		ERROR 'pid file is empty'
 	fi
