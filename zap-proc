@@ -52,7 +52,8 @@ _exact_zap()
 			log "no process matched: $EXACT_PROC"
 			;;
 		*)
-			die "pkill $EXACT_PROC failed: exit status=$STATUS"
+			die "pkill exact: $EXACT_PROC failed: "		\
+			    "exit status=$STATUS"
 			;;
 		esac
 	done
@@ -89,7 +90,7 @@ case "$STATUS" in
 	rm -f $PID_PATH || die "rm -f $PID_PATH failed: exit status=$?"
 	;;
 *)
-	die "pkill TERM $PID failed; exit status=$?"
+	die "pkill TERM $PID failed; exit status=$STATUS"
 	;;
 esac
 
