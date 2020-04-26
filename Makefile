@@ -9,7 +9,14 @@
 include local.mk
 include jmscott.mk
 
-COMPILED=flatx fork-me halloc.o idiff istext stale-mtime
+COMPILED=								\
+	duration-human							\
+	flatx								\
+	fork-me								\
+	halloc.o							\
+	idiff								\
+	istext								\
+	stale-mtime							\
 
 all: $(COMPILED)
 	cd www && $(MAKE) $(MFLAGS) all
@@ -24,6 +31,7 @@ install: all
 		launchd-log						\
 		$(JMSCOTT_PREFIX)/sbin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
+		duration-human						\
 		idiff							\
 		isjson							\
 		istext							\
@@ -66,6 +74,9 @@ distclean:
 
 idiff: idiff.c
 	cc $(CFLAGS) -o idiff idiff.c
+
+duration-human: duration-human.c
+	cc $(CFLAGS) -o duration-human duration-human.c
 
 istext: istext.c
 	cc $(CFLAGS) -o istext istext.c
