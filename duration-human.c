@@ -5,6 +5,8 @@
  *	START_EPOCH=$(date +%s)
  *	...
  *	echo "elpased time: $(duration-human $START_EPOCH)"
+ *  Note:
+ *	No rounding of <major><minor> calculations.
  */
 #include <stdlib.h>
 #include <stdio.h>
@@ -12,6 +14,8 @@
 #include <time.h>
 #include <ctype.h>
 #include <unistd.h>
+
+#define ROUND(n, d) ((((n) < 0) ^ ((d) < 0)) ? (((n) - (d)/2)/(d)) : (((n) + (d)/2)/(d)))
 
 static char *prog = "duration-human";
 
@@ -55,16 +59,31 @@ main(int argc, char **argv)
 	char answer[1024];
 
 	if (duration < 60)
-		sprintf(answer, "%ds\n", duration);
+		sprintf(answer, "%ds\n", duration);		// seconds
 	else if (duration < 3600) {
 		int sec = duration % 60;
 		int min = (duration - sec) / 60;
+
 		if (sec > 0)
-			sprintf(answer, "%dm%ds\n", min, sec);
+			sprintf(answer, "%dm%ds\n", min, sec);	//  minutes
 		else
 			sprintf(answer, "%dm\n", duration);
-	} else
-		sprintf(answer, "%ds\n", duration);
+	} else if (duration < 86400) {
+		int min = duration % 3600;
+		int hr = (duration - min) / 3600;
+
+		if (min > 0)
+			sprintf(answer, "%dh%dm", hr, min);	//  hours
+		else
+			sprintf(answer, "%dh", hr);
+	} else {
+		int hr = duration % 86400;
+		int day = (duration - hr) / 86400;
+		if (hr > 0)
+			sprintf(answer, "%dd%dh", day, hr);	//  days
+		else
+			sprintf(answer, "%dd", day);
+	}
 	write(1, answer, strlen(answer));
 	return 0;
 }
