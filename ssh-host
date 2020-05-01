@@ -1,8 +1,9 @@
+#!/bin/bash
 #
 #  Synopsis:
 #	ssh into a host derived from symbolic link to ssh-host
 #  Usage:
-#	ln -s /usr/local/bin/ssh-host bin/skytel
+#	ln -s /usr/local/jmscott/bin/ssh-host bin/skytel
 #	bin/skytel [-l host_user] [-e <remote exec>]
 #  Description:
 #	Login to a host, deriving the host name from the name
@@ -25,7 +26,7 @@
 #  Blame:
 #	https://github.com/jmscott
 #  See:
-#	https://github.com/jmscott/work/xtitle
+#	xtitle in repo https://github.com/jmscott/work
 #	GNU or BSD hostname
 #  Note:
 #	Would be nice to reset to previous value of title by somehow querying
