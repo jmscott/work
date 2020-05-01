@@ -16,6 +16,9 @@ our (
 
 binmode STDIN;
 
+#  should we parse the body of the POST or passthough to the script.
+
+
 my $CL = $ENV{CONTENT_LENGTH};
 my $CT = $ENV{CONTENT_TYPE};
 
@@ -27,7 +30,6 @@ my $MAX_CONTENT_LENGTH = 100 * 1024 * 1024;	#  100meg
 die "Content-Length too big: $CL > $MAX_CONTENT_LENGTH"
 				if $CL > $MAX_CONTENT_LENGTH
 ;
-
 if ($CL > 0) {
 	#
 	#  Insure the content is not too big.
