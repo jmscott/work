@@ -298,10 +298,17 @@ sub put_POST
 #
 \$CGI{POST}->{in}->{putter}->{'$name'}->{name} = '$name';
 END
+		my $pc = $putter->[0]->{'parse-content'};
+		if ($pc) {
+			print MAIN <<END;
+\$CGI{POST}->{in}->{putter}->{'$name'}->{'parse-content'} = '$pc';
+END
+		}
 		&put_vars(
 			root	=>	$putter,
 			xpath	=>	"/cgi/POST/in/putter[\@name=$name]",
 			path	=>     "\$CGI{POST}->{in}->{putter}->{'$name'}",
+			'parse-content'	=>     "\$CGI{POST}->{in}->{putter}->{'parse-content'}",
 		);
 		print MAIN <<END;
 #
