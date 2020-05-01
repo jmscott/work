@@ -4,10 +4,8 @@
 #	Set the title bar of an xterm.
 #  Usage:
 #	xtitle groucho
-#  Blame:
-#	John the Scott, jmscott@setspace.com
-#  Subversion Id:
-#	$Id: xtitle 9 2010-06-27 10:11:04Z jmscott $
+#  Note:
+#	Need to rename to set-xterm-title, since script with same name exists.
 #
 use strict;
 
