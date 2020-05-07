@@ -11,6 +11,7 @@ WWW_USER?=$(INSTALL_USER)
 WWW_GROUP?=$(INSTALL_GROUP)
 
 COMPILED=								\
+		bust-http-rfc2388					\
 		env env.d/help.pl 					\
 		form form.d/help.pl
 
@@ -112,3 +113,6 @@ dist-lib:
 	make-dist dist-lib.conf
 
 world: clean all distclean install
+
+bust-http-rfc2388: bust-http-rfc2388.go
+	$(GODIST)/bin/go build bust-http-rfc2388.go
