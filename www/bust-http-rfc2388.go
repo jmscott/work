@@ -9,8 +9,6 @@
  *	curl -F ‘data=@path/to/local/file’ UPLOAD_ADDRESS
  *  See:
  *	https://medium.com/@petehouston/upload-files-with-curl-93064dcccc76
- *  Note:
- *	Ought to rename to bust-http-rfc2388.go
  */
 package main
 
