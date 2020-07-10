@@ -5,6 +5,8 @@
 #	local-linux.mk.example
 #	local-darwin.mk.example
 #	https://github.com/jmscott/work
+#  Note:
+#	Add recipe to install remote dependencies!
 #
 include local.mk
 include jmscott.mk
@@ -61,6 +63,7 @@ install: all
 		istext.c						\
 		stale-mtime.c						\
 		$(JMSCOTT_PREFIX)/src
+	cd pgsnap && $(MAKE) $(MFLAGS) install
 	cd www && $(MAKE) $(MFLAGS) install
 
 clean:
@@ -68,6 +71,7 @@ clean:
 	rm -f $(COMPILED)
 distclean:
 	cd www && $(MAKE) $(MFLAGS) distclean
+	cd pgsnap && $(MAKE) $(MFLAGS) distclean
 	rm -rf $(JMSCOTT_PREFIX)/bin
 	rm -rf $(JMSCOTT_PREFIX)/sbin
 	rm -rf $(JMSCOTT_PREFIX)/src
