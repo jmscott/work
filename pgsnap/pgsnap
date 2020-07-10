@@ -23,7 +23,7 @@ Description:
 
 	The database dump files are stored in
 
-		$PGSNAP_ROOT/spool/pgsnap-src1-tgt1-YYYYMMDD-HHmmSS
+		$PGSNAP_ROOT/spool/pgsnap-src1-tgt1-YYYYMMDD-HHmmSS-$$
 
 	The spool files are purged regularly by pgsnap-janitor.
 	Typically we keep 3 days on line.
@@ -304,7 +304,7 @@ log "lock file: $LOCK"
 log "setting PG variables for source=$SRC"
 export_PG $SRC
 
-SPOOL="spool/$PROG-$SRC-$TGT-$(date +'%Y%m%d-%H%M%S')_$$"
+SPOOL="spool/$PROG-$SRC-$TGT-$(date +'%Y%m%d-%H%M%S')-$$"
 log "spool directory $SPOOL"
 mkdir -p $SPOOL || die "mkdir $SPOOL failed"
 cd $SPOOL || die "cd $SPOOL failed"
