@@ -36,6 +36,8 @@ Blame:
 	john.scott@americanmessaging.net
 	jmscott@setspace.com
 Note:
+	Merge PGSNAP_NOTIFY and PGSNAP_NOTIFY_LIST.
+
 	Tis a sad fact that the global users must already exist in the 
 	target database.  In other words, the global users must have been 
 	manually installed via
@@ -44,7 +46,7 @@ Note:
 
 	Of course, this implies the global users do not change often.
 
-	A lock file is created in $PGSNAP_ROOT/log/pgsnap-TGT.pid.
+	A lock file is created in $PGSNAP_ROOT/run/pgsnap-TGT.pid.
 	pgsnap will not run if the pgsnap-TGT.pid file exists.
 
 	Need to automagically create directory $PGSNAP_ROOT/run.
