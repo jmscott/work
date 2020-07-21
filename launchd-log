@@ -1,7 +1,7 @@
 #/bin/bash
 #
 #  Synopsis:
-#	Trivial script to init and log start/stop of process execed by launchd.
+#	Trivial script to help launchd set up configs and proper logging.
 #  Usage:
 #	cd /usr/local/blobio
 #	
@@ -14,7 +14,11 @@
 #	*	exit status of launched process
 #  	127	unexpected error in launchd-log
 #  Note:
-#	Consider renamed to launchd-helper.
+#	Why put launched-log in $JMSCOTT_ROOT/sbin?
+#	Seems like /bin/ better for permissons, since typically /sbin/
+#	is only owned by a particular user.
+#
+#	Consider renaming script to launchd-helper.
 #
 
 PROG=$(basename $0)

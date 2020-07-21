@@ -6,6 +6,10 @@
 #	local-darwin.mk.example
 #	https://github.com/jmscott/work
 #  Note:
+#	Why put launched-log in $JMSCOTT_ROOT/sbin?
+#	Seems like /bin/ better for permissons, since typically /sbin/
+#	is only owned by a particular user.
+#
 #	Add recipe to install remote dependencies!
 #
 include local.mk
