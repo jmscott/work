@@ -14,6 +14,8 @@
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
+#	Rename make-dist to make-tar-dist.
+#
 #	At least one file must exist in the *.dist file.	
 #
 #	What about moving the dynamic directories like tmp/ spool/
