@@ -2,13 +2,16 @@
 
 ## Install dependencies
 
-###  google golang
+###  google golang, expected in /usr/local/go
+	macosx: dmg installer on golang.org
+	linux: tar install in /usr/local/go
 ###  perl package XML::Parser
-####  debian: apt-get libxml-parser-perl (linux)
-####  macosx: port install  port install p5-xml-parser
+	debian: apt-get libxml-parser-perl (linux)
+	macosx: port install  port install p5-xml-parser
+
 ###  perl package postgres DBI driver
-####  macosx: port install p5-dbd-pg
-####  debian: apt-get install libdbd-pg-perl
+	macosx: port install p5-dbd-pg
+	debian: apt-get install libdbd-pg-perl
 
 ##  Tarballable Packages
 
