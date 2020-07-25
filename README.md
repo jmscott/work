@@ -1,5 +1,15 @@
 #  Code Used by Customers of John Scott
 
+## Install dependencies
+
+###  google golang
+###  perl package XML::Parser
+####  debian: apt-get libxml-parser-perl (linux)
+####  macosx: port install  port install p5-xml-parser
+###  perl package postgres DBI driver
+####  macosx: port install p5-dbd-pg
+####  debian: apt-get install libdbd-pg-perl
+
 ##  Tarballable Packages
 
 ### rasql
@@ -83,3 +93,5 @@
 
 ###  fork-me.c
 	Measure sequential fork/exec of a program
+
+
