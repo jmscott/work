@@ -1,22 +1,31 @@
 #!/bin/bash
 #
 #  Synopsis:
-#	Create a tar distro for a typical SystemV unix file system layout.
+#	From a config file, create a tar distro for a typical SysV file system.
 #  Usage:
 #	make-dist --help
-#	make-dist --template >setspace.dist
-#	vi setspace.dist
+#	make-dist --template >root.dist
+#	vi root.dist
 #
 #	make-dist setspace.dist
 #	D=$(pwd)
 #	cd /path/to/product/root && tar xvf $D/setspace-20140403_1213.tar.bz2
+#
+#	#  Makefile variables can be extracted from the the root.dist file
+#	#  with these recipes
+#
+#       COMPILEs := $(shell  (. ./root.dist && echo $$COMPILEs))
+#       SBINs := $(shell  (. ./root.dist && echo $$SBINs))
+#       LIBs := $(shell  (. ./root.dist && echo $$LIBs))
+#       SRCs := $(shell  (. ./root.dist && echo $$SRCs))
+#
 #  See:
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
 #	Rename make-dist to make-tar-dist.
 #
-#	At least one file must exist in the *.dist file.	
+#	At least one file must exist in the root.dist file.	
 #
 #	What about moving the dynamic directories like tmp/ spool/
 #	into var/?  Perhaps a variable VAR_DIR="spool data"?
@@ -357,6 +366,10 @@ test -s $TAR_FILE || die "empty tar file $TAR_FILE"
 
 #
 #  Zap the temporary scratch dir.
+#
+#  Note:
+#	What about zapping dir tmp/ upon certain common errors,
+#	like missing files.
 #
 find $WORK_TMP -print | xargs chmod +x
 rm -rf $WORK_TMP || die "rm -rf $WORK_TMP failed"
