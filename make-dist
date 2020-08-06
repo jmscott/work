@@ -18,11 +18,20 @@
 #       SBINs := $(shell  (. ./root.dist && echo $$SBINs))
 #       LIBs := $(shell  (. ./root.dist && echo $$LIBs))
 #       SRCs := $(shell  (. ./root.dist && echo $$SRCs))
-#
 #  See:
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
+#	Add --unpack option, which properly removes and unpacks *.tar.bz2
+#	directories.  Will need to make no assumptions about the root directory
+#	files.  In other words, if, say, dir sbin/ is not in the tar file,
+#	then --unpack would NOT remove an existing /sbin/ on the target.
+#	This algorithm implies knowing the difference between  static dirs
+#	like /sbin/, /lib/, etc versus dynatic dirs like /run/, /spool/.
+#	Perhaps if the directory is empty in the tar file, then we can
+#	safely assume the directory is dynamic and NOT to be removed on the
+#	target.
+#
 #	Consolidate this comment preamble and the --help docs.
 #
 #	Rename make-dist to make-tar-dist.
