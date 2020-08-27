@@ -1,0 +1,22 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	exec a command when $USER logs off
+#  Usage:
+#	#  crontab
+#	PATH=/usr/local/jmscott/bin:/usr/bin:/bin
+#
+#	* * * * * exec-logoff pkill -u jmscott bio4d
+#
+U=$(who | awk '{print $1}' | grep "^$USER\$" | head -1)
+case "$U" in
+$USER)
+	;;		#  do nothing, user logged
+'')
+	exec $@		#  use not logged in so exec
+	;;
+*)
+	echo "$0: unexpected output from who command: $U" >&2
+	exit 1
+	;;
+esac
