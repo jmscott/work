@@ -38,6 +38,7 @@ install: all
 		$(JMSCOTT_PREFIX)/sbin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		duration-human						\
+		exec-logoff						\
 		idiff							\
 		isjson							\
 		istext							\
