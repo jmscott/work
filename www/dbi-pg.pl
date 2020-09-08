@@ -18,6 +18,8 @@ $ENV{LD_LIBRARY_PATH} = "$ENV{PGHOME}:$ENV{LD_LIBRARY_PATH}" if $ENV{PGHOME};
 
 use DBD::Pg;
 
+our %QUERY_ARG;
+
 my ($CACHED, @OPEN);
 
 END
@@ -57,11 +59,13 @@ sub dbi_pg_disconnect
 sub dbi_pg_connect
 {
 	my %arg = @_;
-	my $uri;
 
-	my $trace = $arg{trace};
-
-	DBI->trace($trace) if $trace;
+	my (
+		$tag,
+		$uri,
+	) = (
+		$arg{tag},
+	);
 
 	return $CACHED if $CACHED;
 
@@ -77,13 +81,18 @@ sub dbi_pg_connect
 		#  Use unix pipe??
 		#
 		$uri =
-	       'dbi:Pg:host=/tmp;port=5432;dbname=setspace;user=setspace';
+	              'dbi:Pg:host=/tmp;port=5432;dbname=setspace;user=setspace'
+		;
 	}
 
 	my $db = DBI->connect($uri, '', '', {
                         AutoCommit      =>      1
 	}) or die "DBI->connect($uri) failed: " . DBI->errstr;
 
+	#
+	#  Note:
+	#	Only one open, so build stack of @OPEN?
+	#
 	push @OPEN, $db;
 	return $CACHED = $db;
 }
@@ -94,27 +103,32 @@ sub dbi_pg_dump
 	my (
 		$sql,
 		$tag,
-		$dump,
+		$pgdump,
 	) = (
 		$arg{sql},
 		$arg{tag},
-		$arg{dump},
+		$QUERY_ARG{pgdump},
 	);
 
-	if ($dump eq 'STDERR') {
+	print STDERR "dbi_pg_dump: $tag: requested";
+
+	if ($pgdump eq 'STDERR') {
 		print STDERR $tag, ': sql: ', $sql, "\n";
-	} elsif ($dump eq 'STDOUT') {
+	} elsif ($pgdump eq 'STDOUT') {
 		print STDOUT $tag, ': sql: ', $sql, "\n";
-	} elsif ($dump =~ /^>>?/) {
-		print STDERR "sql dump: $dump", "\n";
-		my $now = `date`;  chomp $now;
+	} elsif ($pgdump eq '1' || $pgdump eq 'yes') {
+
+		my ($TMPDIR, $sql_path) = ($ENV{TMPDIR});
+
+		$TMPDIR = '/tmp' unless $TMPDIR;
+		$sql_path = ">$TMPDIR/$tag.sql";
 
 		my $T;
-		open($T, $dump) or die "open($dump) failed: $!";
+		open($T, $sql_path) or die "$tag: open($sql_path) failed: $!";
 		print $T $sql, ";\n";
-		close $T or die "close($dump) failed: $!";
-	} else {
-		print STDERR "dbi_pg_dump: unknown dump arg: $dump";
+		close $T or die "close($sql_path) failed: $!";
+	} elsif ($pgdump ne '0' && $pgdump ne 'off') {
+		die "dbi_pg_dump: unknown dump arg: $pgdump";
 	}
 }
 
@@ -122,10 +136,10 @@ sub dbi_pg_dump
 #  Synopsis:
 #	Prepare&execute an sql select query and return readable results handle.
 #  Arguments:
+#	All are required, including empty argv[].
+#
 #	db	=>	DBI handle opened with dbi_pg_connect()
 #	tag	=>	short tag describing query (required)
-#	dump	=>	dump sql to STDERR, STDOUT, >file, or >>file.
-#	trace	=>	set DBI network trace flags: 0-15
 #	argv	=>	query arguments: argv => [$1, $2, ...]
 #	sql	=>	sql to execute
 #  Returns:
@@ -140,22 +154,20 @@ sub dbi_pg_select
 		$sql,
 		$argv,
 		$tag,
-		$dump,
-		$trace,
 		$q
 	) = (
 		$arg{db},
 		$arg{sql},
 		$arg{argv},
-		$arg{tag},
-		$arg{dump},
-		$arg{trace}
 	);
 
-	die 'dbi_pg_select: missing variable "tag"' unless $tag;
-	die 'dbi_pg_select: missing variable "db"' unless $db;
-	DBI->trace($trace) if $trace;
-	dbi_pg_dump(%arg) if $dump;
+	die 'dbi_pg_select: missing variable: tag' unless $tag;
+	die 'dbi_pg_select: missing variable: db' unless $db;
+	die 'dbi_pg_select: missing variable: sql' unless $sql;
+	die 'dbi_pg_select: missing variable: argv' unless $argv;
+
+	dbi_pg_dump(%arg) if $ENV{pgdump};
+
 	$q = $db->prepare($sql) or die
 			'dbi_pg_select: prepare($tag) failed: ' . $db->errstr;
 	$q->execute(@{$argv}) or
