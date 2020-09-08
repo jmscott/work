@@ -100,6 +100,10 @@ sub dbi_pg_connect
 	return $CACHED = $db;
 }
 
+#
+#  Note:
+#	>$tag.sql dilently fails!
+#
 sub dbi_pg_dump
 {
 	my %arg = @_;
@@ -125,6 +129,7 @@ sub dbi_pg_dump
 
 		$TMPDIR = '/tmp' unless $TMPDIR;
 		$sql_path = ">$TMPDIR/$tag.sql";
+		print STDERR "dbi_pg_dump: sql path: $sql_path\n";
 
 		my $T;
 		open($T, $sql_path) or die "$tag: open($sql_path) failed: $!";
