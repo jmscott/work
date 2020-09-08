@@ -169,7 +169,7 @@ sub dbi_pg_select
 	die 'dbi_pg_select: missing variable: sql' unless $sql;
 	die 'dbi_pg_select: missing variable: argv' unless $argv;
 
-	dbi_pg_dump(%arg) if $ENV{pgdump};
+	dbi_pg_dump(%arg) if $QUERY_ARG{pgdump};
 
 	my $q = $db->prepare($sql) or die
 			'dbi_pg_select: prepare($tag) failed: ' . $db->errstr;
