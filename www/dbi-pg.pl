@@ -4,6 +4,9 @@
 #  Return:
 #	Always implies success, die otherwise
 #  Note:
+#	Added example of query called from cgi-bin, similar to env.cgi and
+#	form.cgi.
+#
 #	perl -W generates complaints
 #
 #		Subroutine version::declare redefined at ...
