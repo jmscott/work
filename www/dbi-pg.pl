@@ -113,7 +113,7 @@ sub dbi_pg_dump
 		$QUERY_ARG{pgdump},
 	);
 
-	print STDERR "dbi_pg_dump: $tag: requested";
+	print STDERR "dbi_pg_dump: $tag: requested\n";
 
 	if ($pgdump eq 'STDERR') {
 		print STDERR $tag, ': sql: ', $sql, "\n";
