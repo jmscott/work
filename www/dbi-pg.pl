@@ -157,11 +157,11 @@ sub dbi_pg_select
 		$sql,
 		$argv,
 		$tag,
-		$q
 	) = (
 		$arg{db},
 		$arg{sql},
 		$arg{argv},
+		$arg{tag},
 	);
 
 	die 'dbi_pg_select: missing variable: tag' unless $tag;
@@ -171,7 +171,7 @@ sub dbi_pg_select
 
 	dbi_pg_dump(%arg) if $ENV{pgdump};
 
-	$q = $db->prepare($sql) or die
+	my $q = $db->prepare($sql) or die
 			'dbi_pg_select: prepare($tag) failed: ' . $db->errstr;
 	$q->execute(@{$argv}) or
 			die "dbi_pg_select: ($tag) failed: ". $q->errstr;
