@@ -16,7 +16,7 @@ include local.mk
 include jmscott.mk
 
 COMPILED=								\
-	duration-human							\
+	duration-english							\
 	flatx								\
 	fork-me								\
 	halloc.o							\
@@ -37,7 +37,7 @@ install: all
 		launchd-log						\
 		$(JMSCOTT_PREFIX)/sbin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
-		duration-human						\
+		duration-english						\
 		exec-logoff						\
 		idiff							\
 		isjson							\
@@ -84,8 +84,8 @@ distclean:
 idiff: idiff.c
 	cc $(CFLAGS) -o idiff idiff.c
 
-duration-human: duration-human.c
-	cc $(CFLAGS) -o duration-human duration-human.c
+duration-english: duration-english.c
+	cc $(CFLAGS) -o duration-english duration-english.c
 
 istext: istext.c
 	cc $(CFLAGS) -o istext istext.c
