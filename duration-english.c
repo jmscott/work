@@ -31,6 +31,7 @@ die(char *msg)
 
 	buf[sizeof buf - 2] = '\n';
 	buf[sizeof buf - 1] = 0;
+	write(2, buf, strlen(buf)); 
 	exit(1);
 }
 
