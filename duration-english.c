@@ -1,11 +1,21 @@
 /*
  *  Synopsis:
- *	Write human readable, english duration using unix epoch at start time.
+ *	Write english description elapsed time from duration in integer seconds
  *  Usage:
- *	START_EPOCH=$(date +%s)
- *	...
- *	echo "elpased time: $(duration-human $START_EPOCH)"
+ *	#!/bin/bash
+ *
+ *	#  on mac osx
+ *	DURATION_SEC=$(expr $(date +%s) - $(date -v -1d +%s))
+ *
+ *	#  on gnu/linux
+ *	DURATION_SEC=$(expr $(date +%s) - $(date -d yesterday +%s))
+ *
+ *	echo "elpased time: $(duration-english $DURATION_SEC)"
  *  Note:
+ *	Improve parsing of duration seconds.
+ *
+ *	Should seconds be a floating point, for sub second timing?
+ *
  *	No rounding of <major><minor> calculations.
  */
 #include <stdlib.h>
@@ -17,7 +27,7 @@
 
 #define ROUND(n, d) ((((n) < 0) ^ ((d) < 0)) ? (((n) - (d)/2)/(d)) : (((n) + (d)/2)/(d)))
 
-static char *prog = "duration-human";
+static char *prog = "duration-english";
 
 static void
 die(char *msg)
@@ -41,49 +51,46 @@ main(int argc, char **argv)
 	if (argc != 2)
 		die("wrong number of arguments");
 
-	char *se = argv[1], c;
-	char *p = se;
+	char *d = argv[1], c;
+	char *p = d;
 
+	if (*d == 0)
+		die("empty duration seconds");
 	while ((c = *p++)) {
 		if (!isdigit(c))
-			die("start epoch: non-digit");
-		if (p - se > 20)
-			die("start epoch: > 20 digits");
+			die("duration seconds: non-digit");
+		if (p - d > 20)
+			die("duration seconds: > 20 digits");
 	}
-	time_t start_time = atoi(se);
-	time_t now = time(NULL);
-	if (start_time > now)
-		die("start_time > now");
-
-	int duration = now - start_time;
-
+	int duration = atoi(d);
 	char answer[1024];
 
-	if (duration < 60)
-		sprintf(answer, "%ds\n", duration);		// seconds
-	else if (duration < 3600) {
-		int sec = duration % 60;
-		int min = (duration - sec) / 60;
+	if (duration < 60)					//  seconds
+		sprintf(answer, "%ds\n", duration);
+	else if (duration < 3600) {				//  min & sec
+		int min = duration / 60;
+		int sec = duration - (min * 60);
 
 		if (sec > 0)
-			sprintf(answer, "%dm%ds\n", min, sec);	//  minutes
+			sprintf(answer, "%dm%ds\n", min, sec);
 		else
-			sprintf(answer, "%dm\n", duration);
-	} else if (duration < 86400) {
-		int min = duration % 3600;
-		int hr = (duration - min) / 3600;
+			sprintf(answer, "%dm\n", min);
+	} else if (duration < 86400) {				// hr & min
+		int hr = duration / 3600;
+		int min = ROUND(duration - (hr * 3600), 60);
 
 		if (min > 0)
-			sprintf(answer, "%dh%dm", hr, min);	//  hours
+			sprintf(answer, "%dhr%dm", hr, min);	//  hours
 		else
-			sprintf(answer, "%dh", hr);
-	} else {
-		int hr = duration % 86400;
-		int day = (duration - hr) / 86400;
+			sprintf(answer, "%dhr", hr);
+	} else {						//  days & hr
+		int day = duration / 86400;
+		int hr = ROUND(duration - (day * 86400), 3600);
+
 		if (hr > 0)
-			sprintf(answer, "%dd%dh", day, hr);	//  days
+			sprintf(answer, "%dd%dhr", day, hr);
 		else
-			sprintf(answer, "%dd", day);
+			sprintf(answer, "%dy", day);
 	}
 	write(1, answer, strlen(answer));
 	return 0;
