@@ -7,7 +7,7 @@
 #	Added example of query called from cgi-bin, similar to env.cgi and
 #	form.cgi.
 #
-#	perl -W generates complaints
+#	On macports, perl -W generates complaints
 #
 #		Subroutine version::declare redefined at ...
 #
@@ -185,6 +185,48 @@ sub dbi_pg_select
 	#
 	$q->{NUM_OF_FIELDS} > 0 or
 			die 'dbi_pg_select: expected NUM_OF_FIELDS > ';
+	return $q;
+}
+
+#
+#  Synopsis:
+#	Prepare&execute an sql query and return readable results handle.
+#  Arguments:
+#	All are required, including empty argv[].
+#
+#	db	=>	DBI handle opened with dbi_pg_connect()
+#	tag	=>	short tag describing query (required)
+#	argv	=>	query arguments: argv => [$1, $2, ...]
+#	sql	=>	sql to execute
+#  Returns:
+#	DBI->prepare() query handle, after query has been executed.
+#
+sub dbi_pg_exec
+{
+	my %arg = @_;
+
+	my (
+		$db,
+		$sql,
+		$argv,
+		$tag,
+	) = (
+		$arg{db},
+		$arg{sql},
+		$arg{argv},
+		$arg{tag},
+	);
+
+	die 'dbi_pg_exec: missing variable: tag' unless $tag;
+	die 'dbi_pg_exec: missing variable: db' unless $db;
+	die 'dbi_pg_exec: missing variable: sql' unless $sql;
+	die 'dbi_pg_exec: missing variable: argv' unless $argv;
+
+	dbi_pg_dump(%arg) if $QUERY_ARG{pgdump};
+
+	my $q = $db->prepare($sql) or die
+			'dbi_pg_exec: prepare($tag) failed: ' . $db->errstr;
+	$q->execute(@{$argv}) or die "dbi_pg_exec: ($tag) failed: ". $q->errstr;
 	return $q;
 }
 
