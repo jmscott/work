@@ -6,6 +6,9 @@
 #	local-darwin.mk.example
 #	https://github.com/jmscott/work
 #  Note:
+#	Install README in /usr/local/jmscott/README, describing github location
+#	and digest of installed code (typically trunk).
+#
 #	Why put launched-log in $JMSCOTT_ROOT/sbin?
 #	Seems like /bin/ better for permissons, since typically /sbin/
 #	is only owned by a particular user.
