@@ -12,6 +12,8 @@
  *
  *	echo "elpased time: $(duration-english $DURATION_SEC)"
  *  Note:
+ *	Add option --round-single-unit.
+ *
  *	Improve parsing of duration seconds.
  *
  *	Should seconds be a floating point, for sub second timing?
