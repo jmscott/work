@@ -14,10 +14,10 @@
 #	#  Makefile variables can be extracted from the the root.dist file
 #	#  with these recipes
 #
-#       COMPILEs := $(shell  (. ./root.dist && echo $$COMPILEs))
-#       SBINs := $(shell  (. ./root.dist && echo $$SBINs))
-#       LIBs := $(shell  (. ./root.dist && echo $$LIBs))
-#       SRCs := $(shell  (. ./root.dist && echo $$SRCs))
+#	       COMPILEs := $(shell  (. ./root.dist && echo $$COMPILEs))
+#	       SBINs := $(shell  (. ./root.dist && echo $$SBINs))
+#	       LIBs := $(shell  (. ./root.dist && echo $$LIBs))
+#	       SRCs := $(shell  (. ./root.dist && echo $$SRCs))
 #  See:
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
@@ -245,9 +245,20 @@ case "$1" in
 #	Configuration file read by make-dist to build tar files.
 #  See Also:
 #	https://github.com/jmscott/work/blob/master/make-dist
+#  Note:
+#	For a GNU Makefile to extract the shell variables defined in this
+#	dist file, include the following line in Makefile:
+#
+#		BINs := \$(shell (. ./root.dist && echo \$\$BINs))
+#		SBINs := \$(shell (. ./root.dist && echo \$\$SBINs))
+#		LIBs := \$(shell (. ./root.dist && echo \$\$LIBs))
+#		HTDOCs := \$(shell (. ./root.dist && echo \$\$HTDOCs))
+#		CGIBINs := \$(shell (. ./root.dist && echo \$\$CGIBINs))
 #
 
-#  Define PRODUCT to change from \$(basename \$(pwd))
+#  Define PRODUCT to change name of tar file from \$(basename \$(pwd))
+#  to, say, foobar-YYYYMMDD_hhmmss.tar.bz2
+
 #PRODUCT=foobar
 
 LIBs="
