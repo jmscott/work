@@ -40,7 +40,7 @@ install: all
 		launchd-log						\
 		$(JMSCOTT_PREFIX)/sbin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
-		duration-english						\
+		duration-english					\
 		exec-logoff						\
 		idiff							\
 		isjson							\
