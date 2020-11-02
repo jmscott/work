@@ -19,7 +19,7 @@ include local.mk
 include jmscott.mk
 
 COMPILED=								\
-	duration-english							\
+	duration-english						\
 	flatx								\
 	fork-me								\
 	halloc.o							\
