@@ -1,6 +1,9 @@
 /*
  *  Synopsis:
  *	Count number of bits in stream of bytes.
+ *  Exit Status:
+ *	0	success, signed 64 written to stdout
+ *	1	error
  *  Note:
  *	overflow of 64 bit incorrect.
  */
@@ -39,8 +42,10 @@ main()
 	while ((nr = read(0, buf, sizeof buf)) > 0)
 		for (size_t i = 0;  i < nr;  i++)
 			count += byte_bit_count[buf[i]];
-	if (nr < 0)
+	if (nr < 0) {
 		fprintf(stderr, "read(stdin) failed: %s", strerror(errno));
+		_exit(1);
+	}
 	printf("%lld\n", count);
 	_exit(0);
 }
