@@ -19,6 +19,7 @@ include local.mk
 include jmscott.mk
 
 COMPILED=								\
+	bit-pop-count							\
 	duration-english						\
 	flatx								\
 	fork-me								\
@@ -63,6 +64,7 @@ install: all
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/src
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r		\
+		bit-pop-count.c						\
 		flatx.c							\
 		fork-me.c						\
 		halloc.c						\
@@ -92,6 +94,9 @@ duration-english: duration-english.c
 
 istext: istext.c
 	cc $(CFLAGS) -o istext istext.c
+
+bit-pop-count: bit-pop-count.c
+	cc $(CFLAGS) -o bit-pop-count bit-pop-count.c
 
 halloc.o: halloc.c
 	cc $(CFLAGS) -c halloc.c
