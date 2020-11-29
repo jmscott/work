@@ -37,10 +37,10 @@ main()
 {
 	long long int count = 0;
 	unsigned char buf[4096];
-	size_t nr;
+	ssize_t nr;
 
 	while ((nr = read(0, buf, sizeof buf)) > 0)
-		for (size_t i = 0;  i < nr;  i++)
+		for (ssize_t i = 0;  i < nr;  i++)
 			count += byte_bit_count[buf[i]];
 	if (nr < 0) {
 		fprintf(stderr, "read(stdin) failed: %s", strerror(errno));
