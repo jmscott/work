@@ -19,6 +19,7 @@ include local.mk
 include jmscott.mk
 
 COMPILED=								\
+	RFC3339Nano							\
 	duration-english						\
 	escape-json-string						\
 	flatx								\
@@ -41,6 +42,7 @@ install: all
 		launchd-log						\
 		$(JMSCOTT_PREFIX)/sbin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
+		RFC3339Nano						\
 		duration-english					\
 		escape-json-string					\
 		exec-logoff						\
@@ -65,6 +67,7 @@ install: all
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/src
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r		\
+		RFC3339Nano.c						\
 		flatx.c							\
 		fork-me.c						\
 		halloc.c						\
@@ -85,6 +88,9 @@ distclean:
 	rm -rf $(JMSCOTT_PREFIX)/bin
 	rm -rf $(JMSCOTT_PREFIX)/sbin
 	rm -rf $(JMSCOTT_PREFIX)/src
+
+RFC3339Nano: RFC3339Nano.c
+	cc $(CFLAGS) -o RFC3339Nano RFC3339Nano.c
 
 idiff: idiff.c
 	cc $(CFLAGS) -o idiff idiff.c
