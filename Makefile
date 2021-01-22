@@ -20,6 +20,7 @@ include jmscott.mk
 
 COMPILED=								\
 	duration-english						\
+	escape-json-string						\
 	flatx								\
 	fork-me								\
 	halloc.o							\
@@ -41,6 +42,7 @@ install: all
 		$(JMSCOTT_PREFIX)/sbin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		duration-english					\
+		escape-json-string					\
 		exec-logoff						\
 		idiff							\
 		isjson							\
@@ -104,6 +106,9 @@ stale-mtime: stale-mtime.c
 
 flatx: flatx.c
 	cc $(CFLAGS) -o flatx flatx.c -lexpat
+
+escape-json-string: escape-json-string.c
+	cc $(CFLAGS) -o escape-json-string escape-json-string.c
 
 world:
 	cd www && $(MAKE) $(MFLAGS) world
