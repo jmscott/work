@@ -1,27 +1,58 @@
 #!/bin/bash
 #
 #  Synopsis:
-#	From a config file, create a tar distro for a typical SysV file system.
+#	Build a tar or populate makefile from a shell sourcable config file.
 #  Usage:
 #	make-dist --help
-#	make-dist --template >root.dist
-#	vi root.dist
+#	make-dist --template >product.dist
+#	vi product.dist
 #
 #	make-dist setspace.dist
 #	D=$(pwd)
 #	cd /path/to/product/root && tar xvf $D/setspace-20140403_1213.tar.bz2
 #
 #	#  Makefile variables can be extracted from the the root.dist file
-#	#  with these recipes
+#	#  with these recipes.  Example make code follows:
 #
-#	       COMPILEs := $(shell  (. ./root.dist && echo $$COMPILEs))
-#	       SBINs := $(shell  (. ./root.dist && echo $$SBINs))
-#	       LIBs := $(shell  (. ./root.dist && echo $$LIBs))
-#	       SRCs := $(shell  (. ./root.dist && echo $$SRCs))
+#		DIST=product.dist
+#		COMPILEs := $(shell  (. ./$(DIST) && echo $$COMPILEs))
+#		SBINs := $(shell  (. ./$(DIST) && echo $$SBINs))
+#		LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
+#		SRCs := $(shell  (. ./$(DIST) && echo $$SRCs))
+#
+#	Config variables to create directories are these:
+#
+#		BINs="[files] ..."
+#		CACHE=""
+#		CGIBINs="[files] ..."
+#		DATA=""
+#		ETC=""
+#		HTDOCs="[files] ..."
+#		LIBEXECs="[files] ..."
+#		LIBs="[files] ..."
+#		LOG=""
+#		RUN=""
+#		SBINs="[files] ..."
+#		SPOOL=""
+#		SRCs="[files] ..."
+#		TMP=""
+#
+#	Empty string implies directory is created, if needed.
+#	Any files
+#
 #  See:
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
+#	Think deepky about recursive version that can combine *.dist files
+#
+#	Rename variable PRODUCT to less ambitious REPO.
+#
+#	What does "copy_files BASEs mean?
+#
+#	Why are the dirs/ for copy_files() hardwired for BINs, SBINs, etc?
+#	Should not thast list be derived from the dist file?
+#
 #	Add --unpack option, which properly removes and unpacks *.tar.bz2
 #	directories.  Will need to make no assumptions about the root directory
 #	files.  In other words, if, say, dir sbin/ is not in the tar file,
@@ -57,17 +88,18 @@ Description:
 	$PROG reads a configuration file and builds a bzipped tar file of the 
 	files in a typical unix directory layout.  The confiugration files
 	contains bourne shell variable definitions.  The tar file is 
-	suitable for unpacking to install or upgrade a target host.  
+	suitable for manually unpacking to install or upgrade a target host.  
 	The files rebuilt in the tar archive into the following sub
 	directories:
 	
-		bin/	#  read only executables executed by cli or scripts
+		 bin/	#  read only executables executed by cli or scripts
 		sbin/	#  read only executables executed by daemons/services.
-		src/	#  compilable source code, not scripts.
-		lib/	#  read only support files.  typically sql scripts,
+		 src/	#  compilable source code, not scripts.
+	         lib/	#  read only support files.  typically sql scripts,
 			#    perl libraries, etc.
-	    cgi-bin/	#  cgi-scripts for web server
-	     htdocs/	#  htdoc scripts for web server
+	     libexec/	#  hidden executables, typically called from scripts.
+	     cgi-bin/	#  cgi-scripts for web server
+	      htdocs/	#  htdoc scripts for web server
 		
 	In the configuration file are environment variables BINs, CGIBINs, 
 	LIBs, SBINs and HTDOCs that contain the source file list for
@@ -249,11 +281,19 @@ case "$1" in
 #	For a GNU Makefile to extract the shell variables defined in this
 #	dist file, include the following line in Makefile:
 #
-#		BINs := \$(shell (. ./root.dist && echo \$\$BINs))
-#		SBINs := \$(shell (. ./root.dist && echo \$\$SBINs))
-#		LIBs := \$(shell (. ./root.dist && echo \$\$LIBs))
-#		HTDOCs := \$(shell (. ./root.dist && echo \$\$HTDOCs))
-#		CGIBINs := \$(shell (. ./root.dist && echo \$\$CGIBINs))
+#	Makefile variables can be extracted from the the root.dist file
+#	with these recipes.  Example make code follows:
+#
+#		DIST=product.dist
+#
+#		SBINs := \$(shell  (. ./\$(DIST) && echo \$\$SBINs))
+#		LIBs := \$(shell  (. ./\$(DIST) && echo \$\$LIBs))
+#		SRCs := \$(shell  (. ./\$(DIST) && echo \$\$SRCs))
+#		BINs := \$(shell  (. ./\$(DIST) && echo \$\$BINs))
+#		HTDOCs := \$(shell  (. ./\$(DIST) && echo \$\$HTDOCs))
+#		CGIBINs := \$(shell  (. ./\$(DIST) && echo \$\$CGIBINs))
+#		LIBEXEC := \$(shell  (. ./\$(DIST) && echo \$\$LIBEXECs))
+#		COMPILEs := \$(shell  (. ./\$(DIST) && echo \$\$COMPILEs))
 #
 
 #  Define PRODUCT to change name of tar file from \$(basename \$(pwd))
@@ -267,17 +307,16 @@ LIBs="
 BINs="
 "
 
-SBINs="
-"
+#SBINs=""
 
-CGIBINs="
-"
+#  Uncomment to create cgibin/ directory
+#CGIBINs=""
 
-HTDOCs="
-"
+#  Uncomment to create htdocs/ directory
+#HTDOCs=""
 
-SRCs="
-"
+#  Uncomment to create src/ directory
+#SRCs=""
 
 #  Uncomment to create etc/ directory
 #ETC=""
@@ -299,6 +338,9 @@ SRCs="
 
 #  Uncomment to create tmp/ directory
 #TMP=""
+
+#  Uncomment to create directory libexec/
+#LIBEXECs=""
 
 END
 	exit 0
@@ -350,26 +392,25 @@ echo ">$WORK_TMP"
 #  Does the order of the directories matter?
 #  Probably ought to be the order defined in the file.
 #
-copy_files BASEs . u=rwx,g=rx,o= ug=rx,o=
-#
-#  Shouldn't bin/ be readable by world?
-#
+copy_files BASEs . u=rwx,g=rx,o= ug=rx,o=		#  clarify!?
 copy_files BINs bin u=rwx,g=rx,o= ug=rx,o=
-copy_files SBINs sbin u=rwx,go= u=rx,go=
 copy_files CGIBINs cgi-bin u=rwx,g=rx,o= ug=rx,o=
-copy_files LIBs lib u=rwx,g=rx,o= ug=r,o=
-copy_files SRCs src u=rwx,g=rx,o= ug=r,o=
 copy_files HTDOCs htdocs u=wrx,g=rx,o= ug=r,o=
+copy_files LIBEXECs libexec u=rwx,g=rx,o= ug=rx,o=
+copy_files LIBs lib u=rwx,g=rx,o= ug=r,o=
+copy_files SBINs sbin u=rwx,go= u=rx,go=
+copy_files SRCs src u=rwx,g=rx,o= ug=r,o=
 
 #  make directories, if variables defined in distribution file
 
-make_dir TMP ug=wrx,o=
-make_dir SPOOL u=wrx,go=
-make_dir RUN u=wrx,go=
-make_dir DATA u=wrx,go=
 make_dir CACHE u=wrx,go=
+make_dir DATA u=wrx,go=
 make_dir ETC u=wrx,g=rx,o=
+make_dir LIBEXEC u=wrx,g=rx,o=
 make_dir LOG u=wrx,g=rx,o=
+make_dir RUN u=wrx,go=
+make_dir SPOOL u=wrx,go=
+make_dir TMP ug=wrx,o=
 
 #
 #  Tar up files into $PRODUCT-YYYYMMDD_hhmmss.tar.bz2
