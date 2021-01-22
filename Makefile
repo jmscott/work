@@ -19,6 +19,7 @@ include local.mk
 include jmscott.mk
 
 COMPILED=								\
+	RFC3339Nano							\
 	duration-english						\
 	flatx								\
 	fork-me								\
@@ -83,6 +84,9 @@ distclean:
 	rm -rf $(JMSCOTT_PREFIX)/bin
 	rm -rf $(JMSCOTT_PREFIX)/sbin
 	rm -rf $(JMSCOTT_PREFIX)/src
+
+RFC3339Nano: RFC3339Nano.c
+	cc $(CFLAGS) -o RFC3339Nano RFC3339Nano.c
 
 idiff: idiff.c
 	cc $(CFLAGS) -o idiff idiff.c
