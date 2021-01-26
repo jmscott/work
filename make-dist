@@ -44,6 +44,15 @@
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
+#	Replace --<options> with <actions> like moder cli systems
+#
+#		make-dist tar <dist.conf>
+#		make-dist template
+#		make-dist frisk <dist.conf>
+#
+#	New options --frisk to sort list in VARs and replace root.dist
+#	to $PRODUCT.dist
+#
 #	Think deepky about recursive version that can combine *.dist files
 #
 #	Rename variable PRODUCT to less ambitious REPO.
