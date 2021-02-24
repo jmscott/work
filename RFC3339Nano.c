@@ -6,6 +6,16 @@
  *  Exit Status:
  *	0	time written
  *	1	failed
+ *  Note:
+ *	Consider writing program RFC3339, for dates like
+ *
+ *	      1990-12-31T23:59:60Z
+ *
+ *	Not clear to me if is Z is appropriate in RFC 3339.
+ *	See the "Examples" section of RFC.
+ *
+ *		https://tools.ietf.org/html/rfc3339
+ *		
  */
 #include <sys/errno.h>
 #include <string.h>
