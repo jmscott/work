@@ -22,6 +22,8 @@
 #
 #	Config variables to create directories are these:
 #
+#		ARCHIVE=""
+#		ATTIC=""
 #		BINs="[files] ..."
 #		CACHE=""
 #		CGIBINs="[files] ..."
@@ -44,7 +46,10 @@
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
-#	Replace --<options> with <actions> like moder cli systems
+#	Add command "env" or "fs" to document environment variables in config
+#	file that describe directories.
+#	
+#	Replace --<options> with <actions> like modern cli systems
 #
 #		make-dist tar <dist.conf>
 #		make-dist template
@@ -135,7 +140,7 @@ Description:
 Exit Status:
 	0	no error
 	1	error, temp build directory, named ./tmp/make-dist.\$\$,
-			left intact.
+			remains intact for debugging.
 END
 }
 
@@ -236,7 +241,7 @@ copy_files()
 	fi
 }
 
-#  Makefile an empty directory, typical not for static data
+#  Makefile an empty directory
 make_dir()
 {
 	VAR=$1;		shift
@@ -327,6 +332,12 @@ BINs="
 #  Uncomment to create src/ directory
 #SRCs=""
 
+#  Uncomment to create attic/ directory
+#ATTIC=""
+
+#  Uncomment to create archive/ directory
+#ARCHIVE=""
+
 #  Uncomment to create etc/ directory
 #ETC=""
 
@@ -412,6 +423,8 @@ copy_files SRCs src u=rwx,g=rx,o= ug=r,o=
 
 #  make directories, if variables defined in distribution file
 
+make_dir ARCHIVE u=wrx,go=
+make_dir ATTIC u=wrx,go=
 make_dir CACHE u=wrx,go=
 make_dir DATA u=wrx,go=
 make_dir ETC u=wrx,g=rx,o=

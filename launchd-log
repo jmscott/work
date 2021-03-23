@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 #  Synopsis:
-#	Trivial script to help launchd set up configs and proper logging.
+#	Script to help poor logging of launchd and missing docs for SIP.
 #  Usage:
 #	cd /usr/local/blobio
 #	
@@ -28,12 +28,6 @@ log()
 	echo "$PROG: $(date +'%Y/%m/%d %H:%M:%S'): $@"
 }
 
-leave()
-{
-	log 'good bye, cruel world'
-	exit
-}
-
 die()
 {
 	log "ERROR: $@" >&1
@@ -44,31 +38,27 @@ test $# -gt 0 || die 'wrong number of arguments, expected > 0'
 PROG="$PROG: $(basename $1)"
 
 log "hello, world"
-trap leave EXIT TERM INT QUIT
+trap 'log good bye, cruel world' EXIT TERM INT QUIT
 
 log "working directory: $(pwd)"
 
 CONF=etc/launchd-log.conf
+log "launchd config: $CONF"
 if [ -r $CONF ];  then
-	log "sourcing conf file: $CONF"
-	. $CONF
+	log "sourcing config file ..."
+	. $CONF || exit
 fi
 
-log "environment ..."
+log 'dump of process environment ...'
 env | while read LINE;  do
 	log "$LINE"
 done
-
-CONF=etc/launchd-log.conf
-if [ -r $CONF ];  then
-	log "sourcing conf file: $CONF"
-	. $CONF
-fi
 
 log "executing: $@"
 $@ 2>&1 | while read LINE;  do
 	log $LINE
 done
+
 STATUS=${PIPESTATUS[*]}
 log "process exited with status: $STATUS" 
 STATUS=$(echo $STATUS | awk '{print $1}')
