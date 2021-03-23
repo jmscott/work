@@ -306,7 +306,7 @@ case "$1" in
 #
 
 #  Define PRODUCT to change name of tar file from \$(basename \$(pwd))
-#  to, say, foobar-YYYYMMDD_hhmmss.tar.bz2
+#  to, say, foobar-YYYYMMDD_hhmm.tar.bz2
 
 #PRODUCT=foobar
 
@@ -422,9 +422,9 @@ make_dir SPOOL u=wrx,go=
 make_dir TMP ug=wrx,o=
 
 #
-#  Tar up files into $PRODUCT-YYYYMMDD_hhmmss.tar.bz2
+#  Tar up files into $PRODUCT-YYYYMMDD_hhmm.tar.bz2
 #
-TAR_FILE=$PRODUCT-$(date +'%Y%m%d_%H%M%S').tar.bz2
+TAR_FILE=$PRODUCT-$(date +'%Y%m%d_%H%M').tar.bz2
 echo ">$TAR_FILE"
 (
 	cd $WORK_TMP || die "cd $WORK_TMP failed"
