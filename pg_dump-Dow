@@ -98,12 +98,17 @@ if [ -d $BACKUP ];  then
 	log "removing previous backup: $(du -sh $BACKUP)"
 	rm -rf $BACKUP || die "rm daily backup dir failed: exit status=$?"
 fi
+DBSIZE=$(psql --tuples-only -c '
+SELECT
+	pg_size_pretty(pg_database_size(current_database()));
+' | sed 's/^ *//')
+log "size of database: $DATABASE=$DBSIZE"
 log 'starting pg_dump ...'
-pg_dump									\
+pg_dump $DATABASE							\
 	--format=d							\
 	--jobs=$JOBS							\
 	--file=$BACKUP							||
   die "pg_dump failed: exit status=$?"
-log "backup OK: $(du -sh $BACKUP)"
+log "pg_dump OK: $(du -sh $BACKUP)"
 
 exit 0
