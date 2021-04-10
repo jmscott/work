@@ -1,0 +1,109 @@
+#!/bin/bash
+
+help() { cat <<'END'
+
+Synopsis:
+	Midnight dump of PG database into backup/<database>/<database>.Dow.d
+Description:
+	Typical butt save, daily pg_dump of a PostgreSQL database.
+	The backup format is pg_dump directory, named like:
+	
+		backup/<database>/<database>-<Dow>.d/
+
+	Compression is 9 (best).  The parallel jobs is set to 4 processors. 
+	Faults are written to run/pg_dump-midnight-<database>.fault
+Usage:
+	D=setspace
+	0 0 * * * pg_dump-Dow $DB >>log/pg_dump-Dow-$DB.log 2>&1
+Depends
+	$JMSCOTT_ROOT/bin/duration-english
+	$PGHOME/bin/pg_dump
+Source Code:
+	https://github.com/jmscott/work
+Exit Status:
+	0	dump ok
+	1	dump failed
+END
+	exit 0
+}
+
+DOW=$(date +%a)
+PROG=$(basename $0)
+START_EPOCH=$(date +%s)
+JOBS=4
+COMPRESSION=9
+
+now()
+{
+	date +'%Y/%m/%d: %H:%M:%S'
+}
+
+log()
+{
+	echo "$(now): $@"
+}
+
+leave()
+{
+	STATUS=$?
+	ELAPSED_DURATION=$(duration-english $(expr $(date +%s) - $START_EPOCH))
+	log "elapsed duration: $ELAPSED_DURATION"
+	log 'good bye, cruel world'
+	exit $STATUS
+}
+
+die()
+{
+	MSG="ERROR: $@"
+	test -w run && echo "$(now): $MSG" >>run/$PROG.fault
+	log "$MSG" >&2
+	exit 1
+}
+
+in_PATH()
+{
+	EXE=$1
+	type -P $EXE 2>/dev/null || die "executable not in \$PATH: $EXE"
+}
+
+test "$1" = '--help' && help
+
+test $# = 1 || die "wrong number of arguments: got $#, expected 1"
+DATABASE=$1
+
+log 'hello, world'
+trap leave EXIT INT TERM
+
+test -r etc/profile && . etc/profile
+
+log "PATH=$PATH"
+in_PATH duration-english
+in_PATH pg_dump
+
+log "PGHOME=$PGHOME"
+log "PGHOST=$PGHOST"
+log "PGPORT=$PGPORT"
+log "PGUSER=$PGUSER"
+log "PGPASSWORD=$PGPASSWORD"
+log "day of week: $DOW"
+log "compression: $COMPRESSION"
+
+log "parallel jobs: $JOBS"
+
+BACKUP=backup/$DATABASE/$DATABASE-$DOW.d
+log "backup dir: $BACKUP"
+mkdir -p $BACKUP || die "mkdir backup failed: exit status=$?"
+
+if [ -d $BACKUP ];  then
+	log "removing previous backup: $(du -sh $BACKUP)"
+	rm -rf $BACKUP || die "rm daily backup dir failed: exit status=$?"
+fi
+log 'starting pg_dump ...'
+pg_dump									\
+	--format=d							\
+	--jobs=$JOBS							\
+	--file=$BACKUP							||
+  die "pg_dump failed: exit status=$?"
+log "backup OK: $(du -sh $BACKUP)"
+
+exit 0
