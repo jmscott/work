@@ -6,6 +6,8 @@
 #	local-darwin.mk.example
 #	https://github.com/jmscott/work
 #  Note:
+#	Need to make a dist file for work/ !!!  See play/
+#
 #	Install README in /usr/local/jmscott/README, describing github location
 #	and digest of installed code (typically trunk).
 #
@@ -53,6 +55,7 @@ install: all
 		overwrite						\
 		pdf-merge						\
 		pg2pg							\
+		pg_dump-Dow						\
 		rsunk							\
 		rsync-fs						\
 		ssh-host						\
