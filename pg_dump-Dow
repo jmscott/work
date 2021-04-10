@@ -32,6 +32,7 @@ PROG=$(basename $0)
 START_EPOCH=$(date +%s)
 JOBS=4
 COMPRESSION=9
+PSQL='psql --no-psqlrc'
 
 now()
 {
@@ -98,7 +99,7 @@ if [ -d $BACKUP ];  then
 	log "removing previous backup: $(du -sh $BACKUP)"
 	rm -rf $BACKUP || die "rm daily backup dir failed: exit status=$?"
 fi
-DBSIZE=$(psql --tuples-only -c '
+DBSIZE=$($PSQL --tuples-only -c '
 SELECT
 	pg_size_pretty(pg_database_size(current_database()));
 ' | sed 's/^ *//')
