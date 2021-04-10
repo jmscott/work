@@ -86,6 +86,8 @@ log "PGHOST=$PGHOST"
 log "PGPORT=$PGPORT"
 log "PGUSER=$PGUSER"
 log "PGPASSWORD=$PGPASSWORD"
+export PGDATABASE=$DATABASE
+log "PGDATABASE=$PGDATABASE"
 log "day of week: $DOW"
 log "compression: $COMPRESSION"
 
@@ -96,20 +98,21 @@ log "backup dir: $BACKUP"
 mkdir -p $BACKUP || die "mkdir backup failed: exit status=$?"
 
 if [ -d $BACKUP ];  then
-	log "removing previous backup: $(du -sh $BACKUP)"
+	log "removing previous backup: $(du -sh $BACKUP | awk '{print $1}')"
 	rm -rf $BACKUP || die "rm daily backup dir failed: exit status=$?"
 fi
 DBSIZE=$($PSQL --tuples-only -c '
 SELECT
 	pg_size_pretty(pg_database_size(current_database()));
 ' | sed 's/^ *//')
-log "size of database: $DATABASE=$DBSIZE"
+log "size of raw database: $DATABASE: $DBSIZE"
 log 'starting pg_dump ...'
 pg_dump $DATABASE							\
 	--format=d							\
 	--jobs=$JOBS							\
 	--file=$BACKUP							||
   die "pg_dump failed: exit status=$?"
-log "pg_dump OK: $(du -sh $BACKUP)"
+log '... pg_dump done, OK, no errors'
+log "dump size: $(du -sh $BACKUP | awk '{print $1}')"
 
 exit 0
