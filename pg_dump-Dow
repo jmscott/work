@@ -24,6 +24,11 @@ Exit Status:
 	0	dump ok
 	1	dump failed
 END
+#
+#  Note:
+#	Investigate if directory format of pg_dump includes checksum in
+#	manifest.
+#
 	exit 0
 }
 
