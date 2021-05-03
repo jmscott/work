@@ -1,6 +1,6 @@
 #
 #  Synopsis:
-#	Typical .bash_login for jmscott interactive bash work environment.
+#	Overrideable .bash_login for jmscott interactive bash work environment.
 #  Usage:
 #	cd $HOME
 #	JMSCOTT_ROOT=/usr/local/jmscott
@@ -9,6 +9,7 @@
 #
 #	#  alternatively, to track changes to bash_login
 #
+#	cd $HOME
 #	ln -s $JMSCOTT_ROOT/lib/bash_login.example $HOME/etc/bash_login
 #	echo '. etc/bash_login' >>$HOME/.bash_login
 #
@@ -22,10 +23,14 @@ set -o vi
 export HISTSIZE=10000
 export HISTCONTROL=ignoreboth:erasedups
 
-#  source in profile used by cronjobs
+#
+#  Source in $HOME/etc/profile
+#
 test -e etc/profile && . etc/profile
 
-#  monitor mail
+#
+#  Monitor mail
+#
 if [ -d /var/mail ];  then
 	export MAIL=/var/mail/$USER
 fi
@@ -40,37 +45,35 @@ case "$PATH" in
 esac
 
 #
-#  add jmscott tools
+#  Add jmscott tools, if not setup in $HOME/etc/profile.
 #
 #	https://github.com/jmscott/work
 #
-if [ -d /usr/local/jmscott ];  then
+if [ -z "$JMSCOTT_ROOT" -a -d /usr/local/jmscott ];  then
 	export JMSCOTT_ROOT=/usr/local/jmscott
+	PATH=$JMSCOTT_ROOT/bin
+fi
 
-	#  add $JMSCOTT_ROOT/bin to PATH
-	case "$PATH" in
-	*$JMSCOTT_ROOT/bin*)
-		;;
-	*)
-		PATH=$JMSCOTT_ROOT/bin:$PATH
-		;;
-	esac
+#
+#  add postgresql tools, if not setup in $HOME/etc/profile.
+#
+if [ -z "$PGHOME" -a -d /usr/local/pgsql ];  then
+	export PGHOME=/usr/local/pgsql
+	export PGHOST=/tmp
+	export PGPORT=5432
+	export PGUSER=$USER
+	export PGDATABASE=$USER
+	PATH=$PGHOME/bin:$PATH
+fi
+
+#
+#  add blobio toos, if not setup in $HOME/etc/profile
+#
+if [ -z "$BLOBIO_ROOT" -a -d /usr/local/blobio ];  then
+	export BLOBIO_ROOT=/usr/local/blobio
+	PATH=$BLOBIO_ROOT/bin:$PATH
 fi
 
 #  enable options for tab expansion of directory names
 
-shopt | grep -w direxpand >/dev/null
-STATUS="${PIPESTATUS[*]}"
-case "$STATUS" in
-'0 0')
-	shopt -s direxpand
-	;;
-'0 1')
-	;;
-*)
-	echo "WARN: unknown status: shopt | grep direxpand: $STATUS"
-	;;
-esac
-
-export BLOBIO_ROOT=${BLOBIO_ROOT:=/usr/local/blobio}
-test -x $BLOBIO_ROOT/bin && PATH=$BLOBIO_ROOT/bin:$PATH
+(shopt | grep -wq direxpand ) && shopt -s direxpand
