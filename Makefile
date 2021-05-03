@@ -29,6 +29,7 @@ COMPILED=								\
 	halloc.o							\
 	idiff								\
 	istext								\
+	pg_launchd							\
 	stale-mtime							\
 
 all: $(COMPILED)
@@ -44,6 +45,7 @@ install: all
 		-d $(JMSCOTT_PREFIX)/sbin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		launchd-log						\
+		pg_launchd						\
 		$(JMSCOTT_PREFIX)/sbin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		bash_login.example					\
@@ -124,6 +126,9 @@ flatx: flatx.c
 
 escape-json-string: escape-json-string.c
 	cc $(CFLAGS) -o escape-json-string escape-json-string.c
+
+pg_launchd: pg_launchd.c
+	cc $(CFLAGS) -o pg_launchd pg_launchd.c
 
 world:
 	cd www && $(MAKE) $(MFLAGS) world
