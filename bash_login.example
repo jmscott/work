@@ -1,0 +1,53 @@
+#
+#  Synopsis:
+#	Typical .bash_login for jmscott work environment
+#  Usage:
+#	JMSCOTT_ROOT=/usr/local/jmscott
+#	cp $JMSCOTT_ROOT/lib/bash_login.example $HOME/.bash_login
+#
+
+export BASH_SILENCE_DEPRECATION_WARNING=1	#  silence macos silliness
+
+PS1="$USER@$(hostname | sed 's/\..*//')> "
+unalias -a
+set -o vi
+
+export HISTSIZE=10000
+export HISTCONTROL=ignoreboth:erasedups
+
+test -e etc/profile && . etc/profile
+
+export MAIL=/var/mail/$USER
+if [ ! -r $MAIL ];  then
+	echo "WARN: cannot read mail file: $MAIL"
+	MAIL=
+fi
+
+#  Add mac ports, if not already added by etc/profile
+case "$PATH" in
+*/opt/local/bin*)
+	;;
+*)
+	test -d /opt/local/bin && PATH=/opt/local/bin:$PATH
+	;;
+esac
+
+#
+#  add jmscott tools
+#
+#	https://github.com/jmscott/work
+#
+if [ -d /usr/local/jmscott ];  then
+	export JMSCOTT_ROOT=/usr/local/jmscott
+
+	#  add $JMSCOTT_ROOT/bin to PATH
+	case "$PATH" in
+	*$JMSCOTT_ROOT/bin*)
+		;;
+	*)
+		PATH=$JMSCOTT_ROOT/bin:$PATH
+		;;
+	esac
+fi
+
+shopt -s direxpand

@@ -37,11 +37,16 @@ install: all
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
+		-d $(JMSCOTT_PREFIX)/lib
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/bin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/sbin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		launchd-log						\
+		$(JMSCOTT_PREFIX)/sbin
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
+		bash_login.example					\
 		$(JMSCOTT_PREFIX)/sbin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		RFC3339Nano						\
@@ -91,6 +96,7 @@ distclean:
 	rm -rf $(JMSCOTT_PREFIX)/bin
 	rm -rf $(JMSCOTT_PREFIX)/sbin
 	rm -rf $(JMSCOTT_PREFIX)/src
+	rm -rf $(JMSCOTT_PREFIX)/lib
 
 RFC3339Nano: RFC3339Nano.c
 	cc $(CFLAGS) -o RFC3339Nano RFC3339Nano.c
