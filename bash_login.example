@@ -1,9 +1,14 @@
 #
 #  Synopsis:
-#	Typical .bash_login for jmscott work environment
+#	Typical .bash_login for jmscott interactive bash work environment.
 #  Usage:
 #	JMSCOTT_ROOT=/usr/local/jmscott
 #	cp $JMSCOTT_ROOT/lib/bash_login.example $HOME/.bash_login
+#
+#	#  alternatively, to track changes to bash_login
+#
+#	ln -s $JMSCOTT_ROOT/lib/bash_login.example $HOME/etc/bash_login
+#	echo '. etc/bash_login' >>$HOME/.bash_login
 #
 
 export BASH_SILENCE_DEPRECATION_WARNING=1	#  silence macos silliness
@@ -15,12 +20,12 @@ set -o vi
 export HISTSIZE=10000
 export HISTCONTROL=ignoreboth:erasedups
 
+#  source in profile used by cronjobs
 test -e etc/profile && . etc/profile
 
-export MAIL=/var/mail/$USER
-if [ ! -r $MAIL ];  then
-	echo "WARN: cannot read mail file: $MAIL"
-	MAIL=
+#  monitor mail
+if [ -d /var/mail ];  then
+	export MAIL=/var/mail/$USER
 fi
 
 #  Add mac ports, if not already added by etc/profile
@@ -50,4 +55,17 @@ if [ -d /usr/local/jmscott ];  then
 	esac
 fi
 
-shopt -s direxpand
+#  enable options for tab expansion of directory names
+
+shopt | grep -w direxpand >/dev/null
+STATUS="${PIPESTATUS[*]}"
+case "$STATUS" in
+'0 0')
+	shopt -s direxpand
+	;;
+'0 1')
+	;;
+*)
+	echo "WARN: unknown status: shopt | grep direxpand: $STATUS"
+	;;
+esac
