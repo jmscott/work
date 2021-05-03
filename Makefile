@@ -49,7 +49,7 @@ install: all
 		$(JMSCOTT_PREFIX)/sbin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		bash_login.example					\
-		$(JMSCOTT_PREFIX)/sbin
+		$(JMSCOTT_PREFIX)/lib
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		RFC3339Nano						\
 		duration-english					\
