@@ -51,7 +51,7 @@ esac
 #
 if [ -z "$JMSCOTT_ROOT" -a -d /usr/local/jmscott ];  then
 	export JMSCOTT_ROOT=/usr/local/jmscott
-	PATH=$JMSCOTT_ROOT/bin
+	PATH=$JMSCOTT_ROOT/bin:$PATH
 fi
 
 #
