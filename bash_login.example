@@ -2,8 +2,10 @@
 #  Synopsis:
 #	Typical .bash_login for jmscott interactive bash work environment.
 #  Usage:
+#	cd $HOME
 #	JMSCOTT_ROOT=/usr/local/jmscott
 #	cp $JMSCOTT_ROOT/lib/bash_login.example $HOME/.bash_login
+#	chmod +w .bash_login 
 #
 #	#  alternatively, to track changes to bash_login
 #
@@ -69,3 +71,6 @@ case "$STATUS" in
 	echo "WARN: unknown status: shopt | grep direxpand: $STATUS"
 	;;
 esac
+
+export BLOBIO_ROOT=${BLOBIO_ROOT:=/usr/local/blobio}
+test -x $BLOBIO_ROOT/bin && PATH=$BLOBIO_ROOT/bin
