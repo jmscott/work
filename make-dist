@@ -46,13 +46,17 @@
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
+#	Consider a variable VAR_ROOT for variable directores like etc/, data/,
+#	spool/, ... Currently the dynamical directories are created at the
+#	the same level as the static directories.
+#
 #	The tar version insures that dynamic directories in foobar.conf
 #	exist but does NOT ever overwrite, lest precious data be lost.
 #	However, the Makefile version, does not insure, so make recipes
 #	must be hand coded.  Adding an option to generate the install
 #	recipes would be nice:
 #
-#		make-dist recipe-install
+#		make-dist dynamic-dirs
 #
 #	Which could be manually spliced back into the Makefile.
 #
