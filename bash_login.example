@@ -24,35 +24,20 @@ export HISTSIZE=10000
 export HISTCONTROL=ignoreboth:erasedups
 
 #
-#  Source in $HOME/etc/profile
+#  Source in $HOME/etc/profile, which may preceed/override the
+#  following defines
 #
 test -e etc/profile && . etc/profile
 
 #
 #  Monitor mail
 #
-if [ -d /var/mail ];  then
+if [ -d /var/mail -a -z "$MAIL" ];  then
 	export MAIL=/var/mail/$USER
 fi
 
-#  Add mac ports, if not already added by etc/profile
-case "$PATH" in
-*/opt/local/bin*)
-	;;
-*)
-	test -d /opt/local/bin && PATH=/opt/local/bin:$PATH
-	;;
-esac
-
-#
-#  Add jmscott tools, if not setup in $HOME/etc/profile.
-#
-#	https://github.com/jmscott/work
-#
-if [ -z "$JMSCOTT_ROOT" -a -d /usr/local/jmscott ];  then
+test -z "$JMSCOTT_ROOT" -a -d /usr/local/jmscott &&
 	export JMSCOTT_ROOT=/usr/local/jmscott
-	PATH=$JMSCOTT_ROOT/bin:$PATH
-fi
 
 #
 #  add postgresql tools, if not setup in $HOME/etc/profile.
@@ -63,17 +48,44 @@ if [ -z "$PGHOME" -a -d /usr/local/pgsql ];  then
 	export PGPORT=5432
 	export PGUSER=$USER
 	export PGDATABASE=$USER
-	PATH=$PGHOME/bin:$PATH
 fi
 
+jmscott_prepend_PATH()
+{
+	for ((i=$#; i>0; i--)); do
+		ARG=${!i}
+		if [ -d "$ARG" ] && [[ ":$PATH:" != *":$ARG:"* ]]; then
+			PATH="$ARG${PATH:+":$PATH"}"
+		fi
+	done
+}
+
 #
-#  add blobio toos, if not setup in $HOME/etc/profile
+#  Add various directories to PATH
+#
+jmscott_prepend_PATH 							\
+	/opt/local/libexec/gnubin					\
+	/opt/local/bin							\
+	$JMSCOTT_ROOT/bin						\
+	$PGHOME/bin							\
+
+#
+#  add blobio root tools, if not setup in $HOME/etc/profile
 #
 if [ -z "$BLOBIO_ROOT" -a -d /usr/local/blobio ];  then
 	export BLOBIO_ROOT=/usr/local/blobio
-	PATH=$BLOBIO_ROOT/bin:$PATH
+	test -r $BLOBIO_ROOT/bin/etc/profile &&
+		. $BLOBIO_ROOT/bin/etc/profile
+
 fi
 
-#  enable options for tab expansion of directory names
+jmscott_prepend_PATH $BLOBIO_ROOT/bin
+
+#
+#  add blobio service, if not setup in $HOME/etc/profile
+#
+test -z "$BLOBIO_SERVICE" && BLOBIO_SERVICE=bio4:127.0.0.1:1797
+
+jmscott_prepend_PATH . $HOME/bin
 
 (shopt | grep -wq direxpand ) && shopt -s direxpand
