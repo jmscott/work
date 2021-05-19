@@ -74,7 +74,6 @@ jmscott_prepend_PATH 							\
 #
 if [ -z "$BLOBIO_ROOT" -a -d /usr/local/blobio ];  then
 	export BLOBIO_ROOT=/usr/local/blobio
-	test -r $BLOBIO_ROOT/etc/profile && . $BLOBIO_ROOT/etc/profile
 fi
 
 jmscott_prepend_PATH $BLOBIO_ROOT/bin
