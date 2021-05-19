@@ -1,18 +1,35 @@
 #!/bin/bash
+#
+#  Synopsis:
+#	Are files well formed json?
+#  Usage:
+#	isjson <x.json
+#	isjson x.json
+#  Exit Status:
+#	0	input is well formed json
+#	1	input is not well formed json
+#	2	unknown error
+#	127	python can not be executed
+#
 
 python -m json.tool $@ >/dev/null 2>&1 | read OUT
 STATUS=${PIPESTATUS[*]}
 case "$STATUS" in
 '0 0')
 	echo "YES: valid json"
+	exit 0
 	;;
 '1 0'|'1 1')
 	echo "NO: invalid json"
+	exit 1
 	;;
 '127 '*)
 	echo "ERROR: exit status=127: is python installed?"
+	exit 127
 	;;
 *)
+	STATUS=$(echo $STATUS | cut -d' ' -f1)
 	echo "ERROR: python json failed: exit status=$STATUS: $OUT" >&2
+	exit $STATUS
 	;;
 esac
