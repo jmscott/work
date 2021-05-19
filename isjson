@@ -1,6 +1,18 @@
-python -m json.tool $@ >/dev/null 2>&1
-if [ $? = 0 ];  then
+#!/bin/bash
+
+python -m json.tool $@ >/dev/null 2>&1 | read OUT
+STATUS=${PIPESTATUS[*]}
+case "$STATUS" in
+'0 0')
 	echo "YES: valid json"
-else
+	;;
+'1 0'|'1 1')
 	echo "NO: invalid json"
-fi
+	;;
+'127 '*)
+	echo "ERROR: exit status=127: is python installed?"
+	;;
+*)
+	echo "ERROR: python json failed: exit status=$STATUS: $OUT" >&2
+	;;
+esac
