@@ -306,11 +306,8 @@ case "$1" in
 #  See:
 #	https://github.com/jmscott/work/blob/master/make-dist
 #  Note:
-#	For a GNU Makefile to extract the shell variables defined in this
-#	dist file, include the following line in Makefile:
-#
-#	Makefile variables can be extracted from the the root.dist file
-#	with these recipes.  Example make code follows:
+#	Makefile variables can be extracted and defined from the the
+#	root.dist file with these recipes.  Example make code follows:
 #
 #		DIST=product.dist
 #
@@ -335,46 +332,61 @@ LIBs="
 BINs="
 "
 
-#SBINs=""
+#  Uncomment to create sbins/ directory
+#SBINs="
+#"
 
 #  Uncomment to create cgibin/ directory
-#CGIBINs=""
+#CGIBINs="
+#"
 
 #  Uncomment to create htdocs/ directory
-#HTDOCs=""
+#HTDOCs="
+#"
 
 #  Uncomment to create src/ directory
-#SRCs=""
+#SRCs="
+#"
 
 #  Uncomment to create attic/ directory
-#ATTIC=""
+#ATTIC="
+#"
 
 #  Uncomment to create archive/ directory
-#ARCHIVE=""
+#ARCHIVE="
+#"
 
 #  Uncomment to create etc/ directory
-#ETC=""
+#ETC="
+#"
 
 #  Uncomment to create spool/ directory
-#SPOOL=""
+#SPOOL="
+#"
 
 #  Uncomment to create data/ directory
-#DATA=""
+#DATA="
+#"
 
 #  Uncomment to create run/ directory
-#RUN=""
+#RUN="
+#"
 
 #  Uncomment to create log/ directory
-#LOG=""
+#LOG="
+#"
 
 #  Uncomment to create cache/ directory
-#CACHE=""
+#CACHE="
+#"
 
 #  Uncomment to create tmp/ directory
-#TMP=""
+#TMP="
+#"
 
 #  Uncomment to create directory libexec/
-#LIBEXECs=""
+#LIBEXECs="
+#"
 
 END
 	exit 0
