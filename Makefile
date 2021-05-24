@@ -78,6 +78,7 @@ install: all
 		-d $(JMSCOTT_PREFIX)/src
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r		\
 		RFC3339Nano.c						\
+		escape-json-string.c					\
 		flatx.c							\
 		fork-me.c						\
 		halloc.c						\
