@@ -16,7 +16,15 @@
 
 export BASH_SILENCE_DEPRECATION_WARNING=1	#  silence macos silliness
 
-PS1="$USER@$(hostname | sed 's/\..*//')> "
+case $USER in
+root)
+	PS1="$(hostname | sed 's/\..*//')# "
+	;;
+*)
+	PS1="$USER@$(hostname | sed 's/\..*//')> "
+	;;
+esac
+
 unalias -a
 set -o vi
 
