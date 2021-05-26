@@ -89,7 +89,7 @@ jmscott_prepend_PATH $BLOBIO_ROOT/bin
 #
 #  add blobio service, if not setup in $HOME/etc/profile
 #
-test -z "$BLOBIO_SERVICE" && BLOBIO_SERVICE=bio4:127.0.0.1:1797
+test -z "$BLOBIO_SERVICE" && export BLOBIO_SERVICE=bio4:127.0.0.1:1797
 
 jmscott_prepend_PATH . $HOME/bin
 
