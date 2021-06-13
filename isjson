@@ -19,6 +19,15 @@ die()
 	exit 2
 }
 
+is_exec()
+{
+	EXE=$1
+	which $EXE >/dev/null 2>&1
+	STATUS=$?
+	test $STATUS -le 1 && return $STATUS
+	die "which $EXE failed: exit status=$STATUS"
+}
+
 case $# in
 0)
 	;;
@@ -31,7 +40,20 @@ case $# in
 	;;
 esac
 
-python -m json.tool $1 >/dev/null 2>&1
+#  Find python.  the pain never ends.
+PYTHON=python
+if is_exec $PYTHON;  then
+	true
+else
+	PYTHON=python3
+	if is_exec $PYTHON;  then
+		true
+	else
+		die 'cannot find python exec'
+	fi
+fi
+
+$PYTHON -m json.tool $1 >/dev/null 2>&1
 STATUS=$?
 case $STATUS in
 0)
