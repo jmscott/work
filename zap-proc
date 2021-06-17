@@ -63,7 +63,7 @@ _zap()
 }
 
 #  zap list of processes with particular names
-_exact_zap()
+_name_zap()
 {
 	if [ $CLI_ARGC = 0 ];  then
 		_zap EXACT $PROC_NAME
@@ -90,7 +90,7 @@ _corrupt_zap()
 	else
 		ERROR 'pid file is empty'
 	fi
-	_exact_zap || exit 1
+	_name_zap || exit 1
 }
 
 test $# = 0 && die 'no arguments: pid file must be first argument'
@@ -105,7 +105,7 @@ CLI_ARGV=$*
 if [ ! -e $PID_PATH ];  then
 	log "no pid file (ok): $PID_PATH"
 	log "process $PROC_NAME may not be running"
-	_exact_zap
+	_name_zap
 	exit
 fi
 
@@ -113,7 +113,7 @@ log "pid file exists: $PID_PATH"
 
 if [ ! -s $PID_PATH ];  then
 	log "WARN: empty pid file: $PID_PATH"
-	_exact_zap
+	_name_zap
 	exit
 fi
 
@@ -139,7 +139,7 @@ sleep $PROC_PAUSE
 test -e $PID_PATH || exit 0
 
 log "pid file still exists, so force exact kill"
-_exact_zap
+_name_zap
 test -e $PID_PATH || exit 0
 
 log "hmm, pid still exists, so nuke $PID with -9 and remove pid file"
