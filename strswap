@@ -23,7 +23,12 @@ Depends:
 See:
 	https://github.com/jmscott/work/strswap
 	http://www.amazon.com/Unix-Programming-Environment-Prentice-Hall-Software/dp/013937681X
+
 Note:
+	A --verbose or -v option would be nice.
+
+	The meta escaping of sed command needs a rethink.
+
 	A --word option would be nice.
 END
 }
