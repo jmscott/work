@@ -98,9 +98,11 @@ log "compression: $COMPRESSION"
 
 log "parallel jobs: $JOBS"
 
-BACKUP=backup/$DATABASE/$DATABASE-$DOW.d
-log "backup dir: $BACKUP"
+BACKUP=backup/$DATABASE
+log "backup db dir: $BACKUP"
 mkdir -p $BACKUP || die "mkdir backup failed: exit status=$?"
+BACKUP=backup/$DATABASE/$DATABASE-$DOW.d
+log "backup Dow dir: $BACKUP"
 
 if [ -d $BACKUP ];  then
 	log "removing previous backup: $(du -sh $BACKUP | awk '{print $1}')"
