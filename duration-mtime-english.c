@@ -1,25 +1,13 @@
 /*
  *  Synopsis:
- *	Write english description elapsed time from duration in integer seconds
+ *	Write english description of elapsed modification time of a file.
  *  Usage:
- *	#!/bin/bash
- *
- *	#  on mac osx
- *	DURATION_SEC=$(expr $(date +%s) - $(date -v -1d +%s))
- *
- *	#  on gnu/linux
- *	DURATION_SEC=$(expr $(date +%s) - $(date -d yesterday +%s))
- *
- *	echo "elpased time: $(duration-english $DURATION_SEC)"
+ *	duration-mtime-english <path/to/file>
  *  Note:
  *	Add option --round-single-unit.
- *
- *	Improve parsing of duration seconds.
- *
- *	Should seconds be a floating point, for sub second timing?
- *
- *	No rounding of <major><minor> calculations.
  */
+#include <sys/stat.h>
+#include <sys/errno.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -27,9 +15,10 @@
 #include <ctype.h>
 #include <unistd.h>
 
-#define ROUND(n, d) ((((n) < 0) ^ ((d) < 0)) ? (((n) - (d)/2)/(d)) : (((n) + (d)/2)/(d)))
+#define ROUND(n,d) ((((n)<0)^((d)<0))?(((n)-(d)/2)/(d)):(((n)+(d)/2)/(d)))
 
-static char *prog = "duration-english";
+extern int errno;
+static char *prog = "duration-mtime-english";
 
 static void
 die(char *msg)
@@ -38,33 +27,60 @@ die(char *msg)
 
 	strcpy(buf, prog);
 	strcat(buf, ": ERROR: ");
-	strncat(buf, msg, 1024 - (strlen(buf) + 2));
-	strncat(buf, "\n", 1024 - (strlen(buf) + 2));
+	strncat(buf, msg, sizeof buf - (strlen(buf) + 2));
+	strncat(buf, "\n", sizeof buf - (strlen(buf) + 2));
 
 	buf[sizeof buf - 2] = '\n';
 	buf[sizeof buf - 1] = 0;
 	write(2, buf, strlen(buf)); 
+	exit(2);
+}
+
+static void
+die2(char *msg1, char *msg2)
+{
+	char buf[1024];
+
+	strncpy(buf, msg1, sizeof buf - 1);
+	strncat(buf, ": ", sizeof buf - (strlen(buf) + 1));
+	strncat(buf, msg2, sizeof buf - (strlen(buf) + 1));
+	die(buf);
+}
+
+static void
+enoent(char *path)
+{
+	write(2, prog, strlen(prog));
+	write(2, ": ERROR: file does not exist: ", 29);
+	write(2, path, strlen(path));
+	write(2, "\n", 1);
 	exit(1);
 }
 
 int
 main(int argc, char **argv)
 {
+	int status;
+	struct stat st;
+	time_t now;
+
+	time(&now);
+
 	if (argc != 2)
 		die("wrong number of arguments");
 
-	char *d = argv[1], c;
-	char *p = d;
+	char *path = argv[1];
 
-	if (*d == 0)
-		die("empty duration seconds");
-	while ((c = *p++)) {
-		if (!isdigit(c))
-			die("duration seconds: non-digit");
-		if (p - d > 20)
-			die("duration seconds: > 20 digits");
+	if (*path == 0)
+		die("empty file path");
+	status = stat(path, &st);
+	if (status < 0) {
+		if (errno == ENOENT)
+			enoent(path);
+		die2("stat() failed", strerror(errno));
 	}
-	int duration = atoi(d);
+	int duration = now - st.st_mtime;
+
 	char answer[1024];
 
 	if (duration < 60)					//  seconds
