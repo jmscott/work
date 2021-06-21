@@ -82,17 +82,17 @@ main(int argc, char **argv)
 		int min = ROUND(duration - (hr * 3600), 60);
 
 		if (min > 0)
-			sprintf(answer, "%dh%dm", hr, min);	//  hours
+			sprintf(answer, "%dh%dm\n", hr, min);	//  hours
 		else
-			sprintf(answer, "%dh", hr);
+			sprintf(answer, "%dh\n", hr);
 	} else {						//  days & hr
 		int day = duration / 86400;
 		int hr = ROUND(duration - (day * 86400), 3600);
 
 		if (hr > 0)
-			sprintf(answer, "%dd%dh", day, hr);
+			sprintf(answer, "%dd%dh\n", day, hr);
 		else
-			sprintf(answer, "%dd", day);
+			sprintf(answer, "%dd\n", day);
 	}
 	write(1, answer, strlen(answer));
 	return 0;
