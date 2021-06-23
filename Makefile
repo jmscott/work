@@ -25,6 +25,7 @@ COMPILED=								\
 	duration-english						\
 	duration-mtime-english						\
 	escape-json-string						\
+	duration-mtime							\
 	flatx								\
 	fork-me								\
 	halloc.o							\
@@ -132,6 +133,9 @@ flatx: flatx.c
 
 escape-json-string: escape-json-string.c
 	cc $(CFLAGS) -o escape-json-string escape-json-string.c
+
+duration-mtime: duration-mtime.c
+	cc $(CFLAGS) -o duration-mtime duration-mtime.c
 
 pg_launchd: pg_launchd.c
 	cc $(CFLAGS) -o pg_launchd pg_launchd.c
