@@ -3,6 +3,9 @@
  *   	Simple measurement of sequential fork/execs.
  *  Usage:
  *	time fork-me /usr/bin/true
+ *  Exit Status:
+ *	0	ok
+ *	1	error
  *  See:
  *	https://github.com/jmscott/work
  *  Note:

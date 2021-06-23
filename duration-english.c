@@ -11,6 +11,9 @@
  *	DURATION_SEC=$(expr $(date +%s) - $(date -d yesterday +%s))
  *
  *	echo "elpased time: $(duration-english $DURATION_SEC)"
+ *  Exit Status:
+ *	0	ok
+ *	1	unexpected error
  *  Note:
  *	Add option --round-single-unit.
  *

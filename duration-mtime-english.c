@@ -3,6 +3,10 @@
  *	Write english description of elapsed modification time of a file.
  *  Usage:
  *	duration-mtime-english <path/to/file>
+ *  Exit Status:
+ *	0	ok
+ *	1	file does not exist
+ *	2	unexpected error
  *  Note:
  *	Add option --round-single-unit.
  */
