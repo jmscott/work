@@ -5,8 +5,8 @@
  *	halloc is a memory allocator dependent upon the well known malloc().
  *	halloc() organizes memory into hierarchical allocations;  freeing
  *	the parent frees all the children.  halloc() works best in a long
- *	running process with complex memory mangemanet.  halloc() is NOT thread
- *	safe and NEVER will be.
+ *	running process with complex memory mangemanet.  halloc() is NOT
+ *	thread safe and NEVER will be.
  *
  *	For example,
  *
@@ -17,22 +17,16 @@
  *	
  *		halloc_free(parent);
  *
- *	will allocate chunks of RAM in "parent" and "child", do some work and
- *	then free both the parent and child with single call
+ *	will free all parent and all descendents invoking callbacks deepest
+ *	child first.
  *
- *		halloc_free(parent).
- *
- *	All descendents of parent are also freed.  Any attempt to free "child"
- *	after "parent" is freed will be unpredicatable.
- *
- *	Additionally, a function callback to each blob can be added via
- *	halloc_add_callback(p, *func).  The callbacks are invoked deepest
- *	child first, with no other assumptions.
+ *	This version of halloc is a clean room rewrite of a similar
+ *	production version owned by partners of august.com (and inspired
+ *	by Britton-Lee phi), back in the day.
  *  See:
  *	https://github.com/jmscott/work/halloc.c
  *  Note:
- *	This version is a complete rewrite of a similar production version
- *	owned by partners of august.com, back in the day.
+ *	Should callbacks be called in LIFO order, instead of deepest first?
  */
 #include <stdlib.h>
 #include <string.h>
