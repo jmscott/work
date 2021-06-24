@@ -23,7 +23,6 @@ include jmscott.mk
 COMPILED=								\
 	RFC3339Nano							\
 	duration-english						\
-	duration-mtime-english						\
 	escape-json-string						\
 	duration-mtime							\
 	flatx								\
@@ -55,7 +54,6 @@ install: all
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		RFC3339Nano						\
 		duration-english					\
-		duration-mtime-english					\
 		escape-json-string					\
 		exec-logoff						\
 		idiff							\
@@ -112,9 +110,6 @@ idiff: idiff.c
 
 duration-english: duration-english.c
 	cc $(CFLAGS) -o duration-english duration-english.c
-
-duration-mtime-english: duration-mtime-english.c
-	cc $(CFLAGS) -o duration-mtime-english duration-mtime-english.c
 
 istext: istext.c
 	cc $(CFLAGS) -o istext istext.c
