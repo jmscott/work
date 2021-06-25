@@ -23,8 +23,8 @@ include jmscott.mk
 COMPILED=								\
 	RFC3339Nano							\
 	duration-english						\
-	escape-json-string						\
 	duration-mtime							\
+	escape-json-string						\
 	flatx								\
 	fork-me								\
 	halloc.o							\
@@ -54,6 +54,7 @@ install: all
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		RFC3339Nano						\
 		duration-english					\
+		duration-mtime						\
 		escape-json-string					\
 		exec-logoff						\
 		idiff							\
@@ -79,6 +80,8 @@ install: all
 		-d $(JMSCOTT_PREFIX)/src
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r		\
 		RFC3339Nano.c						\
+		duration-english.c					\
+		duration-mtime.c					\
 		escape-json-string.c					\
 		flatx.c							\
 		fork-me.c						\
@@ -86,6 +89,7 @@ install: all
 		hexdump.c						\
 		idiff.c							\
 		istext.c						\
+		pg_launchd.c						\
 		stale-mtime.c						\
 		$(JMSCOTT_PREFIX)/src
 	cd pgsnap && $(MAKE) $(MFLAGS) install
