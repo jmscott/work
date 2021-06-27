@@ -2,11 +2,6 @@
 #  Synopsis:
 #	Overrideable .bash_login for jmscott interactive bash work environment.
 #  Usage:
-#	cd $HOME
-#	JMSCOTT_ROOT=/usr/local/jmscott
-#	cp $JMSCOTT_ROOT/lib/bash_login.example $HOME/.bash_login
-#	chmod +w .bash_login 
-#
 #	#  alternatively, to track changes to bash_login
 #
 #	cd $HOME
@@ -77,20 +72,7 @@ jmscott_prepend_PATH 							\
 	$JMSCOTT_ROOT/bin						\
 	$PGHOME/bin							\
 
-#
-#  add blobio root tools, if not setup in $HOME/etc/profile
-#
-if [ -z "$BLOBIO_ROOT" -a -d /usr/local/blobio ];  then
-	export BLOBIO_ROOT=/usr/local/blobio
-fi
-
 jmscott_prepend_PATH $BLOBIO_ROOT/bin
-
-#
-#  add blobio service, if not setup in $HOME/etc/profile
-#
-test -z "$BLOBIO_SERVICE" && export BLOBIO_SERVICE=bio4:127.0.0.1:1797
-test -z "$BLOBIO_ALGORITHM" && export BLOBIO_ALGORITHM=bc160
 
 jmscott_prepend_PATH . $HOME/bin
 
