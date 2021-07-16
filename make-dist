@@ -336,6 +336,10 @@ BINs="
 #SBINs="
 #"
 
+#  Uncomment to create tmp/ directory
+#TMP="
+#"
+
 #  Uncomment to create cgibin/ directory
 #CGIBINs="
 #"
@@ -380,13 +384,14 @@ BINs="
 #CACHE="
 #"
 
-#  Uncomment to create tmp/ directory
-#TMP="
-#"
-
 #  Uncomment to create directory libexec/
 #LIBEXECs="
 #"
+
+#  Uncomment for compiled programs to be removed in "clean" recipes.
+#COMPILEs="
+#"
+
 
 END
 	exit 0
