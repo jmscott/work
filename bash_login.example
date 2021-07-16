@@ -72,8 +72,6 @@ jmscott_prepend_PATH 							\
 	$JMSCOTT_ROOT/bin						\
 	$PGHOME/bin							\
 
-jmscott_prepend_PATH $BLOBIO_ROOT/bin
-
 jmscott_prepend_PATH . $HOME/bin
 
 test "$USER" = root && jmscott_prepend_PATH /opt/local/sbin
