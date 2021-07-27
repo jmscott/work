@@ -42,7 +42,7 @@ trap 'log good bye, cruel world' EXIT TERM INT QUIT
 
 CWD=$(pwd)		#  for security issue in new mac os
 STATUS=$?
-test $? = 0 || die "cwd failed: exit status=$STATUS"
+test $STATUS = 0 || die "cwd failed: exit status=$STATUS"
 test -n "$CWD" || die 'empty output from pwd command'
 
 log "working directory: $CWD"
