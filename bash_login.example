@@ -71,6 +71,8 @@ jmscott_prepend_PATH 							\
 	/opt/local/bin							\
 	$JMSCOTT_ROOT/bin						\
 	$PGHOME/bin							\
+	/usr/sbin							\
+	/sbin
 
 jmscott_prepend_PATH . $HOME/bin
 
