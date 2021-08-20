@@ -10,3 +10,4 @@ istext
 local.mk
 pg_launchd
 stale-mtime
+stat-mtime

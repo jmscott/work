@@ -32,6 +32,7 @@ COMPILED=								\
 	istext								\
 	pg_launchd							\
 	stale-mtime							\
+	stat-mtime							\
 
 all: $(COMPILED)
 	cd www && $(MAKE) $(MFLAGS) all
@@ -126,6 +127,9 @@ fork-me: fork-me.c
 
 stale-mtime: stale-mtime.c
 	cc $(CFLAGS) -o stale-mtime stale-mtime.c
+
+stat-mtime: stat-mtime.c
+	cc $(CFLAGS) -o stat-mtime stat-mtime.c
 
 flatx: flatx.c
 	cc $(CFLAGS) -o flatx flatx.c -lexpat
