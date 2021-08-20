@@ -15,7 +15,7 @@
 #include <unistd.h>
 
 extern int errno;
-static char *prog = "-mtime";
+static char *prog = "duration-mtime";
 
 static void
 die(char *msg)
