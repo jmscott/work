@@ -70,6 +70,7 @@ install: all
 		rsync-fs						\
 		ssh-host						\
 		stale-mtime						\
+		stat-mtime						\
 		strip-cr						\
 		strswap							\
 		svn-commit-notify					\
