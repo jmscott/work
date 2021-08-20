@@ -2,7 +2,7 @@
  *  Synopsis:
  *	Extract the duration seconds of the modify time.
  *  Usage:
- *	mtime-duration <path/to/file>
+ *	duration-mtime <path/to/file>
  *  Exit Status:
  *	0	ok
  *	1	file does not exist
