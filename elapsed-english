@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	Elapsed time since "now", written in english, suitable for scripts.
+#  Usage:
+#	START_EPOCH=$(date +%s)
+#	leave() {
+#		echo "good bye, cruel world: $(elapsed-english $START_EPOCH)"
+#		exit
+#	}
+#	echo 'hello world'
+#	trap leave EXIT
+#	sleep 10
+#	exit 0
+#  Exit Status:
+#	0	duration written
+#	1	unexpected error
+#
+
+die()
+{
+	echo "ERROR: $(basename $0): $@" >&1
+	exit 1
+}
+test $# = 1 || die "wrong number of arguments, got $#, expected 1"
+EPOCH=$1
+
+if [[ ! ( "$EPOCH" =~ ^[1-9][0-9]{0,9}$ ) ]];  then
+	die "unknown epoch: $EPOCH"
+fi
+
+exec duration-english $(expr $(date +%s) - $EPOCH)

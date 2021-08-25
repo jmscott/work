@@ -56,6 +56,7 @@ install: all
 		RFC3339Nano						\
 		duration-english					\
 		duration-mtime						\
+		elapsed-english						\
 		escape-json-string					\
 		exec-logoff						\
 		idiff							\
