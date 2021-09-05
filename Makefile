@@ -94,7 +94,6 @@ install: all
 		istext.c						\
 		pg_launchd.c						\
 		stale-mtime.c						\
-		zap-proc.c						\
 		$(JMSCOTT_PREFIX)/src
 	cd pgsnap && $(MAKE) $(MFLAGS) install
 	cd www && $(MAKE) $(MFLAGS) install
