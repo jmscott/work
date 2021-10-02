@@ -11,3 +11,5 @@ local.mk
 pg_launchd
 stale-mtime
 stat-mtime
+tas-lock-fs
+tas-unlock-fs
