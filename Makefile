@@ -33,6 +33,8 @@ COMPILED=								\
 	pg_launchd							\
 	stale-mtime							\
 	stat-mtime							\
+	tas-lock-fs							\
+	tas-unlock-fs							\
 
 all: $(COMPILED)
 	cd www && $(MAKE) $(MFLAGS) all
@@ -76,6 +78,8 @@ install: all
 		strswap							\
 		svn-commit-notify					\
 		svn-ignore						\
+		tas-lock-fs						\
+		tas-unlock-fs						\
 		xtitle							\
 		zap-proc						\
 		$(JMSCOTT_PREFIX)/bin
@@ -141,6 +145,12 @@ escape-json-string: escape-json-string.c
 
 duration-mtime: duration-mtime.c
 	cc $(CFLAGS) -o duration-mtime duration-mtime.c
+
+tas-lock-fs: tas-lock-fs.c
+	cc $(CFLAGS) -o tas-lock-fs tas-lock-fs.c
+
+tas-unlock-fs: tas-unlock-fs.c
+	cc $(CFLAGS) -o tas-unlock-fs tas-unlock-fs.c
 
 pg_launchd: pg_launchd.c
 	cc $(CFLAGS) -o pg_launchd pg_launchd.c
