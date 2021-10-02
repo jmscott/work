@@ -13,7 +13,7 @@
  *  Note:
  *	Should the lock file contain the process id of the creator?
  *	Having the process id means we can automate cleanup of stale lock
- *	files.
+ *	files.  Perhaps the mtime is sufficent for cleanup of stale locks.
  */
 
 #include <sys/errno.h>
