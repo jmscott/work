@@ -98,6 +98,9 @@ install: all
 		istext.c						\
 		pg_launchd.c						\
 		stale-mtime.c						\
+		stat-mtime.c						\
+		tas-lock-fs.c						\
+		tas-unlock-fs.c						\
 		$(JMSCOTT_PREFIX)/src
 	cd pgsnap && $(MAKE) $(MFLAGS) install
 	cd www && $(MAKE) $(MFLAGS) install
