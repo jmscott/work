@@ -31,6 +31,8 @@
 #  See:
 #	https://github.com/jmscott/work/pg2pg
 #  Note:
+#	The 'dump' action should assume both database are not running.
+#
 #	Added Usage: comment to preamble of template output.
 #
 #	pg2pg requires at least an empty the source database to exist
