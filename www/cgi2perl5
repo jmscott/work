@@ -12,29 +12,40 @@
 #  Depends:
 #	Perl modules XML::Parser
 #  Note:
+#	Consider adding a CLI option "--namespace <prefix>" for simplifying
+#	the various directory prefixes added to cgi-bin/ and lib/ when the
+#	package lives in subdirectories of $SERVER_ROOT/{cgi-bin,lib}.
+#	Currently, various separate args server this purpose.  Also, the
+#	name space should be part of the apache environment:
+#
+#		ENV{SERVER_JMSCOTT_NAMESPACE}
+#	
+#	Zap SHA1 code
+#
 #	the name of the required SERVER_ROOT environment variable ought to be
 #	overridden in the xml file or the apache environment.
 #
 
 use XML::Parser;
 
-my $PROG  ='cgi2perl5';
+my $PROG = 'cgi2perl5';
 
 my (
 	$perl_path,
 	$cgi_bin_dir,
 	$cgi_lib_dir,
 	$source_sha1,
-	$cgi_help_alias,
 	@CGI,
 	$source_path,
 	$SOURCE,
+	$alias_path,
+	$INC_alias_path,
 ) = (
 	'/usr/bin/env perl',
 	'.',
 	'.',
 	'No SHA1 Calculated',
-	'/cgi-bin'
+	'/cgi-bin',
 );
 
 my $USAGE = "$PROG [--help] [--<option>] --source-path xml1.cgi";
@@ -61,20 +72,25 @@ Usage:
 Options:
 	--source-path	location of xml.cgi file that describes the script
 	--source-sha1	SHA1 Digest of xml file that generated this script.
-	--cgi-bin-dir	Directory where main cgi-bin script will be built.
+	--cgi-bin-dir	Dev directory where main cgi-bin script will be built.
 			  Defaults to .
-	--cgi-lib-dir	Directory for support cgi-lib directory/files to 
-			  be built, like help.pl.  The support cgi files
-			  are built in a cgi-lib/product.d directory.
-			  Currently, the subdirectory is always built.
-			  Defaults to .
+	--cgi-lib-dir	Dev directory for cgi-lib directory/files to 
+			  be built, like help.pl.  By default, the dev
+			  cgi files are built in ./<name>.d;  otherwise,
+			  scripts are built in <cgi-lib-dir>/<name>.d
+
 	--cgi-help-alias
 			Prefix to cgi-bin in help examples.  Default is
-			/cgi-bin .
+			/cgi-bin.  Deprecated for option --alias-path.
 			
 	--perl5-path	Path to perl5 put at head of generated main scripts.
 			  Defaults to '/usr/bin/env perl'
-	--help		Generate this message.
+
+	--alias-path	Modify references to cgi-bin/<name> to
+			cgi-bin/<alias-path>/<name> and lib/<name>.d to
+			lib/<alias-path>/<name.d> for all automatically
+			generated links, as well as @INC search path.
+			Option --alias-path overrides options --cgi-help-alias.
 Description:
 	Automatically build perl5 scripts from a canonical xml file.
 	The first argument, output file type, determines which cgi files
@@ -85,8 +101,8 @@ Description:
 	lib/cgi-bin/<name>.d.  The output type 'all' builds both help
 	and main files.
 
-	Various "variables" are set by this script and passed to the xslt
-	scripts that do the transformations into perl5 code.
+	Various "variables" are set by this script and passed to the routines
+	that do the transformations into perl5 code.
 
 	source-path:	xml source file path that generated the script,
 	perl5-path:	the #!path-to-perl5 at header of script
@@ -481,11 +497,12 @@ END
 
 		my $example = $examples->[$i + 1];
 		my $query = $example->[0]->{query};
+		die 'missing "query attribute" in example' unless $query;
 		my $dd_text = &find_text($example);
-		my $href = "$cgi_help_alias/$name?$query";
+		my $href = "$/$name?$query";
 		my $a_text = &encode_html_entities($href);
 		print HELP <<END;
-   <dt><a href="$cgi_help_alias/$name?$query">$a_text</a></dt>
+   <dt><a href="/cgi-bin/$alias_path/$name?$query">$a_text</a></dt>
    <dd>$dd_text</dd>
 END
 	}
@@ -563,9 +580,6 @@ while (my $arg = shift @ARGV) {
 	} elsif ($arg eq '--cgi-bin-dir') {
 		die "option --cgi-bin-dir missing path"
 					unless $cgi_bin_dir = shift @ARGV;
-	} elsif ($arg eq '--cgi-help-alias') {
-		die "option --cgi-help-alias: missing alias path"
-				unless $cgi_help_alias = shift @ARGV;
 	} elsif ($arg eq '--cgi-lib-dir') {
 		die "option --cgi-lib-dir missing path"
 					unless $cgi_lib_dir = shift @ARGV;
@@ -580,6 +594,16 @@ while (my $arg = shift @ARGV) {
 					unless $source_path = shift @ARGV;
 		open($SOURCE, "<$source_path") ||
 				die "open(<$source_path) failed: $!";
+	} elsif ($arg eq '--alias-path') {
+		die 'option --alias-path: given more than once' if $alias_path;
+
+		die "option --alias-path requires path"
+					unless $alias_path = shift @ARGV
+		;
+		$INC_alias_path = sprintf(
+					'"$ENV{SERVER_ROOT}/lib/%s", ',
+					$alias_path,
+		);
 	} elsif ($arg =~ /^--/) {
 		die "unknown option: $arg";
 	} else {
@@ -600,8 +624,7 @@ my $parser = XML::Parser->new(
 	) or die "XML::Parser->new(Tree) failed: $!";
 #
 #  For each cgi script passed from the command,
-#  generate the script and script.d/help.pl
-#
+#  generate the script <name> and file <name>.d/help.pl
 #
 #  Parse the cgi/xml definition file into perl structure..
 #
@@ -627,26 +650,25 @@ print MAIN <<END;
 #!$perl_path
 #
 #  Synopsis:
-#	Implements argument processing for /cgi-bin/$name.
+#	Automade script /cgi-bin/$alias_path/$name, made by cgi2perl5.
 #  Source Path:
 #	$source_path
 #  Source SHA1 Digest:
 #	$source_sha1
 #  Note:
-#	/cgi-bin/$name was generated automatically by $PROG.
-#
 #	Do not make changes directly to this script.
 #
 die "SERVER_ROOT environment variable not defined"
-				unless defined \$ENV{SERVER_ROOT};
+				unless defined \$ENV{SERVER_ROOT}
+;
 
 #
 #  Prepend the \$SERVER_ROOT/lib directory
 #  to the load path.
 #
-unshift \@INC, "\$ENV{SERVER_ROOT}/lib";
+unshift \@INC, ${INC_alias_path}"\$ENV{SERVER_ROOT}/lib";
 
-our (\%CGI);
+our \%CGI;
 
 require 'httpd2.d/common.pl';
 END
@@ -714,7 +736,7 @@ print <<END;
 <div\$QUERY_ARG{id_att}\$QUERY_ARG{class_att}>
 END
 print <<'END';
- <h1>Help Page for <code>/cgi-bin/$name</code></h1>
+ <h1>Help Page for <code>/cgi-bin/$alias_path/$name</code></h1>
  <div class="overview">
   <h2>Overview</h2>
   <dl>
@@ -789,7 +811,7 @@ END
 		#
 		print HELP <<END;
     <div class="handlers">
-    <h3>Output Scripts in <code>\$SERVER_ROOT/lib/$name.d</code></h3>
+    <h3>Output Scripts in <code>\$SERVER_ROOT/lib/$alias_path/$name.d</code></h3>
     <dl>
 END
 

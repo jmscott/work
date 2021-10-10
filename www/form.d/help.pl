@@ -17,7 +17,7 @@ print <<END;
 <div$QUERY_ARG{id_att}$QUERY_ARG{class_att}>
 END
 print <<'END';
- <h1>Help Page for <code>/cgi-bin/form</code></h1>
+ <h1>Help Page for <code>/cgi-bin//form</code></h1>
  <div class="overview">
   <h2>Overview</h2>
   <dl>

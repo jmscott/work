@@ -1,13 +1,13 @@
 #!/usr/bin/env perl
 #
 #  Synopsis:
-#	Implements argument processing for /cgi-bin/env.
+#	Automade script for /cgi-bin//env (made by cgi2perl5).
 #  Source Path:
 #	env.cgi
 #  Source SHA1 Digest:
 #	No SHA1 Calculated
 #  Note:
-#	/cgi-bin/env was generated automatically by cgi2perl5.
+#	/cgi-bin//env was generated automatically by cgi2perl5.
 #
 #	Do not make changes directly to this script.
 #
