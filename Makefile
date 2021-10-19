@@ -48,6 +48,7 @@ install: all
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/sbin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
+		launchctl-kick						\
 		launchd-log						\
 		pg_launchd						\
 		$(JMSCOTT_PREFIX)/sbin

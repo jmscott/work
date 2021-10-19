@@ -1,0 +1,115 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	MAC OSX launchctl stop/unload/load of services in /Library/LaunchDaemons
+#  Usage:
+#	sudo -i
+#	launchctl-kick jmsdesk.blobio.*	
+#
+#	alias kickjms=launchctl-kick jmsdesk.blobio.*
+#
+
+LD=/Library/LaunchDaemons
+PROG=$(basename $0)
+LOAD_PAUSE_DURATION=3
+
+log()
+{
+	echo "$PROG: $@"
+}
+
+die()
+{
+	log "ERROR: $@" >&2
+	exit 1
+}
+
+WARN()
+{
+	log "WARN (ok): $@" >&2
+}
+
+test $# = 1 || die "wrong argument count: got $#, expected 1"
+[[ "$1" =~ ^.*[.]plist$ ]] 						&&
+	die '.plist in first argument: is a .plist service file in current dir?'
+
+test $(pwd) = $LD && die "can not start in dir $LD"
+
+cd $LD || die "cd $LD failed: exit status=$?"
+
+for PLIST in $@;  do
+	test -r $PLIST || die "can not read plist file: $PLIST"
+	if [[ "$PLIST" =~ ^.*\.plist$ ]];  then
+		SRV=$(basename $PLIST .plist)
+	else
+		die "service file must match *.plist: $PLIST"
+	fi
+	log "stopping $SRV"
+	launchctl stop $SRV
+	STATUS=$?
+	case $STATUS in
+	0)
+		log "service stopped: $SRV"
+		;;
+	3)
+		WARN 'process already stopped'
+		;;
+	*)
+		EMSG=$(launchctl error $STATUS)
+		die "launchctl stop failed: exit status: $EMSG"
+		;;
+	esac
+
+	log "unloading plist: $PLIST"
+	E=$(launchctl unload $PLIST 2>&1 | tail -1)
+	STATUS=$?
+	case $STATUS in
+	0)
+		#
+		#  launchctl returns 0 when service already unloaded.
+		#  also writes
+		#
+		#	Unload failed: 113: Could not find specified service
+		#
+		#  to standard error, so grep for that pattern.
+		#
+		#  the pain never ends.
+		#
+		if [[ "$(echo $E | tail -1)" =~ ^.*:[[:space:]]113:.*$ ]];  then
+			WARN 'process not loaded'
+		elif [ -n "$EMSG" ];  then
+			die "launchctl: unexpected stderr: $EMSG"
+		fi
+		log "plist unloaded: $PLIST"
+		;;
+	*)
+		EMSG=$(launchctl error $STATUS)
+		die "launchctl stop failed: exit status: $EMSG"
+		;;
+	esac
+
+	log "loading plist: $PLIST"
+	launchctl load $PLIST
+	STATUS=$?
+	case $STATUS in
+	0)
+		;;
+	*)
+		EMSG=$(launchctl error $STATUS)
+		die "launchctl load failed: exit status: $EMSG"
+		;;
+	esac
+	log "service loaded: $PLIST"
+	log "sleep $LOAD_PAUSE_DURATION sec before kick start"
+	sleep $LOAD_PAUSE_DURATION
+	log "plist loaded: $PLIST"
+	log "list service: $SRV"
+	SRV_PID=$(
+		launchctl list $SRV					|
+		fgrep '"PID" = '					|
+		awk '{print $3}'					|
+		sed 's/[^0-9]//g'
+	)
+	test -z "$SRV_PID" && die "can not get pid: $SRV"
+	log "pid of service process: $SRV_PID"
+done
