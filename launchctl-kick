@@ -16,12 +16,11 @@
 #
 
 LD=/Library/LaunchDaemons
-PROG=$(basename $0)
 LOAD_PAUSE_DURATION=3
 
 log()
 {
-	echo "$PROG: $@"
+	echo "$@"
 }
 
 die()
