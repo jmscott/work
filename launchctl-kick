@@ -120,7 +120,7 @@ for PLIST in $@;  do
 		die "launchctl load failed: exit status: $EMSG"
 		;;
 	esac
-	log "service loaded: $PLIST"
+	log "service loaded: $SRV"
 	log "sleep $LOAD_PAUSE_DURATION sec before kick start"
 	sleep $LOAD_PAUSE_DURATION
 	log "plist loaded: $PLIST"
