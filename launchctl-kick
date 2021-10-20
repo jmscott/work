@@ -1,12 +1,18 @@
 #!/bin/bash
 #
 #  Synopsis:
-#	MAC OSX launchctl stop/unload/load of services in /Library/LaunchDaemons
+#	Simple frontend for OSX launchctl to stop/unload/load/list services.
 #  Usage:
 #	sudo -i
 #	launchctl-kick jmsdesk.blobio.*	
 #
 #	alias kickjms=launchctl-kick jmsdesk.blobio.*
+#  Note:
+#	the action "kickstart" seems like what we should do instead of this
+#	script.  however, "kickstart" requires a "service-target", which seems
+#	to need meta info, like user or session 9acording to the manual). 
+#	perhaps we can construct a "service-target" by querying the
+#	*.plist file for, say, user id.  not sure.
 #
 
 LD=/Library/LaunchDaemons
@@ -29,11 +35,20 @@ WARN()
 	log "WARN (ok): $@" >&2
 }
 
-test $# = 1 || die "wrong argument count: got $#, expected 1"
-[[ "$1" =~ ^.*[.]plist$ ]] 						&&
-	die '.plist in first argument: is a .plist service file in current dir?'
+#
+#  Extract a value from plist, cause the path syntax for extract lacks
+#  documentation
+#
+get_plist_value()
+{
+        plutil -p $PLIST						|
+		fgrep "\"$1\""						|
+		awk '{print $3}'					|
+		sed 's/"//g'
+}
 
-test $(pwd) = $LD && die "can not start in dir $LD"
+test $(pwd) = $LD && die "can not run in services dir: $D"
+test $# = 1 || die "wrong argument count: got $#, expected 1"
 
 cd $LD || die "cd $LD failed: exit status=$?"
 
@@ -75,7 +90,7 @@ for PLIST in $@;  do
 		#
 		#  the pain never ends.
 		#
-		if [[ "$(echo $E | tail -1)" =~ ^.*:[[:space:]]113:.*$ ]];  then
+		if [[ "$(echo $E | tail -1)" =~ ^.*:[[:space:]]113:.*$ ]]; then
 			WARN 'process not loaded'
 		elif [ -n "$EMSG" ];  then
 			die "launchctl: unexpected stderr: $EMSG"
@@ -87,6 +102,12 @@ for PLIST in $@;  do
 		die "launchctl stop failed: exit status: $EMSG"
 		;;
 	esac
+
+	DISABLED=$(get_plist_value Disabled)
+	if [ "$DISABLED" = 1 ];  then
+		log "service disabled: $SRV"
+		continue
+	fi
 
 	log "loading plist: $PLIST"
 	launchctl load $PLIST
@@ -110,6 +131,28 @@ for PLIST in $@;  do
 		awk '{print $3}'					|
 		sed 's/[^0-9]//g'
 	)
-	test -z "$SRV_PID" && die "can not get pid: $SRV"
-	log "pid of service process: $SRV_PID"
+	if [ -n "$SRV_PID" ]; then
+		log "pid of service process: $SRV_PID"
+	else
+		test -z "$SRV_PID" && WARN "can not get pid: $SRV"
+		WARN "service failed to start: $SRV"
+		STDERR=$(get_plist_value StandardErrorPath)
+		if [ -n "$STDERR" ];  then
+			log "stderr of service: $STDERR"
+			cat <<END
+
+$(basename $STDERR) ----------------------------------------------------------
+END
+			tput smso
+			tail $STDERR
+			tput rmso
+			cat <<END
+$(basename $STDERR) ----------------------------------------------------------
+
+END
+		else
+			WARN "no key <StandardErrorPath>: $PLIST"
+		fi
+
+	fi
 done
