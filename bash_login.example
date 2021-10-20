@@ -53,7 +53,7 @@ if [ -z "$PGHOME" -a -d /usr/local/pgsql ];  then
 	export PGDATABASE=$USER
 fi
 
-jmscott_prepend_PATH()
+_prepend_PATH()
 {
 	for ((i=$#; i>0; i--)); do
 		ARG=${!i}
@@ -66,7 +66,7 @@ jmscott_prepend_PATH()
 #
 #  Add various directories to PATH
 #
-jmscott_prepend_PATH 							\
+_prepend_PATH 								\
 	/opt/local/libexec/gnubin					\
 	/opt/local/bin							\
 	$JMSCOTT_ROOT/bin						\
@@ -74,8 +74,8 @@ jmscott_prepend_PATH 							\
 	/usr/sbin							\
 	/sbin
 
-jmscott_prepend_PATH . $HOME/bin
+_prepend_PATH . $HOME/bin
 
-test "$USER" = root && jmscott_prepend_PATH /opt/local/sbin
+[ "$USER" = root ] && _prepend_PATH /opt/local/sbin $JMSCOTT_ROOT/sbin
 
 (shopt | grep -wq direxpand ) && shopt -s direxpand
