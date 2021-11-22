@@ -46,6 +46,7 @@ install: all
 		-d $(WWW_PREFIX)/lib/httpd2.d
 
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m ugo=r			\
+		common-json.pl						\
 		dbi-pg.pl						\
 		env.cgi							\
 		form.cgi						\
