@@ -4,6 +4,10 @@
 #  Return:
 #	Always implies success, die otherwise
 #  Note:
+#	CACHED is broken.  Zap it!
+#
+#	existence of "tag" not tested in dbi_pg_connect!.
+#
 #	Added example of query called from cgi-bin, similar to env.cgi and
 #	form.cgi.
 #
@@ -32,8 +36,10 @@ END
 	#
 	for my $db (@OPEN) {
 		next unless $db;
-		$db->disconnect() or print STDERR "DBI->disconnect failed: ".
-							DBI->errstr;
+
+		#  Note: no error logging, since dbu grumbles about unrolled
+		#        statements.
+		$db->disconnect();
 	}
 }
 
@@ -63,16 +69,17 @@ sub dbi_pg_connect
 {
 	my %arg = @_;
 
-	my (
-		$tag,
-		$uri,
-	) = (
-		$arg{tag},
-	);
-
 	return $CACHED if $CACHED;
 
-	if ($ENV{PGHOST}) {
+	my $uri;
+	if ($arg{PGHOST}) {
+		$uri = sprintf('dbi:Pg:host=%s;port=%s;dbname=%s;user=%s',
+				$arg{PGHOST},
+				$arg{PGPORT},
+				$arg{PGDATABASE},
+				$arg{PGUSER}
+			);
+	} elsif ($ENV{PGHOST}) {
 		$uri = sprintf('dbi:Pg:host=%s;port=%s;dbname=%s;user=%s',
 				$ENV{PGHOST},
 				$ENV{PGPORT},
@@ -80,12 +87,7 @@ sub dbi_pg_connect
 				$ENV{PGUSER}
 			);
 	} else {
-		#
-		#  Use unix pipe??
-		#
-		$uri =
-	              'dbi:Pg:host=/tmp;port=5432;dbname=setspace;user=setspace'
-		;
+		die 'DBI->connect: neither arg PGHOST nor ENV{PGHOST} exist';
 	}
 
 	my $db = DBI->connect($uri, '', '', {
@@ -102,7 +104,7 @@ sub dbi_pg_connect
 
 #
 #  Note:
-#	>$tag.sql dilently fails!
+#	>$tag.sql silently fails!
 #
 sub dbi_pg_dump
 {
@@ -114,7 +116,7 @@ sub dbi_pg_dump
 	) = (
 		$arg{sql},
 		$arg{tag},
-		$QUERY_ARG{pgdump},
+		$arg{pgdump} ? $arg{pgdump} : $ENV{pgdump},
 	);
 
 	print STDERR "dbi_pg_dump: $tag: requested, pgdump=$pgdump\n";
@@ -150,6 +152,7 @@ sub dbi_pg_dump
 #	tag	=>	short tag describing query (required)
 #	argv	=>	query arguments: argv => [$1, $2, ...]
 #	sql	=>	sql to execute
+#	pgdump	=>	STDERR|STDOUT|1|yes
 #  Returns:
 #	DBI->prepare() query handle, after query has been executed.
 #
@@ -174,7 +177,7 @@ sub dbi_pg_select
 	die 'dbi_pg_select: missing variable: sql' unless $sql;
 	die 'dbi_pg_select: missing variable: argv' unless $argv;
 
-	dbi_pg_dump(%arg) if $QUERY_ARG{pgdump};
+	dbi_pg_dump(%arg) if $QUERY_ARG{pgdump} || $arg{pgdump};
 
 	my $q = $db->prepare($sql) or die
 			'dbi_pg_select: prepare($tag) failed: ' . $db->errstr;
