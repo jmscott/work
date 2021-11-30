@@ -4,8 +4,6 @@
 #  Return:
 #	Always implies success, die otherwise
 #  Note:
-#	CACHED is broken.  Zap it!
-#
 #	existence of "tag" not tested in dbi_pg_connect!.
 #
 #	Added example of query called from cgi-bin, similar to env.cgi and
@@ -27,7 +25,7 @@ use DBD::Pg;
 
 our %QUERY_ARG;
 
-my ($CACHED, @OPEN);
+my (@OPEN);
 
 END
 {
@@ -50,11 +48,6 @@ sub dbi_pg_disconnect
 		$db->disconnect() or
 				warn "DBI->disconnect() failed: " . DBI->errstr;
 		#
-		#  Should Scalar:;Util be used instead of == ?
-		#
-		$CACHED = undef if $db == $CACHED;
-
-		#
 		#  Iterate backwards through the array of open dbs,
 		#  splicing out open dbs.
 		#
@@ -68,8 +61,6 @@ sub dbi_pg_disconnect
 sub dbi_pg_connect
 {
 	my %arg = @_;
-
-	return $CACHED if $CACHED;
 
 	my $uri;
 	if ($arg{PGHOST}) {
@@ -99,7 +90,7 @@ sub dbi_pg_connect
 	#	Only one open, so build stack of @OPEN?
 	#
 	push @OPEN, $db;
-	return $CACHED = $db;
+	return $db;
 }
 
 #
