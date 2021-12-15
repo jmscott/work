@@ -78,4 +78,4 @@ _prepend_PATH . $HOME/bin
 
 [ "$USER" = root ] && _prepend_PATH /opt/local/sbin $JMSCOTT_ROOT/sbin
 
-(shopt | grep -wq direxpand ) && shopt -s direxpand
+(shopt | grep -wq direxpand) && shopt -s direxpand
