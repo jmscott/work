@@ -11,6 +11,8 @@
  *  Blame:
  *	jmscott@setspace.com
  *	https://github.com/jmscott/work
+ *  See:
+ *	https://github.com/jmscott/work/blob/master/idiff.c
  *  Notes:
  *	Replace fprintf(stderr) with die() and exit() with leave().
  *
@@ -96,7 +98,8 @@ static int child_pid;
 /*
 **  Open file, otherwise complain and die
 */
-static FILE *efopen(char *file, char *mode)
+static FILE *
+efopen(char *file, char *mode)
 {
 	FILE *fp;
 	char *err;
@@ -119,7 +122,8 @@ static FILE *efopen(char *file, char *mode)
 /*
 **  Skip n lines of file fin
 */
-static void nskip(FILE *fin, int n)
+static void
+nskip(FILE *fin, int n)
 {
 	char buf[MAXLINE];
 
@@ -130,7 +134,8 @@ static void nskip(FILE *fin, int n)
 /*
 **  copy n lines from fin to fout.  If n == -1, copies to EOF.
 */
-static void ncopy(FILE *fin, int n, FILE *fout)
+static void
+ncopy(FILE *fin, int n, FILE *fout)
 {
 	char buf[MAXLINE];
 
@@ -144,15 +149,8 @@ static void ncopy(FILE *fin, int n, FILE *fout)
 	}
 }
 
-static void parse
-(
-	char *s,
-	int *pfrom1,
-	int *pto1,
-	int *pcmd,
-	int *pfrom2,
-	int *pto2
-)
+static void
+parse (char *s, int *pfrom1, int *pto1, int *pcmd, int *pfrom2, int *pto2)
 {
 	*pfrom1 = *pto1 = *pfrom2 = *pto2 = 0;
 	a2i(s, *pfrom1);
@@ -168,10 +166,10 @@ static void parse
 		a2i(s, *pto2);
 	} else
 		*pto2 = *pfrom2;
-
 }
 
-static void cleanup(int sig)
+static void
+cleanup(int sig)
 {
 	signal(sig, SIG_IGN);
 
@@ -192,7 +190,8 @@ static void cleanup(int sig)
 	exit(sig);
 }
 
-static void idiff(FILE *f1, FILE *f2, FILE *fin, FILE *fout)
+static void
+idiff(FILE *f1, FILE *f2, FILE *fin, FILE *fout)
 {
 	char buf[MAXLINE], ed[2 * BUFSIZ];
 	int cmd, n, from1, to1, from2, to2, nf1, nf2, again;
@@ -280,7 +279,6 @@ static void idiff(FILE *f1, FILE *f2, FILE *fin, FILE *fout)
 				system(buf + 1);
 				printf("!\n");
 				break;
-
 			default:
 				printf("< or > or e or !\n");
 				again = 1;
@@ -293,7 +291,8 @@ static void idiff(FILE *f1, FILE *f2, FILE *fin, FILE *fout)
 	ncopy(f1, -1, fout);
 }
 
-static FILE *efdiff(char *in1, char *in2)
+static FILE *
+efdiff(char *in1, char *in2)
 {
 	int fds[2];
 	FILE *fp;
