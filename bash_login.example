@@ -31,6 +31,7 @@ export HISTCONTROL=ignoreboth:erasedups
 #  following defines
 #
 test -e etc/profile && . etc/profile
+export EDITOR=${EDITOR:=vi}
 
 #
 #  Monitor mail
