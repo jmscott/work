@@ -2,45 +2,26 @@
  *  Synopsis:
  *	Interactive diff of two US_ASCII text files, inspiration from Pike book.
  *  Usage:
- *	idiff [-c diffcmd] [-o output] file1 file2
+ *	idiff file1 file2
+ *  Exit Status:
+ *	0	gracefull exit
+ *	<sig>	signal of interupted idiff
+ *	127	unknown error
  *  History:
  *	Derived by John Scott from example in 'Unix Programming Environment' 
  *	by Brian Kernighan/Rob Pike.  Substantial additions by Andrew Fullford.
  *  Depends:
- *	Well known unix diff program
+ *	Output of well known unix diff program, both BSD and GNU versions.
  *  Blame:
  *	jmscott@setspace.com
  *	https://github.com/jmscott/work
  *  See:
  *	https://github.com/jmscott/work/blob/master/idiff.c
  *  Notes:
- *	Replace fprintf(stderr) with die() and exit() with leave().
- *
- *	The 'e' command fails when created temp file in Max OSX Mojave.
- *	The pain never ends.
+ *	A sporadic bug still exists when ^D exiting.  Difficult to repeat.
  *
  *	UTF-8 not tested.
- *
- *	The pain never ends.
  */
-
-static char title[] = "idiff, derived 'Unix Programming Environment Book'";
-
-static char usage[] = "\n%s\n\
-\n\
-Usage: %s [-c diffcmd] [-o output] file1 file2\n\
-\n\
-       Interactively select file differences.\n\
-       Default output file is \"%s\".\n\
-       Default diff command is \"%s\".\n\
-\n\
-       For each difference group:\n\
-         <  selects the lines from file1,\n\
-         >  selects the lines from file2,\n\
-         !  invokes a command, and\n\
-         e  invokes an editor on the current group.\n\
-            The result of the edit session is placed\n\
-            in the diff output.\n";
 
 /*
 **  Compiling and linking:
@@ -61,33 +42,10 @@ Usage: %s [-c diffcmd] [-o output] file1 file2\n\
 #include <signal.h>
 #include <unistd.h>
 
-static char default_output[] = "idiff.out";
-static char default_diffcmd[] = "diff";
-static char default_editor[] = "vi";
-
 #define MAXLINE		10240		/* Maximum line length handled */
 
-#ifdef NEED_STRERROR
-
-extern int	sys_nerr;
-extern char	*sys_errlist[];
-
-static char *strerror(int err)
-{
-	static char msg[40];
-
-        if (0 <= err && err < sys_nerr && sys_errlist[err])
-                return sys_errlist[err];
-	sprintf(msg, "Unknown error, errno = %d", err);
-	return msg;
-}
-#endif /* NEED_STRERROR */
-
 static char *prog;
-static char *diffcmd;
-static char *editor = 0;
 static char tempfile[BUFSIZ] = {0};
-static char *ofile = 0;
 static int child_pid;
 
 /*
@@ -95,28 +53,90 @@ static int child_pid;
 */
 #define a2i(s, p)	while (isdigit(*(s))) p = 10 * (p) + (*(s)++ - '0')
 
-/*
-**  Open file, otherwise complain and die
-*/
+static void
+leave(int sig)
+{
+	signal(sig, SIG_IGN);
+
+	if (tempfile[0]) {
+		unlink(tempfile);
+		tempfile[0] = 0;
+	}
+	if (sig && child_pid)
+		kill(child_pid, SIGTERM);
+	exit(sig);
+}
+
+static void
+usage(int fd)
+{
+static char blurb[] = "\n\
+Usage: idiff file1 file2\n\
+\n\
+       Interactively select file differences and write result to idiff.out\n\
+\n\
+       For each difference group:\n\
+         <  selects the lines from file1,\n\
+         >  selects the lines from file2,\n\
+         !  invokes a command, and\n\
+         e  invokes an $EDITOR or nano on the current diff group.\n\
+            The result of the edit session is placed\n\
+            in the diff output.\n"
+;
+	write(fd, blurb, strlen(blurb));
+}
+
+static void
+die(char *msg)
+{
+	char buf[MAXLINE];
+
+	strcpy(buf, prog);
+	strcat(buf, ": ERROR: ");
+	strncat(buf, msg, sizeof buf - (strlen(buf) + 2));
+	strncat(buf, "\n", sizeof buf - (strlen(buf) + 2));
+
+	buf[sizeof buf - 2] = '\n';
+	buf[sizeof buf - 1] = 0;
+	write(2, buf, strlen(buf)); 
+
+	usage(2);
+
+	leave(127);
+}
+
+static void
+die2(char *msg1, char *msg2)
+{
+	char buf[MAXLINE];
+
+	strncpy(buf, msg1, sizeof buf - 1);
+	strncat(buf, ": ", sizeof buf - (strlen(buf) + 1));
+	strncat(buf, msg2, sizeof buf - (strlen(buf) + 1));
+	die(buf);
+}
+
+static void
+edie(char *msg)
+{
+	die2(msg, strerror(errno));
+}
+
 static FILE *
-efopen(char *file, char *mode)
+_fopen(char *file, char *mode)
 {
 	FILE *fp;
-	char *err;
+	char buf[MAXLINE];
 
 	if (strcmp(file, "-") == 0)
 		return *mode == 'r' ? stdin : stdout;
 
 	if ((fp = fopen(file, mode)))
 		return fp;
+	snprintf(buf, sizeof buf, "fopen(%s/%s) failed", mode, file);
+	edie(buf);
 
-	err = strerror(errno);
-	mode = *mode=='w'?"writing":*mode=='r'?"reading":
-	       *mode=='a'?"appending":mode;
-	fprintf(stderr, "%s: Can't open file '%s' for %s -- %s\n",
-		prog, file, mode, err);
-
-	exit(127);
+	return (FILE *)0;		//  not reached
 }
 
 /*
@@ -149,8 +169,9 @@ ncopy(FILE *fin, int n, FILE *fout)
 	}
 }
 
+//  parse output from diff command
 static void
-parse (char *s, int *pfrom1, int *pto1, int *pcmd, int *pfrom2, int *pto2)
+parse(char *s, int *pfrom1, int *pto1, int *pcmd, int *pfrom2, int *pto2)
 {
 	*pfrom1 = *pto1 = *pfrom2 = *pto2 = 0;
 	a2i(s, *pfrom1);
@@ -166,28 +187,6 @@ parse (char *s, int *pfrom1, int *pto1, int *pcmd, int *pfrom2, int *pto2)
 		a2i(s, *pto2);
 	} else
 		*pto2 = *pfrom2;
-}
-
-static void
-cleanup(int sig)
-{
-	signal(sig, SIG_IGN);
-
-	if (tempfile[0]) {
-		unlink(tempfile);
-		tempfile[0] = 0;
-	}
-	if (sig) {
-		if (child_pid)
-			kill(child_pid, SIGTERM);
-		if (ofile && strcmp(ofile, "-") != 0) {
-			unlink(ofile);
-			fprintf(stderr,
-				"\n%s: Interrupted -- \"%s\" removed\n",
-				prog, ofile);
-		}
-	}
-	exit(sig);
 }
 
 static void
@@ -249,13 +248,11 @@ idiff(FILE *f1, FILE *f2, FILE *fin, FILE *fout)
 					(long)getpid(),
 					(long)random()
 				);
-				FILE *ft = efopen(tempfile, "w");
+				FILE *ft = _fopen(tempfile, "w");
 
-				if (editor == NULL) {
-					editor = getenv("EDITOR");
-					if (editor == NULL)
-						editor = default_editor;
-				}
+				char *EDITOR = getenv("EDITOR");
+				if (EDITOR == NULL)
+					EDITOR = "nano";
 				ncopy(f1, from1 - 1 - nf1, fout);
 				nskip(f2, from2 - 1 - nf2);
 				ncopy(f1, to1 + 1 - from1, ft);
@@ -264,11 +261,11 @@ idiff(FILE *f1, FILE *f2, FILE *fin, FILE *fout)
 				fclose(ft);
 				snprintf(ed, sizeof ed - 1,
 					"%s %s",
-					editor,
+					EDITOR,
 					tempfile
 				);
 				system(ed);
-				ft = efopen(tempfile, "r");
+				ft = _fopen(tempfile, "r");
 				ncopy(ft, -1, fout);
 				fclose(ft);
 				unlink(tempfile);
@@ -298,28 +295,22 @@ efdiff(char *in1, char *in2)
 	FILE *fp;
 	char cmd[BUFSIZ];
 
-	if (pipe(fds) != 0) {
-		fprintf(stderr, "%s: Pipe failed -- %s\n",
-			prog, strerror(errno));
-		exit(127);
-	}
+	if (pipe(fds) != 0)
+		edie("pipe(diff) failed");
 
 	child_pid = fork();
-	switch(child_pid) {
+	switch (child_pid) {
 	case -1:
-		fprintf(stderr, "%s: Fork failed -- %s\n",
-			prog, strerror(errno));
-		exit(127);
+		edie("fork(diff) failed");
+		//  not reached */
 	case 0:
 		/*
 		**  Adjust standard files.  Attach stdout to pipe and
 		**  stdin to /dev/null.
 		*/
 		close(1);
-		if (dup(fds[1]) != 1) {
-			fprintf(stderr, "%s: Unexpected dup result\n", prog);
-			exit(126);
-		}
+		if (dup(fds[1]) != 1)
+			edie("dup(diff) failed");
 		close(0);
 		open("/dev/null", O_RDONLY, 0);
 		close(fds[0]);
@@ -329,21 +320,15 @@ efdiff(char *in1, char *in2)
 		**  Exec via a shell so that "diffcmd" is interpreted.
 		**  A command line arg might try magic.
 		*/
-		sprintf(cmd, "exec %s %s %s", diffcmd, in1, in2);
+		sprintf(cmd, "exec diff %s %s", in1, in2);
 		execlp("sh", "sh", "-c", cmd, (char *)0);
 
-		fprintf(stderr,
-			"%s: Exec of <sh -c \"%s\"> command failed -- %s\n",
-			prog, cmd, strerror(errno));
-		exit(126);
+		edie("exec(diff) failed");
 	default:
 		close(fds[1]);
 		fp = fdopen(fds[0], "r");
-		if (!fp) {
-			fprintf(stderr, "%s: Fdopen failed after fork -- %s\n",
-				prog, strerror(errno));
-			cleanup(127);
-		}
+		if (!fp)
+			edie("fdopen(fork diff)");
 		return fp;
 	}
 }
@@ -351,136 +336,52 @@ efdiff(char *in1, char *in2)
 int
 main(int argc, char **argv)
 {
-	FILE *fin, *fout, *f1, *f2, *efopen();
-	int c, err;
+	FILE *fin, *fout, *f1, *f2, *_fopen();
 	char *in1, *in2;
-	struct stat s1, s2, so;
+	struct stat s1, s2;
 	extern char *optarg;
 	extern int optind;
 
-	if ((prog = strrchr(*argv, '/')))
-		prog++;
-	else
-		prog = *argv;
-
-	err = 0;
-	diffcmd = 0;
-	ofile = 0;
-	while ((c = getopt(argc, argv, "c:o:")) != -1) {
-		switch(c) {
-		case 'c':
-			diffcmd = optarg;
-			break;
-		case 'o':
-			ofile = optarg;
-			break;
-		default:
-			err = 1;
-			break;
-		}
+	if (argc <= 1 || strcmp(argv[1], "--help") == 0) {
+		usage(1);
+		exit(0);
 	}
+	if (argc != 3)
+		die("expected 2 command line arguments");
 
-	if (err || argc - optind != 2) {
-		fprintf(stderr, usage,
-			title, prog, default_output, default_diffcmd);
-		exit(127);
-	}
+	if (!isatty(0))
+		die("input is not a terminal");
 
-	if (!isatty(0)) {
-		fprintf(stderr, "%s: Input is not attached to a terminal\n",
-			prog);
-		exit(127);
-	}
+	in1 = argv[1];
+	in2 = argv[2];
 
-	if (!diffcmd)
-		diffcmd = default_diffcmd;
-	if (!ofile)
-		ofile = default_output;
+	f1 = _fopen(in1, "r");
+	f2 = _fopen(in2, "r");
 
-	in1 = argv[optind];
-	in2 = argv[optind+1];
+	if (fstat(fileno(f1), &s1) != 0)
+		edie("stat(file 1) failed");
+	if (fstat(fileno(f2), &s2) != 0)
+		edie("stat(file 2) failed");
+	if (!S_ISREG(s1.st_mode) && !S_ISFIFO(s1.st_mode))
+		die2("file 1 is not a regular file", in1);
+	if (!S_ISREG(s2.st_mode) && !S_ISFIFO(s2.st_mode))
+		die2("file 2 is not a regular file", in2);
+	if (s1.st_ino == s2.st_ino && s1.st_dev == s2.st_dev)
+		die("input files are identical");
 
-	f1 = efopen(in1, "r");
-	f2 = efopen(in2, "r");
+	//  could clobber existing idiff.out!
+	fout = _fopen("idiff.out", "w");
 
-	if (fstat(fileno(f1), &s1) != 0) {
-		fprintf(stderr, "%s: Can't stat input file \"%s\" -- %s\n",
-			prog, in1, strerror(errno));
-		exit(127);
-	}
-	if (fstat(fileno(f2), &s2) != 0) {
-		fprintf(stderr, "%s: Can't stat input file \"%s\" -- %s\n",
-			prog, in2, strerror(errno));
-		exit(127);
-	}
-	if (!S_ISREG(s1.st_mode) && !S_ISFIFO(s1.st_mode)) {
-		fprintf(stderr, "%s: Input file \"%s\" is not a regular file\n",
-			prog, in1);
-		exit(127);
-	}
-	if (!S_ISREG(s2.st_mode) && !S_ISFIFO(s2.st_mode)) {
-		fprintf(stderr, "%s: Input file \"%s\" is not a regular file\n",
-			prog, in2);
-		exit(127);
-	}
-	if (s1.st_ino == s2.st_ino && s1.st_dev == s2.st_dev) {
-		fprintf(stderr,
-			"%s: Input files \"%s\" and \"%s\" are identical\n",
-			prog, in1, in2);
-		exit(127);
-	}
-
-	if (strcmp(ofile, "-") == 0) {
-		/*
-		**  If the output file is stdout we have to play some
-		**  games because an editor may be started and it will
-		**  expect stdout to be a terminal.  In this case, stdout
-		**  is duped for output and stdin is duped to stdout.
-		*/
-		int fd;
-
-		fd = dup(1);
-		close(1);
-		if (dup(0) != 1) {
-			fprintf(stderr,
-				"%s: Bad dup result transfering stdout\n",
-				prog);
-			exit(127);
-		}
-		fout = fdopen(fd, "w");
-		if (!fout) {
-			fprintf(stderr, "%s: Fdopen failed for output -- %s\n",
-				prog, strerror(errno));
-			cleanup(127);
-		}
-	} else {
-		if (stat(ofile, &so) == 0) {
-			if (so.st_ino == s1.st_ino && so.st_dev == s1.st_dev) {
-				fprintf(stderr,
-				    "%s: Output \"%s\" would clobber \"%s\"\n",
-				    prog, ofile, in1);
-				exit(127);
-			}
-			if (so.st_ino == s2.st_ino && so.st_dev == s2.st_dev) {
-				fprintf(stderr,
-				    "%s: Output \"%s\" would clobber \"%s\"\n",
-				    prog, ofile, in2);
-				exit(127);
-			}
-		}
-		fout = efopen(ofile, "w");
-	}
-
-	signal(SIGINT, cleanup);
-	signal(SIGHUP, cleanup);
-	signal(SIGTERM, cleanup);
+	signal(SIGINT, leave);
+	signal(SIGHUP, leave);
+	signal(SIGTERM, leave);
 
 	fin = efdiff(in1, in2);
 
 	idiff(f1, f2, fin, fout);
 
-	printf("%s output in file \"%s\"\n", prog, ofile);
+	printf("output in file idiff.out\n");
 
-	cleanup(0);
-	return 0;
+	leave(0);
+	return 0;	//  not reached
 }
