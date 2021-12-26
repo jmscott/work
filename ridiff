@@ -67,4 +67,19 @@ rsync -va $SSH_AUTH:$LOCAL_PATH $FILE_B					||
 log "invoke: idiff $FILE_A $FILE_B"
 idiff $FILE_A $FILE_B							||
 	die "idiff aborted: exit status=$?"
-cp idiff.out $CWD
+
+echo -n "Update local $LOCAL_PATH? (Y/n)? "
+read RESPONSE
+test "$RESPONSE" != Y && exit 0
+log "local file: update: $LOCAL_PATH"
+
+echo -n "Update remote $SSH_AUTH:$LOCAL_PATH? (Y/n)? "
+read RESPONSE
+test "$RESPONSE" != Y && exit 0
+log "remote file: update: $SSH_AUTH:$LOCAL_PATH"
+
+rsync -va idiff.out $LOCAL_PATH						||
+	die "rsync local update failed: exit status=$?"
+rsync -va idiff.out $SSH_AUTH:$LOCAL_PATH				||
+	die "rsync remote update failed: exit status=$?"
+exit 0
