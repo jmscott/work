@@ -70,6 +70,7 @@ install: all
 		pdf-merge						\
 		pg2pg							\
 		pg_dump-Dow						\
+		ridiff							\
 		rsunk							\
 		rsync-fs						\
 		ssh-host						\
