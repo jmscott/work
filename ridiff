@@ -1,0 +1,70 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	RSync a local file and a remote version using interactive diff.
+#  Usage:
+#	ridiff /path/to/local/file <remote-ssh-auth>
+#  See:
+#	https://github.com/jmscott/work/blob/master/idiff.c
+#
+
+PROG=$(basename $0)
+CWD=$(pwd)
+WORK_DIR=${TMPDIR:=/tmp}/$PROG.$$.d
+
+log()
+{
+	echo "$@"
+}
+
+leave()
+{
+	cd .. && (
+		rm -rf $WORK_DIR					||
+			log "WARN: rm work dir failed: exit status=$?" >&2
+	)
+}
+
+trap leave EXIT
+
+usage()
+{
+	echo "usage: $PROG sshauth:path/to/remote/file"
+}
+
+die()
+{
+	log "ERROR: $PROG: $@" >&2
+	log "usage: $PROG sshauth:path/to/remote/file" >&2
+	exit 1
+}
+
+test $# = 2 || die "wrong number arguments: got $#, expected 1"
+LOCAL_PATH="$1"
+SSH_AUTH="$2"
+log "local path: $LOCAL_PATH"
+log "ssh auth: $SSH_AUTH"
+log "current directory: $CWD"
+
+test -r "$LOCAL_PATH" || die "can not read local file: $LOCAL_PATH"
+ssh $SSH_AUTH "test -r $LOCAL_PATH"					||
+	die "can not read remote file: $SSH_AUTH:$LOCAL_PATH"
+
+log "work dir: $WORK_DIR"
+mkdir -p $WORK_DIR || die "mkdir work dir failed: exit status=$?"
+cd $WORK_DIR || die "cd work dir failed: exit status=$?"
+
+FILE_A=$(basename $LOCAL_PATH).a
+log "local file: $FILE_A"
+cp $LOCAL_PATH $FILE_A							||
+	die "cp local failed: erxit status=$?"
+
+FILE_B=$(basename $LOCAL_PATH).b
+log "fetch remote version: $SSH_AUTH -> $FILE_B"
+rsync -va $SSH_AUTH:$LOCAL_PATH $FILE_B					||
+	die "rsync remote failed: exit status=$?"
+
+log "invoke: idiff $FILE_A $FILE_B"
+idiff $FILE_A $FILE_B							||
+	die "idiff aborted: exit status=$?"
+cp idiff.out $CWD
