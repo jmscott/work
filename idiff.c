@@ -23,14 +23,6 @@
  *	UTF-8 not tested.
  */
 
-/*
-**  Compiling and linking:
-**
-**  The code is Unix dependent and makes use of the standard Unix
-**  diff program.  It should compile on any recent Unix systems
-**  which have an ISO C compiler.  Older Suns may need -DNEED_STRERROR.
-*/
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -44,7 +36,7 @@
 
 #define MAXLINE		10240		/* Maximum line length handled */
 
-static char *prog;
+static char *prog = "idiff";
 static char tempfile[BUFSIZ] = {0};
 static int child_pid;
 
@@ -123,17 +115,14 @@ edie(char *msg)
 }
 
 static FILE *
-_fopen(char *file, char *mode)
+_fopen(char *path, char *mode)
 {
 	FILE *fp;
 	char buf[MAXLINE];
 
-	if (strcmp(file, "-") == 0)
-		return *mode == 'r' ? stdin : stdout;
-
-	if ((fp = fopen(file, mode)))
+	if ((fp = fopen(path, mode)))
 		return fp;
-	snprintf(buf, sizeof buf, "fopen(%s/%s) failed", mode, file);
+	snprintf(buf, sizeof buf, "fopen(%s, %s) failed", path, mode);
 	edie(buf);
 
 	return (FILE *)0;		//  not reached
@@ -336,7 +325,7 @@ efdiff(char *in1, char *in2)
 int
 main(int argc, char **argv)
 {
-	FILE *fin, *fout, *f1, *f2, *_fopen();
+	FILE *fin, *fout, *f1, *f2;
 	char *in1, *in2;
 	struct stat s1, s2;
 	extern char *optarg;
