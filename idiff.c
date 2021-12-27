@@ -291,7 +291,8 @@ efdiff(char *in1, char *in2)
 	switch (child_pid) {
 	case -1:
 		edie("fork(diff) failed");
-		//  not reached */
+		/*NOTREACHED*/
+		return (FILE *)0;
 	case 0:
 		/*
 		**  Adjust standard files.  Attach stdout to pipe and
@@ -313,6 +314,8 @@ efdiff(char *in1, char *in2)
 		execlp("sh", "sh", "-c", cmd, (char *)0);
 
 		edie("exec(diff) failed");
+		/*NOTREACHED*/
+		return (FILE *)0;
 	default:
 		close(fds[1]);
 		fp = fdopen(fds[0], "r");
