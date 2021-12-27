@@ -49,6 +49,7 @@ log "current directory: $CWD"
 test -r "$LOCAL_PATH" || die "can not read local file: $LOCAL_PATH"
 ssh $SSH_AUTH "test -r $LOCAL_PATH"					||
 	die "can not read remote file: $SSH_AUTH:$LOCAL_PATH"
+REAL_LOCAL_PATH=$(realpath $LOCAL_PATH)
 
 log "work dir: $WORK_DIR"
 mkdir -p $WORK_DIR || die "mkdir work dir failed: exit status=$?"
@@ -56,7 +57,7 @@ cd $WORK_DIR || die "cd work dir failed: exit status=$?"
 
 FILE_A=$(basename $LOCAL_PATH).a
 log "local file: $FILE_A"
-cp $LOCAL_PATH $FILE_A							||
+cp $REAL_LOCAL_PATH $FILE_A						||
 	die "cp local failed: erxit status=$?"
 
 FILE_B=$(basename $LOCAL_PATH).b
