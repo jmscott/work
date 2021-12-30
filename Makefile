@@ -26,6 +26,7 @@ COMPILED=								\
 	duration-mtime							\
 	escape-json-string						\
 	flatx								\
+	file-stat-size							\
 	fork-me								\
 	halloc.o							\
 	idiff								\
@@ -62,6 +63,7 @@ install: all
 		elapsed-english						\
 		escape-json-string					\
 		exec-logoff						\
+		file-stat-size						\
 		idiff							\
 		isjson							\
 		istext							\
@@ -92,6 +94,7 @@ install: all
 		duration-english.c					\
 		duration-mtime.c					\
 		escape-json-string.c					\
+		file-stat-size.c					\
 		flatx.c							\
 		fork-me.c						\
 		halloc.c						\
@@ -141,6 +144,9 @@ stale-mtime: stale-mtime.c
 
 stat-mtime: stat-mtime.c
 	cc $(CFLAGS) -o stat-mtime stat-mtime.c
+
+file-stat-size: file-stat-size.c
+	cc $(CFLAGS) -o file-stat-size file-stat-size.c
 
 flatx: flatx.c
 	cc $(CFLAGS) -o flatx flatx.c -lexpat
