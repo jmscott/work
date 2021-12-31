@@ -24,7 +24,7 @@ AGAIN:
 	nb = read(fd, p, nbytes);
 	if (nb >= 0)
 		return nb;
-	if (errno == EINTR)		//  try read()
+	if (errno == EINTR)
 		goto AGAIN;
 	return -1;
 }
@@ -79,7 +79,7 @@ AGAIN:
  *  Synopsis:
  *	write() exactly nbytes, restarting on interrupt.
  */
-static int
+int
 jmscott_write(int fd, void *p, ssize_t nbytes)
 {
 	int nb = 0;
@@ -88,7 +88,7 @@ AGAIN:
 	nb = write(fd, p + nb, nbytes);
 	if (nb < 0) {
 		if (errno == EINTR)
-			goto again;
+			goto AGAIN;
 		return -1;
 	}
 	nbytes -= nb;

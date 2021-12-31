@@ -14,9 +14,6 @@
 #ifndef JMSCOTT_CLANG_ECPG
 #define JMSCOTT_CLANG_ECPG
 
-#include "jmscott/include/strcat.c"
-#include "jmscott/include/die.c"
-
 //  default values when fault map has not mapping for a particular
 //  sql error code
 int	jmscott_ecpg_error_code = 127;

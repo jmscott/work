@@ -13,8 +13,6 @@
 #ifndef JMSCOTT_CLANG_DIE
 #define JMSCOTT_CLANG_DIE
 
-#include "jmscott/include/strcat.c"
-
 extern char	*jmscott_progname;
 
 void
