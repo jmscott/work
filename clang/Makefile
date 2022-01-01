@@ -12,16 +12,17 @@ install:
 		-d $(JMSCOTT_PREFIX)
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/include
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
+		-d $(JMSCOTT_PREFIX)/include/jmscott
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		die.c							\
 		ecpg.c							\
 		posio.c							\
-		strcat.c						\
 		string.c						\
-		$(JMSCOTT_PREFIX)/include
+		$(JMSCOTT_PREFIX)/include/jmscott
 
 distclean:
-	rm -rf $(JMSCOTT_PREFIX)/include
+	rm -rf $(JMSCOTT_PREFIX)/include/jmscott
 
 world:
 	$(MAKE) $(MFLAGS) distclean

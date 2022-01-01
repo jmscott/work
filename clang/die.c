@@ -8,20 +8,25 @@
  *	die(char msg) {
  *		jmscott_die(127, msg);
  *	}
+ *  Note:
+ *	Should "exit()" be called instaead of "_exit()"?  Perhaps stdio is
+ *	being used.
  */
 
 #ifndef JMSCOTT_CLANG_DIE
 #define JMSCOTT_CLANG_DIE
+
+#include "jmscott/string.c"
 
 extern char	*jmscott_progname;
 
 void
 jmscott_die(int status, char *msg1)
 {
-        char msg[4096];
+	char msg[4096];
 
         static char ERROR[] = "ERROR: ";
-        static char  colon[] = ": ";
+        static char colon[] = ": ";
         static char nl[] = "\n";
 
         msg[0] = 0;

@@ -1,18 +1,14 @@
 /*
  *  Synopsis:
- *	Common code used by PostgreSQL *.ecpg, depends on jmscott/lib/clang.
+ *	Helpful routines for compile simple PostgreSQL *.ecpg programs.
  *  Note:
  *	Need to make code reentrant, via a jmscott_clang data structure!
- *
- *	Need to add explcit dependency on common.c
- *
- *	The process exit status of both warnings and errors are remapped through
- *	the array _ecpg_state2exit[] array.  Do we need two arrays,
- *	one for	warnings and one for errors?
  */
 
 #ifndef JMSCOTT_CLANG_ECPG
 #define JMSCOTT_CLANG_ECPG
+
+#include "jmscott/die.c"
 
 //  default values when fault map has not mapping for a particular
 //  sql error code

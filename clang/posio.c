@@ -34,19 +34,26 @@ AGAIN:
  *	Read exactly "size" bytes into "blob".
  *  Usage:
  *	static void
- *	_read_blob(int fd, void *blob, ssize_t size) {
- *		if jmscott_read_blob(fd, blob, size) >= 0)
+ *	_slurp(int fd, void *blob, ssize_t size) {
+ *		switch (jmscott_read_blob(fd, blob, size)) {
+ *		case 0:
  *			return 0;
- *		jmscott_die2("can not slurp blob", strerror(errno));
+ *		case -1:
+ *			jmscott_die2("error slurping blob", strerror(errno));
+ *		case -2:
+ *			jmscott_die("unexpected end-of-file on blob");
+ *		case -3:
+ *			jmscott_die("end-of-file not sean slurping blob");
+ *		}
  *	}
- *  Exit Status:
+ *  Returns:
  *	0	read exactly "size" bytes into "blob".
  *	
- *	Values in "blob" are undefined
+ *	Upon error byte values in *blob are undefined.
  *
  *	-1	read() error, consult errno
- *	-2	premature end-of-file with no error.
- *	-3	unread bytes remain on stream, with no error.
+ *	-2	unexpected  end-of-file reading.
+ *	-3	unread bytes remain on stream.
  */
 int
 jmscott_read_exact(int fd, void *blob, ssize_t size)
@@ -78,6 +85,9 @@ AGAIN:
 /*
  *  Synopsis:
  *	write() exactly nbytes, restarting on interrupt.
+ *  Returns:
+ *	0	wrote "nbytes" with no error.
+ *	-1	error in write(), consult errno.
  */
 int
 jmscott_write(int fd, void *p, ssize_t nbytes)
