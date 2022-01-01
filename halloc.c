@@ -3,10 +3,12 @@
  *	A hierarchical replacement for malloc() with callbacks on free()
  *  Description:
  *	halloc is a memory allocator dependent upon the well known malloc().
- *	halloc() organizes memory into hierarchical allocations;  freeing
- *	the parent frees all the children.  halloc() works best in a long
- *	running process with complex memory mangemanet.  halloc() is NOT
- *	thread safe and NEVER will be.
+ *	halloc() organizes memory into hierarchical allocations;  each
+ *	halloc()ed chunk has a parent.  freeing the parent frees all the
+ *	children.
+ *
+ *	halloc() suitable for long running processes with complex memory
+ *	mangemanet.  halloc() is NOT thread safe and NEVER will be.
  *
  *	For example,
  *
