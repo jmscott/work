@@ -2,6 +2,7 @@ RFC3339Nano
 duration-english
 duration-mtime
 escape-json-string
+file-stat-size
 flatx
 fork-me
 halloc.o

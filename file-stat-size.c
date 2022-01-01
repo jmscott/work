@@ -8,36 +8,38 @@
  *	1	unexpected error
  */
 #include <sys/stat.h>
+#include <sys/errno.h>
+#include <string.h>
+#include <unistd.h>
 
+#include "clang/strcat.c"
 #include "clang/die.c"
 #include "clang/string.c"
+#include "clang/posio.c"
 
 #define EXIT_OK		0
-#define EXIT_BAD_STAT	1
-#define EXIT_BAD_ARGC	2
-#define EXIT_BAD_WRITE	3
+#define EXIT_FAULT	1
 
-#define COMMON_NEED_DIE3
-#define COMMON_NEED_ULLTOA
-#define COMMON_NEED_WRITE
-#include "common.c"
+extern int	errno;
+
+char	*jmscott_progname;
 
 static void
 die(char *msg)
 {
-	jmscott_die(1, msg);
+	jmscott_die(EXIT_FAULT, msg);
 }
 
 static void
-die2(char *msg)
+die2(char *msg1, char *msg2)
 {
-	jmscott_die2(1, msg);
+	jmscott_die2(EXIT_FAULT, msg1, msg2);
 }
 
 static void
 die3(char *msg1, char *msg2, char *msg3)
 {
-	jmscott_die3(msg1, msg2, msg3);
+	jmscott_die3(EXIT_FAULT, msg1, msg2, msg3);
 }
 
 static void
@@ -69,9 +71,9 @@ main(int argc, char **argv)
 	/*
 	 *  Convert size to decimal digit string.
 	 */
-	p = ulltoa((unsigned long long)st.st_size, digits);
+	p = jmscott_ulltoa((unsigned long long)st.st_size, digits);
 	*p++ = '\n';
 
 	_write(digits, p - digits);
-	exit(0);
+	_exit(0);
 }
