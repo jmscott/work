@@ -18,25 +18,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "jmscott/die.c"
+
 extern int errno;
 
-static char *prog = "escape-json-string";
+char *jmscott_progname = "escape-json-string";
 
-static int die(char *msg)
+static void
+die(char *msg)
 {
 	int eno = errno;
 
-	write(2, prog, strlen(prog));
-	write(2, ": ERROR: ", 8);
-	write(2, msg, strlen(msg));
-	if (eno > 0) {
-		char *emsg = strerror(eno);
-
-		write(2, ": ", 2);
-		write(2, emsg, strlen(emsg));
-	}
-	write(2, "\n", 1);
-	exit(1);
+	if (eno > 0)
+		jmscott_die2(1, msg, strerror(eno));
+	jmscott_die(1 , msg);
 }
 
 int
