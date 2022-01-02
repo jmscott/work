@@ -12,17 +12,16 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "clang/strcat.c"
-#include "clang/die.c"
-#include "clang/string.c"
-#include "clang/posio.c"
+#include "jmscott/die.c"
+#include "jmscott/string.c"
+#include "jmscott/posio.c"
 
 #define EXIT_OK		0
 #define EXIT_FAULT	1
 
 extern int	errno;
 
-char	*jmscott_progname;
+char	*jmscott_progname = "file-stat-size";
 
 static void
 die(char *msg)
@@ -55,8 +54,6 @@ main(int argc, char **argv)
 	char *path;
 	struct stat st;
 	char digits[128], *p;
-
-	jmscott_progname = "file-stat-size";
 
 	if (argc != 2)
 		die("wrong number of arguments");
