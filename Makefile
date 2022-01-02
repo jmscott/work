@@ -109,6 +109,7 @@ install: all
 		tas-lock-fs.c						\
 		tas-unlock-fs.c						\
 		$(JMSCOTT_PREFIX)/src
+	cd clang && $(MAKE) $(MFLAGS) install
 	cd pgsnap && $(MAKE) $(MFLAGS) install
 	cd www && $(MAKE) $(MFLAGS) install
 
@@ -116,6 +117,7 @@ clean:
 	cd www && $(MAKE) $(MFLAGS) clean
 	rm -f $(COMPILED)
 distclean:
+	cd clang && $(MAKE) $(MFLAGS) distclean
 	cd www && $(MAKE) $(MFLAGS) distclean
 	cd pgsnap && $(MAKE) $(MFLAGS) distclean
 	rm -rf $(JMSCOTT_PREFIX)/bin
@@ -169,8 +171,9 @@ pg_launchd: pg_launchd.c
 	cc $(CFLAGS) -o pg_launchd pg_launchd.c
 
 world:
-	cd www && $(MAKE) $(MFLAGS) world
 	$(MAKE) $(MFLAGS) clean
 	$(MAKE) $(MFLAGS) all
 	$(MAKE) $(MFLAGS) distclean
 	$(MAKE) $(MFLAGS) install
+	cd clang && $(MAKE) $(MFLAGS) world
+	cd www && $(MAKE) $(MFLAGS) world
