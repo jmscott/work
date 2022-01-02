@@ -14,44 +14,28 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "jmscott/die.c"
+#include "jmscott/posio.c"
+
 extern int errno;
-static char *prog = "stat-mtime";
+char *jmscott_progname = "stat-mtime";
 
 static void
 die(char *msg)
 {
-	char buf[1024];
-
-	strcpy(buf, prog);
-	strcat(buf, ": ERROR: ");
-	strncat(buf, msg, sizeof buf - (strlen(buf) + 2));
-	strncat(buf, "\n", sizeof buf - (strlen(buf) + 2));
-
-	buf[sizeof buf - 2] = '\n';
-	buf[sizeof buf - 1] = 0;
-	write(2, buf, strlen(buf)); 
-	_exit(2);
+	jmscott_die(2, msg);
 }
 
 static void
 die2(char *msg1, char *msg2)
 {
-	char buf[1024];
-
-	strncpy(buf, msg1, sizeof buf - 1);
-	strncat(buf, ": ", sizeof buf - (strlen(buf) + 1));
-	strncat(buf, msg2, sizeof buf - (strlen(buf) + 1));
-	die(buf);
+	jmscott_die2(2, msg1, msg2);
 }
 
 static void
 enoent(char *path)
 {
-	write(2, prog, strlen(prog));
-	write(2, ": ERROR: file does not exist: ", 29);
-	write(2, path, strlen(path));
-	write(2, "\n", 1);
-	_exit(1);
+	jmscott_die2(1, "file does not exist", path);
 }
 
 /*
@@ -60,19 +44,8 @@ enoent(char *path)
 static void
 _write(void *p, ssize_t nbytes)
 {
-	int nb = 0;
-
-	AGAIN:
-
-	nb = write(1, p + nb, nbytes);
-	if (nb < 0) {
-		if (errno == EINTR)
-			goto AGAIN;
-		die2("write(1) failed", strerror(errno));
-	}
-	nbytes -= nb;
-	if (nbytes > 0)
-		goto AGAIN;
+	if (jmscott_write(1, p, nbytes))
+		die2("write(stdout) failed", strerror(errno));
 }
 
 int
