@@ -23,6 +23,7 @@
  *
  *	No rounding of <major><minor> calculations.
  */
+#include <sys/errno.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -30,24 +31,25 @@
 #include <ctype.h>
 #include <unistd.h>
 
+extern int	errno;
+
+#include "jmscott/die.c"
+#include "jmscott/posio.c"
+
 #define ROUND(n, d) ((((n) < 0) ^ ((d) < 0)) ? (((n) - (d)/2)/(d)) : (((n) + (d)/2)/(d)))
 
-static char *prog = "duration-english";
+char *jmscott_progname = "duration-english";
 
 static void
 die(char *msg)
 {
-	char buf[1024];
+	jmscott_die(2, msg);
+}
 
-	strcpy(buf, prog);
-	strcat(buf, ": ERROR: ");
-	strncat(buf, msg, 1024 - (strlen(buf) + 2));
-	strncat(buf, "\n", 1024 - (strlen(buf) + 2));
-
-	buf[sizeof buf - 2] = '\n';
-	buf[sizeof buf - 1] = 0;
-	write(2, buf, strlen(buf)); 
-	exit(1);
+static void
+die2(char *msg1, char *msg2)
+{
+	jmscott_die2(2, msg1, msg2);
 }
 
 int
@@ -97,6 +99,7 @@ main(int argc, char **argv)
 		else
 			sprintf(answer, "%dd\n", day);
 	}
-	write(1, answer, strlen(answer));
+	if (jmscott_write(1, answer, strlen(answer)))
+		die2("write(stderr) failed", strerror(errno));
 	return 0;
 }
