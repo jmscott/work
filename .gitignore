@@ -8,6 +8,7 @@ fork-me
 halloc.o
 idiff
 istext
+jmscott
 local.mk
 pg_launchd
 stale-mtime
