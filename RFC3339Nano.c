@@ -25,6 +25,9 @@
 
 extern int	errno;
 
+#include "jmscott/die.c"
+#include "jmscott/posio.c"
+
 #if __APPLE__ == 1 && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 101200
 
 typedef enum {
@@ -38,32 +41,20 @@ extern int clock_gettime(clockid_t, struct timespec *);
 
 #endif
 
-static char 	*prog = "RFC3339Nano";
+char 	*jmscott_progname = "RFC3339Nano";
+
 static char	*RFC3339Nano = "%04d-%02d-%02dT%02d:%02d:%02d.%09ld+00:00\n";
 
 static void
 die(char *msg)
 {
-	char buf[1024];
-
-	strcpy(buf, prog);
-	strcat(buf, ": ERROR: ");
-	strcat(buf, msg);
-	strcat(buf, "\n");
-
-	write(2, buf, strlen(buf));
-	_exit(1);
+	jmscott_die(1, msg);
 }
 
 static void
 die2(char *msg1, char *msg2)
 {
-	char buf[1024];
-
-	strcpy(buf, msg1);
-	strcat(buf, ": ");
-	strcat(buf, msg2);
-	die(buf);
+	jmscott_die2(1, msg1, msg2);
 }
 
 int
@@ -94,7 +85,7 @@ main(int argc, char **argv)
 		t->tm_sec,
 		now.tv_nsec
 	);
-	if (write(1, tstamp, nwrite) != nwrite)
+	if (jmscott_write(1, tstamp, nwrite))
 		die2("write(stdout) failed", strerror(errno));
 	_exit(0);
 }
