@@ -20,7 +20,7 @@
 include local.mk
 include jmscott.mk
 
-$(test -h jmscott || ln -s clang jmscott)
+$(shell test -h jmscott || ln -s clang jmscott)
 
 COMPILED=								\
 	RFC3339Nano							\
