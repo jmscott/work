@@ -65,6 +65,11 @@ log "fetch remote version: $SSH_AUTH -> $FILE_B"
 rsync -va $SSH_AUTH:$LOCAL_PATH $FILE_B					||
 	die "rsync remote failed: exit status=$?"
 
+if cmp $FILE_A $FILE_B;  then
+	log "files are identical, bye"
+	exit 0
+fi
+
 log "invoke: idiff $FILE_A $FILE_B"
 idiff $FILE_A $FILE_B							||
 	die "idiff aborted: exit status=$?"
