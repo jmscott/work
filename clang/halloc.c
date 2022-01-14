@@ -63,7 +63,7 @@ struct memory
  *	No loop detections.  uggh.
  */
 void *
-halloc_adopt(void *parent, void *p) 
+jmscott_halloc_adopt(void *parent, void *p) 
 {
 	struct memory *parent_mp;
 	struct memory *mp;
@@ -138,7 +138,7 @@ halloc_adopt(void *parent, void *p)
  *	move memory header at tail of memory chunk.
  */
 void *
-halloc(void *parent, size_t size)
+jmscott_halloc(void *parent, size_t size)
 {
 	struct memory *parent_p;
 	struct memory *p;
@@ -231,7 +231,7 @@ fire_free_callbacks(struct memory *m)
 }
 
 void
-halloc_free(void *p)
+jmscott_halloc_free(void *p)
 {
 	struct memory *m;
 
@@ -263,8 +263,11 @@ halloc_free(void *p)
 }
 
 void
-halloc_add_callback(void *p, void (*func)(void *, void *), void *private_data)
-{
+jmscott_halloc_add_callback(
+	void *p,
+	void (*func)(void *, void *),
+	void *private_data
+){
 	struct memory *m;
 	struct memory_callback *cb;
 
@@ -289,7 +292,7 @@ halloc_add_callback(void *p, void (*func)(void *, void *), void *private_data)
 }
 
 char *
-halloc_strdup(void *parent, char *cp)
+jmscott_halloc_strdup(void *parent, char *cp)
 {
 	char *p;
 
@@ -309,7 +312,7 @@ halloc_strdup(void *parent, char *cp)
  *  to new parent, then free parent.
  */
 void *
-halloc_resize(void *p, size_t size)
+jmscott_halloc_resize(void *p, size_t size)
 {
 	struct memory *m, *newm;
 	struct memory *tmp;

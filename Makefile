@@ -99,8 +99,6 @@ install: all
 		file-stat-size.c					\
 		flatx.c							\
 		fork-me.c						\
-		halloc.c						\
-		hexdump.c						\
 		idiff.c							\
 		istext.c						\
 		pg_launchd.c						\

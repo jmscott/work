@@ -17,6 +17,8 @@ install:
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		die.c							\
 		ecpg.c							\
+		halloc.c						\
+		hexdump.c						\
 		posio.c							\
 		string.c						\
 		$(JMSCOTT_PREFIX)/include/jmscott

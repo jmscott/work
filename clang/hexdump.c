@@ -40,7 +40,7 @@ _cksum(unsigned char *buf, int size)
 }
 
 void
-hexdump(unsigned char *src, int src_size, char direction)
+jmscott_hexdump(unsigned char *src, int src_size, char direction)
 {
 	char *t;
 	unsigned char *s, *s_end;
