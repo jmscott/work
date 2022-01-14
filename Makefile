@@ -30,7 +30,6 @@ COMPILED=								\
 	flatx								\
 	file-stat-size							\
 	fork-me								\
-	halloc.o							\
 	idiff								\
 	istext								\
 	pg_launchd							\
@@ -40,6 +39,7 @@ COMPILED=								\
 	tas-unlock-fs							\
 
 all: $(COMPILED)
+	cd clang && $(MAKE) $(MFLAGS) all
 	cd www && $(MAKE) $(MFLAGS) all
 install: all
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
@@ -112,6 +112,7 @@ install: all
 	cd www && $(MAKE) $(MFLAGS) install
 
 clean:
+	cd clang && $(MAKE) $(MFLAGS) clean
 	cd www && $(MAKE) $(MFLAGS) clean
 	rm -f $(COMPILED)
 distclean:
@@ -134,9 +135,6 @@ duration-english: duration-english.c
 
 istext: istext.c
 	cc $(CFLAGS) -o istext istext.c
-
-halloc.o: halloc.c
-	cc $(CFLAGS) -c halloc.c
 
 fork-me: fork-me.c
 	cc $(CFLAGS) -o fork-me fork-me.c

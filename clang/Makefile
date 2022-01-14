@@ -7,6 +7,8 @@
 include ../local.mk
 include ../jmscott.mk
 
+all: halloc.o hexdump.o
+
 install:
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)
@@ -25,7 +27,16 @@ install:
 
 distclean:
 	rm -rf $(JMSCOTT_PREFIX)/include/jmscott
-
+clean:
+	rm -f halloc.o hexdump.o
 world:
+	$(MAKE) $(MFLAGS) clean
+	$(MAKE) $(MFLAGS) all
 	$(MAKE) $(MFLAGS) distclean
 	$(MAKE) $(MFLAGS) install
+
+halloc.o: halloc.c
+	cc $(CFLAGS) -c halloc.c
+
+hexdump.o: hexdump.c
+	cc $(CFLAGS) -c hexdump.c
