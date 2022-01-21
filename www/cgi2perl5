@@ -650,7 +650,7 @@ print MAIN <<END;
 #!$perl_path
 #
 #  Synopsis:
-#	Automade script /cgi-bin/$alias_path/$name, made by cgi2perl5.
+#	Auto-made script /cgi-bin/$alias_path/$name, made by cgi2perl5.
 #  Source Path:
 #	$source_path
 #  Source SHA1 Digest:
