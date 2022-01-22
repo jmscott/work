@@ -38,5 +38,8 @@ world:
 halloc.o: halloc.c
 	cc $(CFLAGS) -c halloc.c
 
+string.o: string.c
+	cc $(CFLAGS) -c string.c
+
 hexdump.o: hexdump.c
 	cc $(CFLAGS) -c hexdump.c

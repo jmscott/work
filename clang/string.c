@@ -6,6 +6,9 @@
 #ifndef JMSCOTT_CLANG_STRING
 #define JMSCOTT_CLANG_STRING
 
+#include <ctype.h>
+#include <stdint.h>
+
 /*
  * Synopsis:
  *      Fast, safe and simple string concatenator
@@ -71,4 +74,48 @@ jmscott_ulltoa(unsigned long long ull, char *digits)
 	return end_p;
 }
 
+/*
+ *  Strictly convert an ascii string to an unsigned 63bit
+ *
+ *	0 <= 9223372036854775808
+ *
+ *  returning a text description of why string can not be parsed.
+ */
+char *
+jmscott_a2ui63(char *a, unsigned long long *ull)
+{
+
+	if (*a == 0)
+		return "value has no chars";;
+
+	unsigned long long u = 0;
+	char *p = a, c;
+	while ((c = *p++)) {
+		if (p - a >= 20)
+			return "value is >= 20 chars";
+		if (!isdigit(c))
+			return "value has non digit";
+		u = u * 10 + (c - '0');
+	}
+	if (ull)
+		*ull = u;
+	return (char *)0;
+}
+
+char *
+jmscott_a2size_t(char *a, size_t *sz)
+{
+	char *err;
+	unsigned long long ull;
+
+	if ((err = jmscott_a2ui63(a, &ull)))
+		return err;
+	if (ull > SIZE_MAX)
+		return "value > maximum of size_t";
+	if (sz)
+		*sz = (size_t)ull;
+	return (char *)0;
+}
+
 #endif	// define JMSCOTT_CLANG_STRING
+
