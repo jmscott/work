@@ -28,35 +28,22 @@
 #include <stdio.h>
 #include <ctype.h>
 
-static short
-_cksum(unsigned char *buf, int size)
-{
-	unsigned short sum;
-	int i;
-
-	for (i = 0, sum = 0;  i < size;  i++)
-		sum += i * buf[i];
-	return sum;
-}
-
 void
-jmscott_hexdump(unsigned char *src, int src_size, char direction)
-{
+jmscott_hexdump(
+	unsigned char *src,
+	int src_size,
+	char direction,
+	char *tgt,
+	int tgt_size
+) {
 	char *t;
 	unsigned char *s, *s_end;
 	int need;
-	char tbuf[64 * 1024], *tgt;
-	int tgt_size;
-	char buf[1024];
 
 	if (src_size == 0) {
-		static char zero[] = "hexdump: 0 bytes in source buffer\n";
-		write(2, zero, strlen(zero));
+		*tgt = 0;
 		return;
 	}
-
-	tgt = tbuf;
-	tgt_size = sizeof tbuf;
 
 	static char hexchar[] = "0123456789abcdef";
 
@@ -138,10 +125,4 @@ jmscott_hexdump(unsigned char *src, int src_size, char direction)
 		t = l + 77;
 	}
 	tgt[need - 1] = 0;
-
-	snprintf(buf, sizeof buf, "\ndump of %d bytes, cksum %hu\n",
-					src_size, _cksum(src, src_size));
-	write(2, buf, strlen(buf));
-	write(2, tgt, strlen(tgt));
-	write(2, "\n", 1);
 }
