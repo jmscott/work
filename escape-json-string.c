@@ -7,6 +7,8 @@
  *	0		ok
  *	1		failed
  *  Note:
+ *	Non ascii are not escaped properly!
+ *
  *	What about escaping command line arguments?
  *
  *	Is code safe for UTF-8?
