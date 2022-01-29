@@ -8,6 +8,11 @@
 #ifndef JMSCOTT_CLANG_POSIO
 #define JMSCOTT_CLANG_POSIO
 
+#include <sys/errno.h>
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <unistd.h>
+
 /*
  *  Synopsis:
  *	Restartable read() of up to "nbytes".
