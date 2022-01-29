@@ -1,3 +1,6 @@
+#ifndef JMSCOTT_CLANG_HEXDUMP
+#define JMSCOTT_CLANG_HEXDUMP
+
 /*
  *  Synopsis:
  *	Write ye old hexdump to file stderr (fd=2).
@@ -65,13 +68,8 @@ jmscott_hexdump(
 	 *  Not enough space in the target buffer ... probably ought
 	 *  to truncate instead of punting.
 	 */
-	if (need > tgt_size) {
-		snprintf(tgt, tgt_size,
-			"hexdump: source bigger than target: %d > %d\n", need,
-				tgt_size);
-		write(2, tgt, strlen(tgt));
-		return;
-	}
+	if (need > tgt_size)
+		src_size = tgt_size;
 
 	s = src;
 	s_end = s + src_size;
@@ -126,3 +124,4 @@ jmscott_hexdump(
 	}
 	tgt[need - 1] = 0;
 }
+#endif
