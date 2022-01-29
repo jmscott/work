@@ -8,6 +8,8 @@
 #ifndef JMSCOTT_CLANG_ECPG
 #define JMSCOTT_CLANG_ECPG
 
+#include "sqlca.h"
+
 #include "jmscott/die.c"
 
 //  default values when fault map has not mapping for a particular

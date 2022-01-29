@@ -21,3 +21,6 @@ INSTALL_PREFIX?=/usr/local
 # location of go distribution.
 
 GODIST=/usr/local/go
+
+PGHOME=/usr/local/pgsql
+PGINC=$(PGHOME)/include

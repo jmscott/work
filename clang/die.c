@@ -9,12 +9,17 @@
  *		jmscott_die(127, msg);
  *	}
  *  Note:
+ *	Consider renaming file die.c to exit.c
+ *
  *	Should "exit()" be called instaead of "_exit()"?  Perhaps stdio is
  *	being used.
  */
 
 #ifndef JMSCOTT_CLANG_DIE
 #define JMSCOTT_CLANG_DIE
+
+#include <unistd.h>
+#include <string.h>
 
 #include "jmscott/string.c"
 
