@@ -27,23 +27,9 @@ extern int	errno;
 
 #include "jmscott/die.c"
 #include "jmscott/posio.c"
-
-#if __APPLE__ == 1 && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 101200
-
-typedef enum {
-	CLOCK_REALTIME,
-	CLOCK_MONOTONIC,
-	CLOCK_PROCESS_CPUTIME_ID,
-	CLOCK_THREAD_CPUTIME_ID
-} clockid_t;
-
-extern int clock_gettime(clockid_t, struct timespec *);
-
-#endif
+#include "jmscott/time.c"
 
 char 	*jmscott_progname = "RFC3339Nano";
-
-static char	*RFC3339Nano = "%04d-%02d-%02dT%02d:%02d:%02d.%09ld+00:00\n";
 
 static void
 die(char *msg)
@@ -60,32 +46,18 @@ die2(char *msg1, char *msg2)
 int
 main(int argc, char **argv)
 {
-	char tstamp[512];
-	struct timespec	now;
-	struct tm *t;
-	int nwrite;
+	char now[37], *err;
 
 	if (argc != 1)
 		die("wrong number arguments");
 	(void)argv;
-        if (clock_gettime(CLOCK_REALTIME, &now) < 0)
-		die2("clock_gettime(REALTIME) failed", strerror(errno));
-	t = gmtime(&now.tv_sec);
-	if (!t)
-		die2("gmtime() failed", strerror(errno));
-	/*
-	 *  Format the record buffer.
-	 */
-	nwrite = snprintf(tstamp, sizeof tstamp, RFC3339Nano,
-		t->tm_year + 1900,
-		t->tm_mon + 1,
-		t->tm_mday,
-		t->tm_hour,
-		t->tm_min,
-		t->tm_sec,
-		now.tv_nsec
-	);
-	if (jmscott_write(1, tstamp, nwrite))
+	if ((err = jmscott_RFC3339Nano_now(now, sizeof now - 1)))
+		die2("RFC3339Nano_now() failed", err);
+	size_t len = strlen(now);
+	now[len++] = '\n';
+	now[len] = 0;
+
+	if (jmscott_write(1, now, len))
 		die2("write(stdout) failed", strerror(errno));
 	_exit(0);
 }

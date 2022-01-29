@@ -7,7 +7,7 @@
 include ../local.mk
 include ../jmscott.mk
 
-all: halloc.o hexdump.o
+all: halloc.o hexdump.o string.o posio.o time.o
 
 install:
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
@@ -23,12 +23,13 @@ install:
 		hexdump.c						\
 		posio.c							\
 		string.c						\
+		time.c							\
 		$(JMSCOTT_PREFIX)/include/jmscott
 
 distclean:
 	rm -rf $(JMSCOTT_PREFIX)/include/jmscott
 clean:
-	rm -f halloc.o hexdump.o
+	rm -f halloc.o hexdump.o string.o posio.o time.o
 world:
 	$(MAKE) $(MFLAGS) clean
 	$(MAKE) $(MFLAGS) all
@@ -43,3 +44,9 @@ string.o: string.c
 
 hexdump.o: hexdump.c
 	cc $(CFLAGS) -c hexdump.c
+
+posio.o: posio.c
+	cc $(CFLAGS) -c posio.c
+
+time.o: time.c
+	cc $(CFLAGS) -c time.c

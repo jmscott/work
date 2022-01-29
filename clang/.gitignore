@@ -2,3 +2,4 @@ halloc.o
 hexdump.o
 posio.o
 string.o
+time.o
