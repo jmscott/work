@@ -74,4 +74,34 @@ jmscott_ascii2json_string(char *src, char *tgt, int tgt_size)
 	return (char *)0;
 }
 
+char *
+jmscott_json_write(int fd, char *format)
+{
+	char *f, c;
+
+	(void)fd;
+
+	f = format;
+	if (!f)
+		return "null format";
+step:
+	while ((c = *f++) && isspace(c))
+		;
+	if (!c)
+		return (char *)0;
+	switch (c) {
+
+	//  # comment
+	case '#':
+		while ((c = *f++) && c != '\n')
+			;
+		if (!c)
+			return (char *)0;
+		break;
+	default:
+		return "unknown format char";
+	}
+	goto step;
+}
+
 #endif
