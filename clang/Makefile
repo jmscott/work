@@ -12,6 +12,7 @@ COMPILEs=							\
 	ecpg.c							\
 	halloc.c						\
 	hexdump.c						\
+	json.c							\
 	posio.c							\
 	string.c						\
 	time.c							\
@@ -24,6 +25,7 @@ OBJs=								\
 	ecpg.o							\
 	halloc.o						\
 	hexdump.o						\
+	json.o							\
 	posio.o							\
 	string.o						\
 	time.o							\
@@ -57,25 +59,25 @@ world:
 *.c: include_link
 
 json.o: json.c
-	cc $(CFLAGS) -I. -c json.c
+	cc $(CFLAGS) -c json.c
 
 halloc.o: halloc.c
-	cc $(CFLAGS) -I.  -c halloc.c
+	cc $(CFLAGS) -c halloc.c
 
 string.o: string.c
-	cc $(CFLAGS) -I.  -c string.c
+	cc $(CFLAGS) -c string.c
 
 hexdump.o: hexdump.c
-	cc $(CFLAGS) -I.  -c hexdump.c
+	cc $(CFLAGS) -c hexdump.c
 
 posio.o: posio.c
-	cc $(CFLAGS) -I.  -c posio.c
+	cc $(CFLAGS) -c posio.c
 
 time.o: time.c
-	cc $(CFLAGS) -I.  -c time.c
+	cc $(CFLAGS) -c time.c
 
 die.o: die.c
-	cc $(CFLAGS) -I.  -c die.c
+	cc $(CFLAGS) -c die.c
 
 ecpg.o: ecpg.c
-	cc $(CFLAGS) -I$(PGINC) -I. -c ecpg.c
+	cc $(CFLAGS) -I$(PGINC) -c ecpg.c
