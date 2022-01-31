@@ -9,6 +9,10 @@
 #define JMSCOTT_CLANG_JSON
 
 #include <ctype.h>
+#include <string.h>
+#include <stdarg.h>
+
+#include "jmscott/posio.c"
 
 /*
  *  Convert an ascii string to escaped json "string".
@@ -74,21 +78,34 @@ jmscott_ascii2json_string(char *src, char *tgt, int tgt_size)
 	return (char *)0;
 }
 
+/*
+ *  Synopsis:
+ *	Write json structures described in a format string.
+ *  Description:
+ *	Write a json structure on a file, following a format string and
+ *	variable arguments list.
+ *
+ *		jmscott_json_write("s", "hello, world");
+ */
 char *
-jmscott_json_write(int fd, char *format)
+jmscott_json_write(int fd, char *format, ...)
 {
+#define RETURN(e) {va_end(argv);  return(e);}
+	
 	char *f, c;
-
+	va_list argv;
 	(void)fd;
+
+	va_start(argv, format);
 
 	f = format;
 	if (!f)
-		return "null format";
+		RETURN("null format");
 step:
 	while ((c = *f++) && isspace(c))
 		;
 	if (!c)
-		return (char *)0;
+		RETURN((char *)0);
 	switch (c) {
 
 	//  # comment
@@ -96,10 +113,23 @@ step:
 		while ((c = *f++) && c != '\n')
 			;
 		if (!c)
-			return (char *)0;
+			RETURN((char *)0);
 		break;
+	
+	//  json string
+	case 's': {
+		char json[1024 * 64], *err;
+
+		char *a = va_arg(argv, char *);
+		if ((err = jmscott_ascii2json_string(a, json, sizeof json)))
+			RETURN(err);
+		if (jmscott_write(fd, json, strlen(json)))
+			RETURN(strerror(errno));
+		break;
+	}
 	default:
-		return "unknown format char";
+		if (jmscott_write(fd, &c, 1))
+			RETURN(strerror(errno));
 	}
 	goto step;
 }
