@@ -2,8 +2,8 @@
  *  Synopsis:
  *	Manipulate json objects.
  *  Note:
- *	Investigate clang scopeing rules for macros _PUT and _ESCAPE
- *	defined in function jmscott_ascii2json().
+ *	Investigate scoping rules for cpp macros, such as those defined in
+ *	function jmscott_ascii2json().
  */
 #ifndef JMSCOTT_CLANG_JSON
 #define JMSCOTT_CLANG_JSON
@@ -91,17 +91,28 @@ char *
 jmscott_json_write(int fd, char *format, ...)
 {
 #define RETURN(e) {va_end(argv);  return(e);}
-	
+
+#define WRITE(s)							\
+	{if (jmscott_write(1, s, strlen(s)))				\
+		RETURN(strerror(errno));}
+#define INDENT(level)							\
+	for (int i = 0;  i < level;  i++)				\
+		WRITE("\t");
+
 	char *f, c;
 	va_list argv;
 	(void)fd;
+	char *err;
+	int indent = 1;
 
 	va_start(argv, format);
 
 	f = format;
 	if (!f)
 		RETURN("null format");
+
 step:
+	//  skip white space in format command
 	while ((c = *f++) && isspace(c))
 		;
 	if (!c)
@@ -118,13 +129,12 @@ step:
 	
 	//  json string
 	case 's': {
-		char json[1024 * 64], *err;
+		char json[1024 * 64];
 
 		char *a = va_arg(argv, char *);
 		if ((err = jmscott_ascii2json_string(a, json, sizeof json)))
 			RETURN(err);
-		if (jmscott_write(fd, json, strlen(json)))
-			RETURN(strerror(errno));
+		WRITE(json);
 		break;
 	}
 	default:
