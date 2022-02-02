@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "jmscott/posio.c"
 
@@ -142,7 +143,7 @@ jmscott_json_write(struct jmscott_json *jp, char *format, ...)
 	char *f, c;
 	va_list argv;
 	char *err;
-	int b;
+	int b, i;
 	char js[1024 * 64], *cp;
 
 
@@ -160,7 +161,7 @@ jmscott_json_write(struct jmscott_json *jp, char *format, ...)
 
 #define INDENT								\
 	{								\
-		for (int i = 0;  i < jp->indent;  i++)			\
+		for (i = 0;  i < jp->indent;  i++)			\
 			WRITE("\t");					\
 	}
 
@@ -206,6 +207,15 @@ step:
 		jmscott_json_trace(jp, "s+", js);
 		WRITE(js);
 		break;
+	
+	//  json integer
+	case 'i':
+		i = va_arg(argv, int);
+
+		snprintf(js, sizeof js, "%d", i);
+		jmscott_json_trace(jp, "i", js);
+		WRITE(js);
+		break;
 	case '{': 
 		INDENT;
 		WRITE("{\n");
@@ -219,7 +229,7 @@ step:
 	case '}':
 		--jp->indent;
 		INDENT;
-		WRITE("}\n");
+		WRITE("\n}\n");
 		break;
 	case ']':
 		--jp->indent;
