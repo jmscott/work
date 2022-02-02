@@ -138,6 +138,14 @@ jmscott_json_trace_c(struct jmscott_json *jp, char c)
 char *
 jmscott_json_write(struct jmscott_json *jp, char *format, ...)
 {
+
+	char *f, c;
+	va_list argv;
+	char *err;
+	int b;
+	char js[1024 * 64], *cp;
+
+
 	jmscott_json_trace(jp, "format", format);
 /*
  *  Note: poor man's closure
@@ -155,10 +163,6 @@ jmscott_json_write(struct jmscott_json *jp, char *format, ...)
 		for (int i = 0;  i < jp->indent;  i++)			\
 			WRITE("\t");					\
 	}
-
-	char *f, c;
-	va_list argv;
-	char *err;
 
 	va_start(argv, format);
 
@@ -180,21 +184,27 @@ step:
 		if (!c)
 			RETURN((char *)0);
 		break;
+	case 'b':
+		b = va_arg(argv, int);
+		if (b)
+			WRITE("true")
+		else
+			WRITE("false")
+		break;
 	case 'k':
+		WRITE("\n");
 		INDENT;
 		//  fallthrough to case 's':
 	
 	//  json string
-	case 's': {
-		char json[1024 * 64];
+	case 's':
+		cp = va_arg(argv, char *);
 
-		char *a = va_arg(argv, char *);
-
-		jmscott_json_trace(jp, "s", a);
-		if ((err = jmscott_ascii2json_string(a, json, sizeof json)))
+		jmscott_json_trace(jp, "s", cp);
+		if ((err = jmscott_ascii2json_string(cp, js, sizeof js)))
 			RETURN(err);
-		jmscott_json_trace(jp, "s+", json);
-		WRITE(json);
+		jmscott_json_trace(jp, "s+", js);
+		WRITE(js);
 		break;
 	case '{': 
 		INDENT;
@@ -211,7 +221,6 @@ step:
 		INDENT;
 		WRITE("}\n");
 		break;
-	}
 	case ']':
 		--jp->indent;
 		INDENT;
