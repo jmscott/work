@@ -6,6 +6,8 @@
 #	ridiff /path/to/local/file <remote-ssh-auth>
 #  See:
 #	https://github.com/jmscott/work/blob/master/idiff.c
+#  Note:
+#	Recent changes render this script WAY too buggy to use, even in beta.
 #
 
 PROG=$(basename $0)
