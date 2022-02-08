@@ -59,7 +59,7 @@ world:
 *.c: include_link
 
 json.o: json.c
-	cc $(CFLAGS) -c json.c
+	cc $(CFLAGS) -Wno-implicit-fallthrough -c json.c
 
 halloc.o: halloc.c
 	cc $(CFLAGS) -c halloc.c
