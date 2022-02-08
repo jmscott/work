@@ -8,6 +8,7 @@
 
 #include <ctype.h>
 #include <stdint.h>
+#include <stddef.h>
 
 /*
  * Synopsis:
