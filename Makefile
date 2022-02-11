@@ -27,12 +27,13 @@ COMPILED=								\
 	duration-english						\
 	duration-mtime							\
 	escape-json-string						\
-	flatx								\
 	file-stat-size							\
+	flatx								\
 	fork-me								\
 	idiff								\
 	istext								\
 	pg_launchd							\
+	slice-stdin							\
 	stale-mtime							\
 	stat-mtime							\
 	tas-lock-fs							\
@@ -165,6 +166,9 @@ tas-unlock-fs: tas-unlock-fs.c
 
 pg_launchd: pg_launchd.c
 	cc $(CFLAGS) -o pg_launchd pg_launchd.c
+
+slice-stdin: slice-stdin.c
+	cc $(CFLAGS) -I$(JMSCOTT_ROOT)/include -o slice-stdin slice-stdin.c
 
 world:
 	$(MAKE) $(MFLAGS) clean
