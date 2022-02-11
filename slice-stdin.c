@@ -14,10 +14,6 @@
 #include "jmscott/string.c"
 #include "jmscott/posio.c"
 
-#ifndef ATOMIC_MSG_SIZE
-#define ATOMIC_MSG_SIZE		4096
-#endif
-
 char *jmscott_progname = "slice-stdin";
 
 static void
@@ -69,17 +65,15 @@ int main(int argc, char **argv)
 	if (stop_offset < start_offset)
 		die("stop_offset < start_offset");
 
-	/*
-	 *  Note:
-	 *	The jury in my (jmscott) head is still quiet on the question of
-	 *	empty stream.
-	 */
 	if (stop_offset == start_offset)
 		_exit(0);
 
+	size_t nr = 0;
 	unsigned char buf[4096];
-	while (_read(buf, sizeof buf) > 0)
+	while ((nr = _read(buf, sizeof buf)) > 0)
 		_write(buf, sizeof buf);
+	if (nr == 0)
+		_exit(0);
 
 	_exit(0);
 }
