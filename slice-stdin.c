@@ -71,15 +71,14 @@ int main(int argc, char **argv)
 
 	/*
 	 *  Note:
-	 *	The jury in my head is still quiet on the question of empty
-	 *	stream.
+	 *	The jury in my (jmscott) head is still quiet on the question of
+	 *	empty stream.
 	 */
 	if (stop_offset == start_offset)
 		_exit(0);
 
 	unsigned char buf[4096];
-	size_t nr;
-	while ((nr = _read(buf, sizeof buf)) > 0)
+	while (_read(buf, sizeof buf) > 0)
 		_write(buf, sizeof buf);
 
 	_exit(0);
