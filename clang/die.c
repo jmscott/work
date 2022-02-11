@@ -18,6 +18,9 @@
 #ifndef JMSCOTT_CLANG_DIE
 #define JMSCOTT_CLANG_DIE
 
+//  big enough for gvernment work.
+#define JMSCOTT_ATOMIC_MSG_SIZE		4096		//  bi
+
 #include <unistd.h>
 #include <string.h>
 
