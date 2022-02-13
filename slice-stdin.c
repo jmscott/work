@@ -1,12 +1,14 @@
 /*
  *  Synopsis:
- *	Slice a portion of standard input onto standard output.
+ *	Slice a portion of a file onto standard output.
  *  Usage:
- *	slice-stdin <start-offset> <stop-offset>
+ *	slice-file <start-offset> <end-offset> <path-to-file>
  *  Exit Status:
  *	0	ok, wrote <<stop-offset> - <start-offset> bytes to 
  *	5	unexpected error.
  *  Note:
+ *	Need a file version that uses seek.
+ *
  *	An empty stream exits 0.  Why?
  */
 
@@ -68,10 +70,12 @@ int main(int argc, char **argv)
 	if (stop_offset == start_offset)
 		_exit(0);
 
-	size_t nr = 0;
+	size_t nr = 0, nread = 0;
 	unsigned char buf[4096];
-	while ((nr = _read(buf, sizeof buf)) > 0)
+	while ((nr = _read(buf, sizeof buf)) > 0) {
+		nread += nr;
 		_write(buf, sizeof buf);
+	}
 	if (nr == 0)
 		_exit(0);
 
