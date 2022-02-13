@@ -78,6 +78,7 @@ install: all
 		ridiff							\
 		rsunk							\
 		rsync-fs						\
+		slice-file						\
 		ssh-host						\
 		stale-mtime						\
 		stat-mtime						\
