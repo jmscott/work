@@ -10,6 +10,7 @@
 
 #include <sys/errno.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/uio.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -148,6 +149,28 @@ AGAIN:
 	fd = open(path, oflag, mode);
 	if (fd >= 0)
 		return fd;
+	if (errno == EINTR)
+		goto AGAIN;
+	return -1;
+}
+
+int
+jmscott_fstat(int fd, struct stat *buf)
+{
+AGAIN:
+	if (fstat(fd, buf) == 0)
+		return 0;
+	if (errno == EINTR)
+		goto AGAIN;
+	return -1;
+}
+
+int
+jmscott_stat(char *path, struct stat *buf)
+{
+AGAIN:
+	if (stat(path, buf) == 0)
+		return 0;
 	if (errno == EINTR)
 		goto AGAIN;
 	return -1;
