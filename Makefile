@@ -33,7 +33,7 @@ COMPILED=								\
 	idiff								\
 	istext								\
 	pg_launchd							\
-	slice-stdin							\
+	slice-file							\
 	stale-mtime							\
 	stat-mtime							\
 	tas-lock-fs							\
@@ -167,8 +167,8 @@ tas-unlock-fs: tas-unlock-fs.c
 pg_launchd: pg_launchd.c
 	cc $(CFLAGS) -o pg_launchd pg_launchd.c
 
-slice-stdin: slice-stdin.c
-	cc $(CFLAGS) -I$(JMSCOTT_ROOT)/include -o slice-stdin slice-stdin.c
+slice-file: slice-file.c
+	cc $(CFLAGS) -I$(JMSCOTT_ROOT)/include -o slice-file slice-file.c
 
 world:
 	$(MAKE) $(MFLAGS) clean

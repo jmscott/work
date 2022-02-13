@@ -11,7 +11,7 @@ istext
 jmscott
 local.mk
 pg_launchd
-slice-stdin
+slice-file
 stale-mtime
 stat-mtime
 tas-lock-fs
