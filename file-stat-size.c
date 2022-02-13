@@ -62,7 +62,7 @@ main(int argc, char **argv)
 	/*
 	 *  Stat the file to get the size.
 	 */
-	if (stat(path, &st) != 0)
+	if (jmscott_stat(path, &st) != 0)
 		die3(path, "stat() failed", strerror(errno));
 
 	/*

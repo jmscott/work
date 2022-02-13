@@ -19,6 +19,7 @@
 #include <stdlib.h>
 
 #include "jmscott/die.c"
+#include "jmscott/posio.c"
 
 #define EXIT_STALE	0
 #define EXIT_FRESH	1
@@ -73,7 +74,7 @@ main(int argc, char **argv)
 	//  stat() the file to determine freshness.
 	struct stat st;
 
-	if (stat(path, &st) < 0) {
+	if (jmscott_stat(path, &st) < 0) {
 		if (errno == ENOENT)
 			exit(EXIT_NO_EXIST);
 		die2(strerror(errno), path, EXIT_FAULT);

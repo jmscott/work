@@ -64,7 +64,7 @@ main(int argc, char **argv)
 
 	if (*path == 0)
 		die("empty file path");
-	status = stat(path, &st);
+	status = jmscott_stat(path, &st);
 	if (status < 0) {
 		if (errno == ENOENT)
 			enoent(path);
