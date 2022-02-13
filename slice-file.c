@@ -2,13 +2,12 @@
  *  Synopsis:
  *	Slice a portion of a file onto standard output.
  *  Usage:
- *	slice-file <start-offset> <end-offset> <path-to-file>
+ *	slice-file <file-path> <start-offset> <end-offset>
  *  Exit Status:
- *	0	ok, wrote <<stop-offset> - <start-offset> bytes to 
+ *	0	ok, wrote <stop-offset> - <start-offset> bytes to stdout
+ *	1	ok, wrote less than <end-of-file> - <start> bytes to stdout
  *	5	unexpected error.
  *  Note:
- *	Need a file version that uses seek.
- *
  *	An empty stream exits 0.  Why?
  */
 
@@ -16,7 +15,7 @@
 #include "jmscott/string.c"
 #include "jmscott/posio.c"
 
-char *jmscott_progname = "slice-stdin";
+char *jmscott_progname = "slice-file";
 
 static void
 die(char *msg)
@@ -31,53 +30,70 @@ die2(char *msg1, char *msg2)
 }
 
 static size_t
-_read(unsigned char *buf, size_t buf_size)
+_read(int fd, unsigned char *buf, size_t buf_size)
 {
 	size_t nr;
 
-	nr = jmscott_read(1, buf, buf_size);
+	nr = jmscott_read(fd, buf, buf_size);
 	if (nr < 0)
-		die2("jmscott_read() failed", strerror(errno));
+		die2("read(input) failed", strerror(errno));
 	return nr;
 }
 
 static void
 _write(unsigned char *buf, size_t buf_size)
 {
-	if (jmscott_write(1, buf, buf_size) != (ssize_t)buf_size)
-		die2("jmscott_write(stdout) failed", strerror(errno));
+	if (jmscott_write(1, buf, buf_size))
+		die2("write(stdout) failed", strerror(errno));
 }
 
 int main(int argc, char **argv)
 {
+	argc--;
+	if (argc != 3)
+		die("wrong count of CLI args: expected 3");
+
 	char *err;
 
-	argc--;
-	if (argc != 2)
-		die("wrong count of CLI args: expected 2");
+	if (!argv[1][0])
+		die("empty file path");
+	int in = jmscott_open(argv[1], O_RDONLY, 0);
+	if (in < 0)
+		die2("open(input) failed", strerror(errno));
 
-	size_t start_offset;
-	if ((err = jmscott_a2size_t(argv[1], &start_offset)))
-		die2("jmscott_a2size_t(start_offset) failed", err);
+	size_t start;
+	if ((err = jmscott_a2size_t(argv[2], &start)))
+		die2("a2size_t(start) failed", err);
+	if (jmscott_lseek(in, 0, SEEK_SET) < 0)
+		die2("lseek(input, start offset) failed", strerror(errno));
 
-	size_t stop_offset;
-	if ((err = jmscott_a2size_t(argv[2], &stop_offset)))
-		die2("jmscott_a2size_t(stop_offset) failed", err);
+	size_t stop;
+	if ((err = jmscott_a2size_t(argv[3], &stop)))
+		die2("a2size_t(stop offset) failed", err);
 
-	if (stop_offset < start_offset)
-		die("stop_offset < start_offset");
+	if (stop < start)
+		die("stop < start");
 
-	if (stop_offset == start_offset)
+	if (stop == start)
 		_exit(0);
 
-	size_t nr = 0, nread = 0;
-	unsigned char buf[4096];
-	while ((nr = _read(buf, sizeof buf)) > 0) {
-		nread += nr;
-		_write(buf, sizeof buf);
+	if (jmscott_lseek(in, (off_t)start, SEEK_SET) < 0)
+		die2("lseek(input) failed", strerror(errno));
+
+	//  write slice to standard output
+	unsigned char buf[JMSCOTT_ATOMIC_MSG_SIZE];
+
+	int nwrite = stop - start;
+	while (nwrite > 0) {
+		int sz = sizeof buf;
+		if (nwrite < sz)
+			sz = nwrite;
+		int nb = 0;
+		nb += _read(in, buf, sz);
+		if (nb == 0)
+			_exit(1);		// at end of file
+		_write(buf, nb);
+		nwrite -= nb;
 	}
-	if (nr == 0)
-		_exit(0);
-
 	_exit(0);
 }
