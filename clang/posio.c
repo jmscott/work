@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 /*
  *  Synopsis:
@@ -110,6 +111,46 @@ AGAIN:
 	if (nbytes > 0)
 		goto AGAIN;
 	return 0;
+}
+
+/*
+ *  Synopsis:
+ *	lseek() to a file position, restarting on intearrupt.
+ *  Returns:
+ *	0	seek ok
+ *	-1	error in seek(), consult errno.
+ */
+off_t
+jmscott_lseek(int fd, off_t offset, int whence)
+{
+	off_t where;
+AGAIN:
+	where = lseek(fd, offset, whence);
+	if (where >= 0)
+		return where;
+	if (errno == EINTR)
+		goto AGAIN;
+	return -1;
+}
+
+/*
+ *  Synopsis:
+ *	open a file, restarting on interrupt.
+ *  Returns:
+ *	0	opened file, returned file descriptor
+ *	-1	error in open(), consult errno.
+ */
+int
+jmscott_open(char *path, int oflag, mode_t mode)
+{
+	int fd;
+AGAIN:
+	fd = open(path, oflag, mode);
+	if (fd >= 0)
+		return fd;
+	if (errno == EINTR)
+		goto AGAIN;
+	return -1;
 }
 
 #endif	//  JMSCOTT_CLANG_POSIO
