@@ -1,16 +1,18 @@
 /*
  *  Synopsis:
- *	Slice a portion of a file onto standard output.
+ *	Exactly slice a portion of a file onto standard output.
  *  Usage:
  *	slice-file <file-path> <start-offset> <end-offset>
  *  Exit Status:
  *	0	ok, wrote <stop-offset> - <start-offset> bytes to stdout
- *	1	ok, wrote less than <end-of-file> - <start> bytes to stdout
+ *	1	file length < stop-offset, no bytes written
  *	5	unexpected error.
  *  Note:
+ *	lseek() not returning error on seek of empty file!
+ *	must we stat the file first?
+ *
  *	An empty stream exits 0.  Why?
  */
-
 #include "jmscott/die.c"
 #include "jmscott/string.c"
 #include "jmscott/posio.c"
@@ -47,6 +49,15 @@ _write(unsigned char *buf, size_t buf_size)
 		die2("write(stdout) failed", strerror(errno));
 }
 
+size_t
+_lseek(int fd, off_t offset, int whence)
+{
+	off_t pos = jmscott_lseek(fd, offset, whence);
+	if (pos < 0)
+		die2("lseek() failed", strerror(errno));
+	return (size_t)pos;
+}
+
 int main(int argc, char **argv)
 {
 	argc--;
@@ -77,8 +88,10 @@ int main(int argc, char **argv)
 	if (stop == start)
 		_exit(0);
 
-	if (jmscott_lseek(in, (off_t)start, SEEK_SET) < 0)
-		die2("lseek(input) failed", strerror(errno));
+	if (_lseek(in, 0, SEEK_END) < stop)
+		_exit(1);
+	if (_lseek(in, start, SEEK_SET) != start)
+		die("impossible: lseek(start) != start");
 
 	//  write slice to standard output
 	unsigned char buf[JMSCOTT_ATOMIC_MSG_SIZE];
@@ -91,7 +104,7 @@ int main(int argc, char **argv)
 		int nb = 0;
 		nb += _read(in, buf, sz);
 		if (nb == 0)
-			_exit(1);		// at end of file
+			_exit(2);		// at end of file
 		_write(buf, nb);
 		nwrite -= nb;
 	}
