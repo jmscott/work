@@ -53,6 +53,7 @@ install: all
 		-d $(JMSCOTT_PREFIX)/sbin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
 		launchctl-kick						\
+		launchctl-unload					\
 		launchd-log						\
 		pg_launchd						\
 		$(JMSCOTT_PREFIX)/sbin

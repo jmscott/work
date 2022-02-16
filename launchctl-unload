@@ -1,0 +1,102 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	Simple frontend for OSX launchctl to unload services.
+#  Usage:
+#	sudo -i
+#	launchctl-unload jmsdesk.blobio.*	
+#
+#	alias haltjms=launchctl-unload jmsdesk.blobio.*
+#  Note:
+#	is "stop" done by "unload"?
+#
+#	How to send a sig9 to uncooperative processes?
+#
+
+LD=/Library/LaunchDaemons
+UNLOAD_PAUSE_DURATION=3
+
+log()
+{
+	echo "$@"
+}
+
+die()
+{
+	log "ERROR: $@" >&2
+	exit 1
+}
+
+WARN()
+{
+	log "WARN (ok): $@" >&2
+}
+
+#
+#  Extract a value from plist, cause the path syntax for extract lacks
+#  documentation
+#
+get_plist_value()
+{
+        plutil -p $PLIST						|
+		fgrep "\"$1\""						|
+		awk '{print $3}'					|
+		sed 's/"//g'
+}
+
+test $(pwd) = $LD && die "can not run in services dir: $D"
+test $# = 1 || die "wrong argument count: got $#, expected 1"
+
+cd $LD || die "cd $LD failed: exit status=$?"
+
+for PLIST in $@;  do
+	test -r $PLIST || die "can not read plist file: $PLIST"
+	if [[ "$PLIST" =~ ^.*\.plist$ ]];  then
+		SRV=$(basename $PLIST .plist)
+	else
+		die "service file must match *.plist: $PLIST"
+	fi
+	log "stopping $SRV"
+	launchctl stop $SRV
+	STATUS=$?
+	case $STATUS in
+	0)
+		log "service stopped: $SRV"
+		;;
+	3)
+		WARN 'process already stopped'
+		;;
+	*)
+		EMSG=$(launchctl error $STATUS)
+		die "launchctl stop failed: exit status: $EMSG"
+		;;
+	esac
+
+	log "unloading plist: $PLIST"
+	E=$(launchctl unload $PLIST 2>&1 | tail -1)
+	STATUS=$?
+	case $STATUS in
+	0)
+		#
+		#  launchctl returns 0 when service already unloaded.
+		#  also writes
+		#
+		#	Unload failed: 113: Could not find specified service
+		#
+		#  to standard error, so grep for that pattern.
+		#
+		#  the pain never ends.
+		#
+		if [[ "$(echo $E | tail -1)" =~ ^.*:[[:space:]]113:.*$ ]]; then
+			WARN 'process not loaded'
+		elif [ -n "$EMSG" ];  then
+			die "launchctl: unexpected stderr: $EMSG"
+		fi
+		log "plist unloaded: $PLIST"
+		;;
+	*)
+		EMSG=$(launchctl error $STATUS)
+		die "launchctl stop failed: exit status: $EMSG"
+		;;
+	esac
+done
