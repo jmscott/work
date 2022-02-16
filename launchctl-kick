@@ -8,6 +8,10 @@
 #
 #	alias kickjms=launchctl-kick jmsdesk.blobio.*
 #  Note:
+#	Consider calling script launchctl-unload.
+#
+#	is "stop" done by "unload"?
+#
 #	the action "kickstart" seems like what we should do instead of this
 #	script.  however, "kickstart" requires a "service-target", which seems
 #	to need meta info, like user or session 9acording to the manual). 
