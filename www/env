@@ -1,18 +1,17 @@
 #!/usr/bin/env perl
 #
 #  Synopsis:
-#	Automade script for /cgi-bin//env (made by cgi2perl5).
+#	Auto-made script /cgi-bin//env, made by cgi2perl5.
 #  Source Path:
 #	env.cgi
 #  Source SHA1 Digest:
 #	No SHA1 Calculated
 #  Note:
-#	/cgi-bin//env was generated automatically by cgi2perl5.
-#
 #	Do not make changes directly to this script.
 #
 die "SERVER_ROOT environment variable not defined"
-				unless defined $ENV{SERVER_ROOT};
+				unless defined $ENV{SERVER_ROOT}
+;
 
 #
 #  Prepend the $SERVER_ROOT/lib directory
@@ -20,7 +19,7 @@ die "SERVER_ROOT environment variable not defined"
 #
 unshift @INC, "$ENV{SERVER_ROOT}/lib";
 
-our (%CGI);
+our %CGI;
 
 require 'httpd2.d/common.pl';
 $CGI{name} = 'env';
