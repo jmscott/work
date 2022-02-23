@@ -222,9 +222,12 @@ END
 		print MAIN <<END if $v = escape_apos($arg->[0]->{perl5_re});
 	perl5_re	=>	'$v',
 END
-		print MAIN <<END if $v = escape_apos($arg->[0]->{default});
+		if (defined($arg->[0]->{default})) {
+			$v = escape_apos($arg->[0]->{default});
+			print MAIN <<END;
 	default	=>	'$v',
 END
+		}
 		print MAIN <<END if $v = $arg->[0]->{required};
 	required	=>	'$v',
 END
