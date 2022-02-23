@@ -31,10 +31,10 @@ die2(char *msg1, char *msg2)
 	jmscott_die2(5, msg1, msg2);
 }
 
-static size_t
+static ssize_t
 _read(int fd, unsigned char *buf, size_t buf_size)
 {
-	size_t nr;
+	ssize_t nr;
 
 	nr = jmscott_read(fd, buf, buf_size);
 	if (nr < 0)
