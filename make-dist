@@ -326,15 +326,22 @@ case "$1" in
 
 #PRODUCT=foobar
 
+#
+#  Uncomment for compiled programs to be installed i bin/ or sbin/ and
+#  removed in "clean" recipes.
+#
+#COMPILEs="
+#"
+
 LIBs="
 "
 
-BINs="
-"
-
-#  Uncomment to create sbins/ directory
-#SBINs="
+#  Uncoment to create bin/ directory
+#BINs="
 #"
+
+SBINs="
+"
 
 #  Uncomment to create tmp/ directory
 #TMP="
@@ -387,12 +394,6 @@ BINs="
 #  Uncomment to create directory libexec/
 #LIBEXECs="
 #"
-
-#  Uncomment for compiled programs to be removed in "clean" recipes.
-#COMPILEs="
-#"
-
-
 END
 	exit 0
 	;;
