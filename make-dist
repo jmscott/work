@@ -46,6 +46,9 @@
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
+#	Rename variables for dirs for dynamic data (spool/ run/ etc/ ...) 
+#	to SPOOLd, RUNd, ETCd ... instead of current SPOOL, RUN, ETC.
+#
 #	Consider a variable VAR_ROOT for variable directores like etc/, data/,
 #	spool/, ... Currently the dynamical directories are created at the
 #	the same level as the static directories.
