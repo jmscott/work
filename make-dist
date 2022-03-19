@@ -314,6 +314,7 @@ case "$1" in
 #
 #		DIST=product.dist
 #
+#		COMPILEs := \$(shell  (. ./\$(DIST) && echo \$\$COMPILEs))
 #		SBINs := \$(shell  (. ./\$(DIST) && echo \$\$SBINs))
 #		LIBs := \$(shell  (. ./\$(DIST) && echo \$\$LIBs))
 #		SRCs := \$(shell  (. ./\$(DIST) && echo \$\$SRCs))
@@ -321,7 +322,6 @@ case "$1" in
 #		HTDOCs := \$(shell  (. ./\$(DIST) && echo \$\$HTDOCs))
 #		CGIBINs := \$(shell  (. ./\$(DIST) && echo \$\$CGIBINs))
 #		LIBEXEC := \$(shell  (. ./\$(DIST) && echo \$\$LIBEXECs))
-#		COMPILEs := \$(shell  (. ./\$(DIST) && echo \$\$COMPILEs))
 #
 
 #  Define PRODUCT to change name of tar file from \$(basename \$(pwd))
