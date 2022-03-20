@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 #  Synopsis:
 #	Build a tar or populate makefile from a shell sourcable config file.
@@ -29,7 +29,7 @@
 #		CGIBINs="[files] ..."
 #		DATA=""
 #		ETC=""
-#		HTDOCs="[files] ..."
+#		HTDOCSs="[files] ..."
 #		LIBEXECs="[files] ..."
 #		LIBs="[files] ..."
 #		LOG=""
@@ -38,6 +38,7 @@
 #		SPOOL=""
 #		SRCs="[files] ..."
 #		TMP=""
+#		SYM
 #
 #	Empty string implies directory is created, if needed.
 #	Any files
@@ -46,6 +47,8 @@
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
+#	No permisions set when symbolic link makes dirname target!
+#
 #	Rename variables for dirs for dynamic data (spool/ run/ etc/ ...) 
 #	to SPOOLd, RUNd, ETCd ... instead of current SPOOL, RUN, ETC.
 #
@@ -79,9 +82,7 @@
 #
 #	Rename variable PRODUCT to less ambitious REPO or even DIST_TAR
 #
-#	What does "copy_files BASEs mean?
-#
-#	Why are the dirs/ for copy_files() hardwired for BINs, SBINs, etc?
+#	Why are the dirs/ for copy_file() hardwired for BINs, SBINs, etc?
 #	Should not thast list be derived from the dist file?
 #
 #	Add --unpack option, which properly removes and unpacks *.tar.bz2
@@ -103,6 +104,67 @@
 #	What about moving the dynamic directories like tmp/ spool/
 #	into var/?  Perhaps a variable VAR_DIR="spool data"?
 #
+die()
+{
+	echo "$PROG: ERROR: $@" >&2
+	echo "usage: $USAGE"
+	exit 1
+}
+
+[ "${BASH_VERSINFO:-0}" -ge 4 ] 					||
+	die "bash version must be >= 4: ver ${BASH_VERSINFO:-0}" 
+
+#  map directory name to create permisions.
+
+declare -A dir2perm=(
+	[archive]='u=wrx,go='
+	[attic]='u=wrx,go='
+	[bin]='u=rwx,g=rx,o='
+	[cache]='u=wrx,go='
+	[cgi-bin]='u=rwx,g=rx,o='
+	[data]='u=wrx,go='
+	[etc]='u=wrx,g=rx,o='
+	[htdocs]='u=wrx,g=rx,o='
+	[lib]='u=rwx,g=rx,o='
+	[libexec]='u=rwx,g=rx,o='
+	[log]='u=wrx,g=rx,o='
+	[run]='u=wrx,go='
+	[sbin]='u=rwx,go='
+	[spool]='u=wrx,go='
+	[src]='u=rwx,g=rx,o='
+	[tmp]='ug=wrx,o='
+)
+
+#  map directory name to copy file permisions.
+declare -A file2perm=(
+	[bin]='ug=rx,o='
+	[cgi-bin]='ug=rx,o='
+	[htdocs]='ug=r,o='
+	[lib]='ug=r,o='
+	[libexec]='ug=rx,o='
+	[sbin]='u=rx,go='
+	[src]='ug=r,o='
+)
+
+#  map VAR name to directory name
+declare -A var2dir=(
+	[ARCHIVE]='archive'
+	[ATTIC]='attic'
+	[BINs]='bin'
+	[CACHE]='cache'
+	[CGIBINs]='cgi-bin'
+	[DATA]='data'
+	[ETC]='etc'
+	[HTDOCSs]='htdocs'
+	[LIBEXECs]='libexec'
+	[LIBs]='lib'
+	[LOG]='log'
+	[RUN]='run'
+	[SBINs]='sbin'
+	[SPOOL]='spool'
+	[SRCs]='src'
+	[TMP]='tmp'
+)
 
 PROG=$(basename $0)
 USAGE="$PROG <help | template | tar> [distribution-file]"
@@ -133,7 +195,7 @@ Description:
 	      htdocs/	#  htdoc scripts for web server
 		
 	In the configuration file are environment variables BINs, CGIBINs, 
-	LIBs, SBINs and HTDOCs that contain the source file list for
+	LIBs, SBINs and HTDOCSs that contain the source file list for
 	each target directory.  Also, empty directories may be created
 	when the variables SPOOL, RUN, ETC, LOG, TMP, DATA and CACHE exist.
 	Do make-dist --template for the list of all variables recognized.
@@ -161,14 +223,6 @@ Exit Status:
 END
 }
 
-PRODUCT=$(basename $(pwd))
-
-die()
-{
-	echo "$PROG: ERROR: $@" >&2
-	echo "usage: $USAGE"
-	exit 1
-}
 
 is_readable()
 {
@@ -180,16 +234,37 @@ is_readable()
 	done
 }
 
+make_SYMLINKs()
+{
+	test -n "$SYMLINKs" || return
+	for S in $SYMLINKs;  do
+		echo $S | fgrep -e '->' | sed 's/->/ /' | while read A B;  do
+		echo "+$B -> $A" && (
+			cd $WORK_TMP				||
+				die "cd symlink failed: exit status=$?"
+			BD=$(dirname $B)
+			if [ ! -d $BD ];  then
+				echo "+$BD"
+				#  no permisions!!!
+				mkdir $BD || die "mkdir failed: exit status=$?"
+			fi
+			ln -sf $A $B				||
+				die "ln -fs failed: exit status=$?"
+		)
+		done
+	done
+}
+
 #
 #  Recursively copy files defined in a shell variable to a target directory
 #  in the staging tree.
 #
-copy_files()
+copy_file()
 {
 	VAR=$1;		shift
-	DIR=$1;		shift
-	PERMD=$1;	shift
-	PERMF=$1;	shift
+	DIR="${var2dir[$VAR]}"
+	PERMD="${dir2perm[$DIR]}"
+	PERMF="${file2perm[$DIR]}"
 
 	#
 	#  Echo the value of the variable whose name is $VAR.
@@ -205,7 +280,8 @@ copy_files()
 	#  Make the staging directory.
 	#
 	echo "+$DIR"
-	mkdir -p $WORK_TMP/$DIR || die "$VAR: mkdir $WORK_TMP/$DIR failed"
+	mkdir -p $WORK_TMP/$DIR				||
+		die "copy_file: mkdir stage root failed: exit status=$?"
 	#
 	#  Copy the files and directories into the staging directory
 	#
@@ -217,7 +293,9 @@ copy_files()
 		if [ -d $F ];  then
 			echo "+$DIR/$F/"
 			DN=$WORK_TMP/$DIR/$F
-			mkdir -p $DN || die "mkdir -p $DN failed"
+			mkdir -p $DNq					||
+				die "copy_file: mkdir config failed: "	\
+					"exit status=$?"
 			continue
 		fi
 
@@ -228,7 +306,8 @@ copy_files()
 		if [ "$DN" -a ! -d $WORK_TMP/$DIR/$DN ];  then
 			echo "+$DIR/$DN/"
 			D="$WORK_TMP/$DIR/$DN"
-			mkdir -p $D || die "mkdir -p $D failed"
+			mkdir -p $D					||
+				die "copy_file: mkdir failed: exit status=$?"
 		fi
 		#
 		#  Derive the target directory path.
@@ -247,24 +326,31 @@ copy_files()
 		#  Ought to check fo existence of file before copy?
 		#
 		echo ">$D/$(basename $F)"
-		cp $F $WORK_TMP/$D || die "cp $F $WORK_TMP/$D failed"
+		cp $F $WORK_TMP/$D || die "copy_file: cp failed: exit status=$?"
 	done
 
-	#  Note:  need to test for error!
+	#  set the permissions in the work temp directory
 
 	find $WORK_TMP/$DIR -type d -print | xargs chmod $PERMD
+	STATUS=${PIPESTATUS[*]}
+	test "$STATUS" = '0 0'						||
+		die "copy_file: find work dir | chmod failed:"		\
+			"exit status=$STATUS"
+
 	if [ "$FILEs" ];  then
 		find $WORK_TMP/$DIR -type f -print | xargs chmod $PERMF
+		STATUS=${PIPESTATUS[*]}
+		test "$STATUS" = '0 0'					||
+			die "find copy work | chmod failed: exit status=$STATUS"
 	fi
 }
 
 #  Makefile an empty directory
 make_dir()
 {
-	VAR=$1;		shift
-	PERMD=$1;	shift
+	VAR=$1
 
-	DIR=$(echo $VAR | tr A-Z a-z)
+	DIR="${var2dir[$VAR]}"
 	EXISTS=$(eval "echo \${$VAR+$VAR}")
 	case "$EXISTS" in
 	$VAR)
@@ -279,13 +365,18 @@ make_dir()
 		;;
 	esac
 
+	PERMD="${dir2perm[$DIR]}"
+
 	#
 	#  Make the staging directory.
 	#
 	#  Note:  need to test for error!
 	#
-	mkdir -p $WORK_TMP/$DIR || die "$VAR: mkdir $WORK_TMP/$DIR failed"
+	mkdir -p $WORK_TMP/$DIR || die "make_dir: mkdir failed: exit status=$?"
 	find $WORK_TMP/$DIR -type d -print | xargs chmod $PERMD
+	STATUS=${PIPESTATUS[*]}
+	test "$STATUS" = '0 0' ||
+		die "make_dir: find dir | chmod failed: status=$STATUS"
 }
 
 test $# = 0 && die "wrong number of arguments"
@@ -316,7 +407,7 @@ template)
 #		LIBs := \$(shell  (. ./\$(DIST) && echo \$\$LIBs))
 #		SRCs := \$(shell  (. ./\$(DIST) && echo \$\$SRCs))
 #		BINs := \$(shell  (. ./\$(DIST) && echo \$\$BINs))
-#		HTDOCs := \$(shell  (. ./\$(DIST) && echo \$\$HTDOCs))
+#		HTDOCSs := \$(shell  (. ./\$(DIST) && echo \$\$HTDOCSs))
 #		CGIBINs := \$(shell  (. ./\$(DIST) && echo \$\$CGIBINs))
 #		LIBEXEC := \$(shell  (. ./\$(DIST) && echo \$\$LIBEXECs))
 #
@@ -352,7 +443,7 @@ SBINs="
 #"
 
 #  Uncomment to create htdocs/ directory
-#HTDOCs="
+#HTDOCSs="
 #"
 
 #  Uncomment to create src/ directory
@@ -410,6 +501,7 @@ tar)
 	;;
 esac
 
+
 DIST="$ACTION"
 test -r "$DIST" || die "can't read dist file: $DIST"
 
@@ -432,10 +524,11 @@ echo "# product is $PRODUCT"
 #  Verify that files are readable.
 #
 is_readable BINs
-is_readable SBINs
 is_readable CGIBINs
+is_readable HTDOCSs
+is_readable LIBEXECs
 is_readable LIBs
-is_readable HTDOCs
+is_readable SBINs
 
 #
 #  Make temporary work directory.
@@ -448,32 +541,39 @@ echo ">$WORK_TMP"
 #
 #  Copy files in various staging directories
 #
-#	copy_files VAR dir dir_perms file_perms
+#	copy_file VAR dir dir_perms file_perms
 #
 #  Does the order of the directories matter?
 #  Probably ought to be the order defined in the file.
 #
-copy_files BASEs . u=rwx,g=rx,o= ug=rx,o=		#  clarify!?
-copy_files BINs bin u=rwx,g=rx,o= ug=rx,o=
-copy_files CGIBINs cgi-bin u=rwx,g=rx,o= ug=rx,o=
-copy_files HTDOCs htdocs u=wrx,g=rx,o= ug=r,o=
-copy_files LIBEXECs libexec u=rwx,g=rx,o= ug=rx,o=
-copy_files LIBs lib u=rwx,g=rx,o= ug=r,o=
-copy_files SBINs sbin u=rwx,go= u=rx,go=
-copy_files SRCs src u=rwx,g=rx,o= ug=r,o=
+copy_file BINs
+copy_file CGIBINs
+copy_file HTDOCSs
+copy_file LIBEXECs
+copy_file LIBs
+copy_file SBINs
+copy_file SRCs
 
 #  make directories, if variables defined in distribution file
 
-make_dir ARCHIVE u=wrx,go=
-make_dir ATTIC u=wrx,go=
-make_dir CACHE u=wrx,go=
-make_dir DATA u=wrx,go=
-make_dir ETC u=wrx,g=rx,o=
-make_dir LIBEXEC u=wrx,g=rx,o=
-make_dir LOG u=wrx,g=rx,o=
-make_dir RUN u=wrx,go=
-make_dir SPOOL u=wrx,go=
-make_dir TMP ug=wrx,o=
+make_dir ARCHIVE
+make_dir ATTIC
+make_dir BINs
+make_dir CACHE
+make_dir CGIBINs
+make_dir DATA
+make_dir ETC
+make_dir HTDOCSs
+make_dir LIBEXECs
+make_dir LIBs
+make_dir LOG
+make_dir RUN
+make_dir SBINs
+make_dir SPOOL
+make_dir SRCs
+make_dir TMP
+
+make_SYMLINKs 
 
 #
 #  Tar up files into $PRODUCT-YYYYMMDD_hhmm.tar.bz2
