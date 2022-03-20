@@ -47,16 +47,7 @@
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
-#	No permisions set when symbolic link makes dirname target!
-#
-#	Rename variables for dirs for dynamic data (spool/ run/ etc/ ...) 
-#	to SPOOLd, RUNd, ETCd ... instead of current SPOOL, RUN, ETC.
-#
-#	Consider a variable VAR_ROOT for variable directores like etc/, data/,
-#	spool/, ... Currently the dynamical directories are created at the
-#	the same level as the static directories.
-#
-#	The tar version insures that dynamic directories in foobar.conf
+#	- The tar version insures that dynamic directories in foobar.conf
 #	exist but does NOT ever overwrite, lest precious data be lost.
 #	However, the Makefile version, does not insure, so make recipes
 #	must be hand coded.  Adding an option to generate the install
@@ -66,43 +57,23 @@
 #
 #	Which could be manually spliced back into the Makefile.
 #
-#	Add command "env" or "fs" to document environment variables in config
+#	- Add command "env" or "fs" to document environment variables in config
 #	file that describe directories.
 #	
-#	Replace --<options> with <actions> like modern cli systems
-#
-#		make-dist tar <dist.conf>
-#		make-dist template
-#		make-dist frisk <dist.conf>
-#
-#	New options --frisk to sort list in VARs and replace root.dist
-#	to $PRODUCT.dist
-#
 #	Think deepky about recursive version that can combine *.dist files
-#
-#	Rename variable PRODUCT to less ambitious REPO or even DIST_TAR
 #
 #	Why are the dirs/ for copy_file() hardwired for BINs, SBINs, etc?
 #	Should not thast list be derived from the dist file?
 #
-#	Add --unpack option, which properly removes and unpacks *.tar.bz2
+#	Add "unpack" action, which properly removes and unpacks *.tar.bz2
 #	directories.  Will need to make no assumptions about the root directory
 #	files.  In other words, if, say, dir sbin/ is not in the tar file,
-#	then --unpack would NOT remove an existing /sbin/ on the target.
-#	This algorithm implies knowing the difference between  static dirs
+#	then "unpack" would NOT remove an existing /sbin/ on the target.
+#	This algorithm implies knowing the difference between static dirs
 #	like /sbin/, /lib/, etc versus dynatic dirs like /run/, /spool/.
 #	Perhaps if the directory is empty in the tar file, then we can
 #	safely assume the directory is dynamic and NOT to be removed on the
 #	target.
-#
-#	Consolidate this comment preamble and the --help docs.
-#
-#	Rename make-dist to make-tar-dist.
-#
-#	At least one file must exist in the root.dist file.	
-#
-#	What about moving the dynamic directories like tmp/ spool/
-#	into var/?  Perhaps a variable VAR_DIR="spool data"?
 #
 die()
 {
@@ -179,7 +150,7 @@ Usage:
 	$USAGE
 Description:
 	$PROG reads a configuration file and builds a bzipped tar file of the 
-	files in a typical unix directory layout.  The confiugration files
+	files in a typical unix directory layout.  The configuration file
 	contains bourne shell variable definitions.  The tar file is 
 	suitable for manually unpacking to install or upgrade a target host.  
 	The files rebuilt in the tar archive into the following sub
@@ -193,7 +164,7 @@ Description:
 	     libexec/	#  hidden executables, typically called from scripts.
 	     cgi-bin/	#  cgi-scripts for web server
 	      htdocs/	#  htdoc scripts for web server
-		
+
 	In the configuration file are environment variables BINs, CGIBINs, 
 	LIBs, SBINs and HTDOCSs that contain the source file list for
 	each target directory.  Also, empty directories may be created
@@ -202,20 +173,10 @@ Description:
 
 	The compressed tar file is written into a file named 
 
-		$PRODUCT-YYYYMMDD_HHmm.tar.bz2.
+		$DIST_TAR-YYYYMMDD_HHmm.tar.bz2.
 
-	where default PRODUCT is the $(basename <dist> .dist).
-	To change the basename of the product, define the PRODUCT environment
-	variable in the configuration file.
+	where default DIST_TAR=$(basename <dist> .dist)-YYYMMDD_HHMM.tar
 
-		PRODUCT=setspace
-
-	To unpack the tar file on the production host, do something like
-
-		scp \$PRODUCT-YYMMDD_HHMM.tar.bz2 \$PRODUCT@host:/tmp
-		ssh \$PRODUCT@host
-		cd <target-dir>
-		bzcat /tmp/\$PRODUCT-YYMMDD_HHMM.tar.bz2 | tar xvf -
 Exit Status:
 	0	no error
 	1	error, temp build directory, named ./tmp/make-dist.\$\$,
@@ -412,11 +373,6 @@ template)
 #		LIBEXEC := \$(shell  (. ./\$(DIST) && echo \$\$LIBEXECs))
 #
 
-#  Define PRODUCT to change name of tar file from \$(basename \$(pwd))
-#  to, say, foobar-YYYYMMDD_hhmm.tar.bz2
-
-#PRODUCT=foobar
-
 #
 #  Uncomment for compiled programs to be installed i bin/ or sbin/ and
 #  removed in "clean" recipes.
@@ -513,12 +469,12 @@ test -r "$DIST" || die "can't read dist file: $DIST"
 . ./$DIST
 
 #
-#  PRODUCT is basename of directory, by default;
+#  TAR_FILE is basename of directory, by default;
 #  otherwise, whatever is set in the configuration file.
 #
-PRODUCT=${PRODUCT:=$(basename $DIST .dist)}
+TAR_FILE=$(basename $DIST .dist)
 
-echo "# product is $PRODUCT"
+echo "# tar file is $TAR_FILE"
 
 #
 #  Verify that files are readable.
@@ -576,9 +532,9 @@ make_dir TMP
 make_SYMLINKs 
 
 #
-#  Tar up files into $PRODUCT-YYYYMMDD_hhmm.tar.bz2
+#  Tar up files into $TAR_FILE-YYYYMMDD_hhmm.tar.bz2
 #
-TAR_FILE=$PRODUCT-$(date +'%Y%m%d_%H%M').tar.bz2
+TAR_FILE=$TAR_FILE-$(date +'%Y%m%d_%H%M').tar.bz2
 echo ">$TAR_FILE"
 (
 	cd $WORK_TMP || die "cd $WORK_TMP failed"
@@ -586,8 +542,13 @@ echo ">$TAR_FILE"
 	#  Tar up files in scratch directory.
 	#  Need to check tar error status with ${PIPSTATUS[]}.
 	#
-	tar cf - $(find . -mindepth 1 -maxdepth 1 -type d)
+	tar cf - $(find . -mindepth 1 -maxdepth 1 -type d)		||
+		die "tar cf failed: exit status=$?"
 ) | bzip2 --best >$TAR_FILE
+STATUS=${PIPESTATUS[*]}
+test "$STATUS" = '0 0'							||
+	die "tar | bzip2 failed: exist status=$STATUS"
+
 test -s $TAR_FILE || die "empty tar file $TAR_FILE"
 
 #
@@ -597,6 +558,10 @@ test -s $TAR_FILE || die "empty tar file $TAR_FILE"
 #	What about zapping dir tmp/ upon certain common errors,
 #	like missing files.
 #
-find $WORK_TMP -print | xargs chmod +x
+echo "-$WORK_TMP"
+find $WORK_TMP ! -type l -print | xargs chmod +w
+STATUS="${PIPESTATUS[*]}"
+test "$STATUS" = '0 0' || die "find workd dir | chmod +w failed: "	\
+			      "exist status=$?"
 rm -rf $WORK_TMP || die "rm -rf $WORK_TMP failed"
 exit 0
