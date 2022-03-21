@@ -118,7 +118,7 @@ declare -A file2perm=(
 )
 
 #  map VAR name to directory name
-declare -A var2dir=(
+declare -A VAR2dir=(
 	[ARCHIVE]='archive'
 	[ATTIC]='attic'
 	[BINs]='bin'
@@ -136,6 +136,8 @@ declare -A var2dir=(
 	[SRCs]='src'
 	[TMP]='tmp'
 )
+
+declare -A VAR2dir_local
 
 PROG=$(basename $0)
 USAGE="$PROG <help | template | tar> [distribution-file]"
@@ -223,7 +225,7 @@ make_SYMLINKs()
 copy_file()
 {
 	VAR=$1;		shift
-	DIR="${var2dir[$VAR]}"
+	DIR="${VAR2dir[$VAR]}"
 	PERMD="${dir2perm[$DIR]}"
 	PERMF="${file2perm[$DIR]}"
 
@@ -311,7 +313,7 @@ make_dir()
 {
 	VAR=$1
 
-	DIR="${var2dir[$VAR]}"
+	DIR="${VAR2dir[$VAR]}"
 	EXISTS=$(eval "echo \${$VAR+$VAR}")
 	case "$EXISTS" in
 	$VAR)
@@ -327,6 +329,7 @@ make_dir()
 	esac
 
 	PERMD="${dir2perm[$DIR]}"
+	test -n "$PERMD" || die "make_dir: no perms: $DIR"
 
 	#
 	#  Make the staging directory.
@@ -449,7 +452,6 @@ tar)
 	;;
 *.dist)
 	DIST="$ACTION"
-	test -r "$DIST" || die "can't read dist file: $DIST"
 	;;
 *)
 	test -e "$ACTION" && die "dist file does not end in .dist: $ACTION"
@@ -467,6 +469,12 @@ test -r "$DIST" || die "can't read dist file: $DIST"
 #  Source in the configuration file.
 #
 . ./$DIST
+
+#  map local VAR declarations to new directory paths
+for key in "${!VAR2dir_local[@]}"; do
+	VAR2dir[$key]="${VAR2dir_local[$key]}"
+	echo "+$key->${VAR2dir[$key]}"
+done
 
 #
 #  TAR_FILE is basename of directory, by default;
