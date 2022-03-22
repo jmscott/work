@@ -6,6 +6,9 @@
 #	local-darwin.mk.example
 #	https://github.com/jmscott/work
 #  Note:
+#	Consider for backwards compatiability, putting an older version in
+#	libexec/make-dist-compat.
+#
 #	Need to make a dist file for work/ !!!  See play/
 #
 #	Install README in /usr/local/jmscott/README, describing github location
