@@ -47,6 +47,11 @@
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
+#	Add startup test for GNU sed!
+#
+#	- VAR->dir remaps only for a single directory.  for example,
+#
+#		LIBs->lib/schema
 #	- The tar version insures that dynamic directories in foobar.conf
 #	exist but does NOT ever overwrite, lest precious data be lost.
 #	However, the Makefile version, does not insure, so make recipes
@@ -75,6 +80,17 @@
 #	safely assume the directory is dynamic and NOT to be removed on the
 #	target.
 #
+
+leave()
+{
+	if [ -n "$WORK_TMP" -a -d $WORK_TMP ];  then
+		rm -rf $WORK_TMP					||
+			echo "WARN: rm work tmp failed: exit status=$?"
+	fi
+}
+
+trap leave EXIT QUIT TERM
+
 die()
 {
 	echo "$PROG: ERROR: $@" >&2
@@ -171,7 +187,7 @@ Description:
 	LIBs, SBINs and HTDOCSs that contain the source file list for
 	each target directory.  Also, empty directories may be created
 	when the variables SPOOL, RUN, ETC, LOG, TMP, DATA and CACHE exist.
-	Do make-dist --template for the list of all variables recognized.
+	Do make-dist template for the list of all variables recognized.
 
 	The compressed tar file is written into a file named 
 
@@ -209,10 +225,11 @@ make_SYMLINKs()
 			if [ ! -d $BD ];  then
 				echo "+$BD"
 				#  no permisions!!!
-				mkdir $BD || die "mkdir failed: exit status=$?"
+				mkdir -p $BD				||
+					die 'make_SYMLINKs: mkdir failed: '\
+					     "exit status=$?"
 			fi
-			ln -sf $A $B				||
-				die "ln -fs failed: exit status=$?"
+			ln -sf $A $B || die "ln -fs failed: exit status=$?"
 		)
 		done
 	done
@@ -256,7 +273,7 @@ copy_file()
 		if [ -d $F ];  then
 			echo "+$DIR/$F/"
 			DN=$WORK_TMP/$DIR/$F
-			mkdir -p $DNq					||
+			mkdir -p $DN					||
 				die "copy_file: mkdir config failed: "	\
 					"exit status=$?"
 			continue
@@ -265,7 +282,7 @@ copy_file()
 		#
 		#  The file lives in an uncreated directory.
 		#
-		DN=$(dirname $F | sed "s/^$DIR\///" | sed "s/^$DIR$//")
+		DN=$(dirname $F | sed "s:^$DIR\/::" | sed "s:^$DIR$::")
 		if [ "$DN" -a ! -d $WORK_TMP/$DIR/$DN ];  then
 			echo "+$DIR/$DN/"
 			D="$WORK_TMP/$DIR/$DN"
@@ -376,8 +393,13 @@ template)
 #		LIBEXEC := \$(shell  (. ./\$(DIST) && echo \$\$LIBEXECs))
 #
 
+#  Uncomment to override default mappings of VARs to target directory
+#VAR2dir_local=(
+#	[CGIBINs]='cgi-bin/schema'
+#)
+
 #
-#  Uncomment for compiled programs to be installed i bin/ or sbin/ and
+#  Uncomment for compiled programs to be installed in bin/ or sbin/ and
 #  removed in "clean" recipes.
 #
 #COMPILEs="
@@ -470,10 +492,23 @@ test -r "$DIST" || die "can't read dist file: $DIST"
 #
 . ./$DIST
 
-#  map local VAR declarations to new directory paths
-for key in "${!VAR2dir_local[@]}"; do
-	VAR2dir[$key]="${VAR2dir_local[$key]}"
-	echo "+$key->${VAR2dir[$key]}"
+#  remap local VAR declarations to new directory paths
+
+for V in "${!VAR2dir_local[@]}"; do
+	ORIG_D="${VAR2dir[$V]}"
+	test -n "$ORIG_D" || die "can not map original var to directory: $V"
+
+	PERMD="${dir2perm[$ORIG_D]}"
+	test -n "$PERMD" || die "no perms for original dir: $ORIG_D"
+	PERMF="${file2perm[$ORIG_D]}"
+	test -n "$PERMF" || die "no perms for original dir/file: $ORIG_D"
+
+	NEW_D="${VAR2dir_local[$V]}"
+	VAR2dir[$V]="$NEW_D"
+	dir2perm[$NEW_D]="$PERMD"
+	file2perm[$NEW_D]="$PERMF"
+	echo "+$V->${VAR2dir[$V]} ($PERMD) ($PERMF)"
+
 done
 
 #
@@ -502,22 +537,6 @@ test -d $WORK_TMP && die "tmp directory $WORK_TMP already exists"
 mkdir -p $WORK_TMP || die "mkdir -p $WORK_TMP failed"
 echo ">$WORK_TMP"
 
-#
-#  Copy files in various staging directories
-#
-#	copy_file VAR dir dir_perms file_perms
-#
-#  Does the order of the directories matter?
-#  Probably ought to be the order defined in the file.
-#
-copy_file BINs
-copy_file CGIBINs
-copy_file HTDOCSs
-copy_file LIBEXECs
-copy_file LIBs
-copy_file SBINs
-copy_file SRCs
-
 #  make directories, if variables defined in distribution file
 
 make_dir ARCHIVE
@@ -536,6 +555,22 @@ make_dir SBINs
 make_dir SPOOL
 make_dir SRCs
 make_dir TMP
+
+#
+#  Copy files in various staging directories
+#
+#	copy_file VAR dir dir_perms file_perms
+#
+#  Does the order of the directories matter?
+#  Probably ought to be the order defined in the file.
+#
+copy_file BINs
+copy_file CGIBINs
+copy_file HTDOCSs
+copy_file LIBEXECs
+copy_file LIBs
+copy_file SBINs
+copy_file SRCs
 
 make_SYMLINKs 
 
@@ -570,6 +605,7 @@ echo "-$WORK_TMP"
 find $WORK_TMP ! -type l -print | xargs chmod +w
 STATUS="${PIPESTATUS[*]}"
 test "$STATUS" = '0 0' || die "find workd dir | chmod +w failed: "	\
-			      "exist status=$?"
+			      "exit status=$?"
+
 rm -rf $WORK_TMP || die "rm -rf $WORK_TMP failed"
 exit 0
