@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+#
+#  Synopsis:
+#	Build a tar or populate makefile from a shell sourcable config file.
+#  Usage:
+#	make-dist --help
+#	make-dist --template >foobar.dist
+#	vi foobar.dist
+#
+#	make-dist foobar.dist
+#	D=$(pwd)
+#	cd /usr/local/foobar && tar xvf $D/foobar-20140403_1213.tar.bz2
+#
+#	#  Makefile variables can be extracted from the the root.dist file
+#	#  with these recipes.  Example make code follows:
+#
+#		DIST=product.dist
+#		COMPILEs := $(shell  (. ./$(DIST) && echo $$COMPILEs))
+#		SBINs := $(shell  (. ./$(DIST) && echo $$SBINs))
+#		LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
+#		SRCs := $(shell  (. ./$(DIST) && echo $$SRCs))
+#
+#	Config variables to create directories are these:
+#
+#		ARCHIVE=""
+#		ATTIC=""
+#		BINs="[files] ..."
+#		CACHE=""
+#		CGIBINs="[files] ..."
+#		DATA=""
+#		ETC=""
+#		HTDOCSs="[files] ..."
+#		LIBEXECs="[files] ..."
+#		LIBs="[files] ..."
+#		LOG=""
+#		RUN=""
+#		SBINs="[files] ..."
+#		SPOOL=""
+#		SRCs="[files] ..."
+#		TMP=""
+#		SYM
+#
+#	Empty string implies directory is created, if needed.
+#	Any files
+#
+#  See:
+#	https://github.com/jmscott/work/blob/master/make-dist
+#	https://en.wikipedia.org/wiki/Unix_filesystem
+#  Note:
+#	Add startup test for GNU sed!
+#
+#	- VAR->dir remaps only for a single directory.  for example,
+#
+#		LIBs->lib/schema
+#	- The tar version insures that dynamic directories in foobar.conf
+#	exist but does NOT ever overwrite, lest precious data be lost.
+#	However, the Makefile version, does not insure, so make recipes
+#	must be hand coded.  Adding an option to generate the install
+#	recipes would be nice:
+#
+#		make-dist dynamic-dirs
+#
+#	Which could be manually spliced back into the Makefile.
+#
+#	- Add command "env" or "fs" to document environment variables in config
+#	file that describe directories.
+#	
+#	Think deepky about recursive version that can combine *.dist files
+#
+#	Why are the dirs/ for copy_file() hardwired for BINs, SBINs, etc?
+#	Should not thast list be derived from the dist file?
+#
+#	Add "unpack" action, which properly removes and unpacks *.tar.bz2
+#	directories.  Will need to make no assumptions about the root directory
+#	files.  In other words, if, say, dir sbin/ is not in the tar file,
+#	then "unpack" would NOT remove an existing /sbin/ on the target.
+#	This algorithm implies knowing the difference between static dirs
+#	like /sbin/, /lib/, etc versus dynatic dirs like /run/, /spool/.
+#	Perhaps if the directory is empty in the tar file, then we can
+#	safely assume the directory is dynamic and NOT to be removed on the
+#	target.
+#
+
+leave()
+{
+	if [ -n "$WORK_TMP" -a -d $WORK_TMP ];  then
+		rm -rf $WORK_TMP					||
+			echo "WARN: rm work tmp failed: exit status=$?"
+	fi
+}
+
+trap leave EXIT QUIT TERM
+
+die()
+{
+	echo "$PROG: ERROR: $@" >&2
+	echo "usage: $USAGE"
+	exit 1
+}
+
+[ "${BASH_VERSINFO:-0}" -ge 4 ] 					||
+	die "bash version must be >= 4: ver ${BASH_VERSINFO:-0}" 
+
+test $# = 0 && die "wrong number of arguments"
+
+ACTION="$1";  shift
+case "$ACTION" in
+help)
+	test $# = 0							||
+		die "help: wrong number of arguments: got $#, expected 0"
+	exec $JMSCOTT_ROOT/libexec/make-dist-help
+	;;
+
+template)
+	test $# = 0							||
+		die "template: wrong number of arguments: got $#, expected 0"
+	exec cat $JMSCOTT_ROOT/lib/make-dist-template.dist
+	;;
+tar)
+	test $# = 1							||
+		die "tar: wrong number of arguments: got $#, expected 1"
+	exec $JMSCOTT_ROOT/libexec/make-dist-tar $@
+	;;
+*.dist)
+	test $# = 0							||
+		die "tar: wrong number of arguments: got $#, expected 0"
+	exec $JMSCOTT_ROOT/libexec/make-dist-tar $ACTION
+	;;
+*)
+	test -e "$ACTION" && die "dist file does not end in .dist: $ACTION"
+	die "unknown action: $ACTION"
+	;;
+esac

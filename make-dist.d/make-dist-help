@@ -1,0 +1,20 @@
+#/bin/bash
+#
+#  Synopsis:
+#	exec "make-dist help" command by pulling preamble from make-dist script.
+#
+die()
+{
+	echo "make-dist: ERROR: $@" 2>&1
+	exit 1
+}
+
+MAKE_DIST_PATH=$(which make-dist)
+STATUS=$?
+test $STATUS = 0 || die "which make-dist failed: exit status=$STATUS"
+
+#  filter the comments from the preamble in the bash script
+
+#  macos awk has issue with / in char class, hence filter out #!/bin/bash
+
+sed -n '/^#/,/^$/{/^$/q; p}' $MAKE_DIST_PATH | grep -v '^#!' | more
