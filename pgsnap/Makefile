@@ -8,23 +8,29 @@
 include ../local.mk
 include ../jmscott.mk
 
-install:
-	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
-		-d $(JMSCOTT_PREFIX)/bin
+_MAKE=$(MAKE) $(MFLAGS)
+
+DIST=work-pgsnap.dist
+BINs := $(shell  (. ./$(DIST) && echo $$BINs))
+LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
+
+install-dirs:
+	cd .. && $(_MAKE) install-dirs
+
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/lib/pgsnap
 
+install:
+	$(_MAKE) install-dirs
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
-		pgsnap							\
-		pgsnap-janitor						\
+		$(BINs)							\
 		$(JMSCOTT_PREFIX)/bin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
-		crontab.example						\
-		profile.example						\
+		$(LIBs)							\
 		$(JMSCOTT_PREFIX)/lib/pgsnap
 world:
-	$(MAKE) $(MFLAGS) distclean
-	$(MAKE) $(MFLAGS) install
+	$(_MAKE) distclean
+	$(_MAKE) install
 distclean:
 	rm -f $(JMSCOTT_PREFIX)/bin/pgsnap
 	rm -f $(JMSCOTT_PREFIX)/bin/pgsnap-janitor
@@ -36,4 +42,4 @@ dev-links:
 	test -e run || ln -s . run
 	test -e spool || ln -s . spool
 dist:
-	make-dist dist-root.conf
+	make-dist $(DIST)
