@@ -39,7 +39,7 @@ LIBs="
 "
 
 BINs="
-	$(COMPILEs)
+	$COMPILEs
 	elapsed-english
 	exec-logoff
 	isjson
