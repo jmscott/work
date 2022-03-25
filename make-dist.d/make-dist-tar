@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #  Synopsis:
-#	Build a tar or populate makefile from a shell sourcable config file.
+#	Build a tar using files/dirs defined in shell sourcable config file.
 #  Usage:
 #	make-dist --help
 #	make-dist --template >foobar.dist
@@ -19,6 +19,7 @@
 #		SBINs := $(shell  (. ./$(DIST) && echo $$SBINs))
 #		LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
 #		SRCs := $(shell  (. ./$(DIST) && echo $$SRCs))
+#		INCLUDEs := $(shell  (. ./$(DIST) && echo $$INCLUDEs))
 #
 #	Config variables to create directories are these:
 #
@@ -52,6 +53,7 @@
 #	- VAR->dir remaps only for a single directory.  for example,
 #
 #		LIBs->lib/schema
+#
 #	- The tar version insures that dynamic directories in foobar.conf
 #	exist but does NOT ever overwrite, lest precious data be lost.
 #	However, the Makefile version, does not insure, so make recipes
@@ -112,8 +114,9 @@ declare -A dir2perm=(
 	[data]='u=wrx,go='
 	[etc]='u=wrx,g=rx,o='
 	[htdocs]='u=wrx,g=rx,o='
-	[lib]='u=rwx,g=rx,o='
-	[libexec]='u=rwx,g=rx,o='
+	[include]='u=rwx,go=rx'
+	[lib]='u=rwx,go=rx'
+	[libexec]='u=rwx,go=rx'
 	[log]='u=wrx,g=rx,o='
 	[run]='u=wrx,go='
 	[sbin]='u=rwx,go='
@@ -127,10 +130,11 @@ declare -A file2perm=(
 	[bin]='ug=rx,o='
 	[cgi-bin]='ug=rx,o='
 	[htdocs]='ug=r,o='
-	[lib]='ug=r,o='
-	[libexec]='ug=rx,o='
+	[include]='ugo=r'
+	[lib]='ugo=r'
+	[libexec]='ugo=rx'
 	[sbin]='u=rx,go='
-	[src]='ug=r,o='
+	[src]='ugo=r'
 )
 
 #  map VAR name to directory name
@@ -143,6 +147,7 @@ declare -A VAR2dir=(
 	[DATA]='data'
 	[ETC]='etc'
 	[HTDOCSs]='htdocs'
+	[INCLUDEs]='include'
 	[LIBEXECs]='libexec'
 	[LIBs]='lib'
 	[LOG]='log'
@@ -156,7 +161,7 @@ declare -A VAR2dir=(
 declare -A VAR2dir_local
 
 PROG=$(basename $0)
-USAGE="$PROG <help | template | tar> [distribution-file]"
+USAGE="$PROG <help | template | tar> [product.dist]"
 
 is_readable()
 {
@@ -384,6 +389,7 @@ echo "# tar file is $TAR_FILE"
 is_readable BINs
 is_readable CGIBINs
 is_readable HTDOCSs
+is_readable INCLUDEs
 is_readable LIBEXECs
 is_readable LIBs
 is_readable SBINs
@@ -406,6 +412,7 @@ make_dir CGIBINs
 make_dir DATA
 make_dir ETC
 make_dir HTDOCSs
+make_dir INCLUDEs
 make_dir LIBEXECs
 make_dir LIBs
 make_dir LOG
@@ -426,6 +433,7 @@ make_dir TMP
 copy_file BINs
 copy_file CGIBINs
 copy_file HTDOCSs
+copy_file INCLUDEs
 copy_file LIBEXECs
 copy_file LIBs
 copy_file SBINs

@@ -1,0 +1,1 @@
+exec cat $JMSCOTT_ROOT/lib/make-dist.dist.example

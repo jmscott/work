@@ -3,46 +3,9 @@
 #  Synopsis:
 #	Build a tar or populate makefile from a shell sourcable config file.
 #  Usage:
-#	make-dist --help
-#	make-dist --template >foobar.dist
-#	vi foobar.dist
-#
-#	make-dist foobar.dist
-#	D=$(pwd)
-#	cd /usr/local/foobar && tar xvf $D/foobar-20140403_1213.tar.bz2
-#
-#	#  Makefile variables can be extracted from the the root.dist file
-#	#  with these recipes.  Example make code follows:
-#
-#		DIST=product.dist
-#		COMPILEs := $(shell  (. ./$(DIST) && echo $$COMPILEs))
-#		SBINs := $(shell  (. ./$(DIST) && echo $$SBINs))
-#		LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
-#		SRCs := $(shell  (. ./$(DIST) && echo $$SRCs))
-#
-#	Config variables to create directories are these:
-#
-#		ARCHIVE=""
-#		ATTIC=""
-#		BINs="[files] ..."
-#		CACHE=""
-#		CGIBINs="[files] ..."
-#		DATA=""
-#		ETC=""
-#		HTDOCSs="[files] ..."
-#		LIBEXECs="[files] ..."
-#		LIBs="[files] ..."
-#		LOG=""
-#		RUN=""
-#		SBINs="[files] ..."
-#		SPOOL=""
-#		SRCs="[files] ..."
-#		TMP=""
-#		SYM
-#
-#	Empty string implies directory is created, if needed.
-#	Any files
-#
+#	make-dist help
+#	make-dist template >foobar.dist
+#	make-dist tar foobar.dist
 #  See:
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
@@ -81,16 +44,6 @@
 #	target.
 #
 
-leave()
-{
-	if [ -n "$WORK_TMP" -a -d $WORK_TMP ];  then
-		rm -rf $WORK_TMP					||
-			echo "WARN: rm work tmp failed: exit status=$?"
-	fi
-}
-
-trap leave EXIT QUIT TERM
-
 die()
 {
 	echo "$PROG: ERROR: $@" >&2
@@ -123,8 +76,8 @@ tar)
 	;;
 *.dist)
 	test $# = 0							||
-		die "tar: wrong number of arguments: got $#, expected 0"
-	exec $JMSCOTT_ROOT/libexec/make-dist-tar $ACTION
+		die "compat: wrong number of arguments: got $#, expected 0"
+	exec $JMSCOTT_ROOT/libexec/make-dist-compat $ACTION
 	;;
 *)
 	test -e "$ACTION" && die "dist file does not end in .dist: $ACTION"

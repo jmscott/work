@@ -1,22 +1,9 @@
 #
 #  Synopsis:
-#	Configuration file read by make-dist to build tar files.
+#	Bash sourceable conf file for make-dist to build files in $JMSCOTT_ROOT.
 #  See:
+#	./Makefile
 #	https://github.com/jmscott/work/blob/master/make-dist
-#  Note:
-#	Makefile variables can be extracted and defined from the the
-#	root.dist file with these recipes.  Example make code follows:
-#
-#		DIST=product.dist
-#
-#		COMPILEs := \$(shell  (. ./\$(DIST) && echo \$\$COMPILEs))
-#		SBINs := \$(shell  (. ./\$(DIST) && echo \$\$SBINs))
-#		LIBs := \$(shell  (. ./\$(DIST) && echo \$\$LIBs))
-#		SRCs := \$(shell  (. ./\$(DIST) && echo \$\$SRCs))
-#		BINs := \$(shell  (. ./\$(DIST) && echo \$\$BINs))
-#		HTDOCSs := \$(shell  (. ./\$(DIST) && echo \$\$HTDOCSs))
-#		CGIBINs := \$(shell  (. ./\$(DIST) && echo \$\$CGIBINs))
-#		LIBEXEC := \$(shell  (. ./\$(DIST) && echo \$\$LIBEXECs))
 #
 
 #  Uncomment to override default mappings of VARs to target directory
@@ -28,17 +15,55 @@
 #  Uncomment for compiled programs to be installed in bin/ or sbin/ and
 #  removed in "clean" recipes.
 #
-#COMPILEs="
-#"
-
-LIBs="
+COMPILEs="
+	RFC3339Nano
+	duration-english
+	duration-mtime
+	escape-json-string
+	file-stat-size
+	flatx
+	fork-me
+	idiff
+	istext
+	pg_launchd
+	slice-file
+	stale-mtime
+	stat-mtime
+	tas-lock-fs
+	tas-unlock-fs
 "
 
-#  Uncoment to create bin/ directory
-#BINs="
-#"
+LIBs="
+	bash_login.example
+	work.dist
+"
+
+BINs="
+	$(COMPILEs)
+	elapsed-english
+	exec-logoff
+	isjson
+	overwrite
+	pdf-merge
+	pg2pg
+	pg_dump-Dow
+	ridiff
+	rsunk
+	rsync-fs
+	ssh-host
+	strip-cr
+	strswap
+	svn-commit-notify
+	svn-ignore
+	xtitle
+	zap-proc
+"
 
 SBINs="
+	launchctl-kick
+	launchctl-unload
+	launchd-log
+	pg_launchd
 "
 
 #  Uncomment to create tmp/ directory
@@ -54,8 +79,22 @@ SBINs="
 #"
 
 #  Uncomment to create src/ directory
-#SRCs="
-#"
+SRCs="
+	RFC3339Nano.c
+	duration-english.c
+	duration-mtime.c
+	escape-json-string.c
+	file-stat-size.c
+	flatx.c
+	fork-me.c
+	idiff.c
+	istext.c
+	pg_launchd.c
+	stale-mtime.c
+	stat-mtime.c
+	tas-lock-fs.c
+	tas-unlock-fs.c
+"
 
 #  Uncomment to create attic/ directory
 #ATTIC="
@@ -90,6 +129,5 @@ SBINs="
 #"
 
 #  Uncomment to create directory libexec/
-#LIBEXECs="
-#"
-END
+LIBEXECs="
+"

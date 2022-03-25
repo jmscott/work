@@ -6,10 +6,8 @@
 #	local-darwin.mk.example
 #	https://github.com/jmscott/work
 #  Note:
-#	Consider for backwards compatiability, putting an older version in
-#	libexec/make-dist-compat.
-#
-#	Need to make a dist file for work/ !!!  See play/
+#	Add warning when running ./make-dist instead of previously installed
+#	version in $JMSCOTT_ROOT/bin.
 #
 #	Install README in /usr/local/jmscott/README, describing github location
 #	and digest of installed code (typically trunk).
@@ -25,93 +23,48 @@ include jmscott.mk
 
 $(shell test -h jmscott || ln -s clang jmscott)
 
-COMPILED=								\
-	RFC3339Nano							\
-	duration-english						\
-	duration-mtime							\
-	escape-json-string						\
-	file-stat-size							\
-	flatx								\
-	fork-me								\
-	idiff								\
-	istext								\
-	pg_launchd							\
-	slice-file							\
-	stale-mtime							\
-	stat-mtime							\
-	tas-lock-fs							\
-	tas-unlock-fs							\
+_MAKE=$(MAKE) $(MFLAGS)
 
-all: $(COMPILED)
-	cd clang && $(MAKE) $(MFLAGS) all
-	cd www && $(MAKE) $(MFLAGS) all
-install: all
+DIST=work.dist
+COMPILEs := $(shell  (. ./$(DIST) && echo $$COMPILEs))
+SBINs := $(shell  (. ./$(DIST) && echo $$SBINs))
+LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
+BINs := $(shell  (. ./$(DIST) && echo $$BINs))
+SRCs := $(shell  (. ./$(DIST) && echo $$SRCs))
+
+all: $(COMPILEs)
+	cd clang && $(_MAKE) all
+	cd www && $(_MAKE) all
+
+install-dirs:
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
-		-d $(JMSCOTT_PREFIX)/lib
-	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/bin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
+		-d $(JMSCOTT_PREFIX)/lib
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
+		-d $(JMSCOTT_PREFIX)/include
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
+		-d $(JMSCOTT_PREFIX)/libexec
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/sbin
-	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
-		launchctl-kick						\
-		launchctl-unload					\
-		launchd-log						\
-		pg_launchd						\
-		$(JMSCOTT_PREFIX)/sbin
-	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
-		bash_login.example					\
-		$(JMSCOTT_PREFIX)/lib
-	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
-		RFC3339Nano						\
-		duration-english					\
-		duration-mtime						\
-		elapsed-english						\
-		escape-json-string					\
-		exec-logoff						\
-		file-stat-size						\
-		idiff							\
-		isjson							\
-		istext							\
-		make-dist						\
-		overwrite						\
-		pdf-merge						\
-		pg2pg							\
-		pg_dump-Dow						\
-		ridiff							\
-		rsunk							\
-		rsync-fs						\
-		slice-file						\
-		ssh-host						\
-		stale-mtime						\
-		stat-mtime						\
-		strip-cr						\
-		strswap							\
-		svn-commit-notify					\
-		svn-ignore						\
-		tas-lock-fs						\
-		tas-unlock-fs						\
-		xtitle							\
-		zap-proc						\
-		$(JMSCOTT_PREFIX)/bin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/src
+install: all
+	$(_MAKE) install-dirs
+
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
+		$(SBINs)						\
+		$(JMSCOTT_PREFIX)/sbin
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
+		$(LIBs)							\
+		$(JMSCOTT_PREFIX)/lib
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
+		$(BINs)							\
+		$(JMSCOTT_PREFIX)/bin
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r		\
-		RFC3339Nano.c						\
-		duration-english.c					\
-		duration-mtime.c					\
-		escape-json-string.c					\
-		file-stat-size.c					\
-		flatx.c							\
-		fork-me.c						\
-		idiff.c							\
-		istext.c						\
-		pg_launchd.c						\
-		stale-mtime.c						\
-		stat-mtime.c						\
-		tas-lock-fs.c						\
-		tas-unlock-fs.c						\
+		$(SRCs)							\
 		$(JMSCOTT_PREFIX)/src
 	cd clang && $(MAKE) $(MFLAGS) install
 	cd pgsnap && $(MAKE) $(MFLAGS) install
@@ -122,7 +75,7 @@ clean:
 	cd www && $(MAKE) $(MFLAGS) clean
 	rm -f $(COMPILED)
 distclean:
-	cd clang && $(MAKE) $(MFLAGS) distclean
+	cd clang && $(_MAKE) $(MFLAGS) distclean
 	cd www && $(MAKE) $(MFLAGS) distclean
 	cd pgsnap && $(MAKE) $(MFLAGS) distclean
 	rm -rf $(JMSCOTT_PREFIX)/bin
@@ -176,9 +129,12 @@ slice-file: slice-file.c
 	cc $(CFLAGS) -I$(JMSCOTT_ROOT)/include -o slice-file slice-file.c
 
 world:
-	$(MAKE) $(MFLAGS) clean
-	$(MAKE) $(MFLAGS) all
-	$(MAKE) $(MFLAGS) distclean
-	$(MAKE) $(MFLAGS) install
-	cd clang && $(MAKE) $(MFLAGS) world
-	cd www && $(MAKE) $(MFLAGS) world
+	$(_MAKE) clean
+	$(_MAKE) all
+	$(_MAKE) distclean
+	$(_MAKE) install
+	cd clang && $(_MAKE) world
+	cd pgsnap && $(_MAKE) pgsnap
+	cd www && $(_MAKE) world
+dist:
+	make-dist $(DIST)

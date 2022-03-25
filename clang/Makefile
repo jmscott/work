@@ -7,54 +7,37 @@
 include ../local.mk
 include ../jmscott.mk
 
-COMPILEs=							\
-	die.c							\
-	ecpg.c							\
-	halloc.c						\
-	hexdump.c						\
-	json.c							\
-	posio.c							\
-	string.c						\
-	time.c							\
+_MAKE=$(MAKE) $(MFLAGS)
 
-#
-#  Note:
-#	ought to be OBJs=$(shell echo $(COMPILEs) | sed 's/\..c/.o/')
-OBJs=								\
-	die.o							\
-	ecpg.o							\
-	halloc.o						\
-	hexdump.o						\
-	json.o							\
-	posio.o							\
-	string.o						\
-	time.o							\
+DIST=work-clang.dist
+COMPILEs := $(shell  (. ./$(DIST) && echo $$COMPILEs))
+INCLUDEs := $(shell  (. ./$(DIST) && echo $$INCLUDEs))
 
-all: $(OBJs) include_link
+all: $(COMPILEs) include_link
 
 include_link:
 	test -e jmscott || ln -s . jmscott
 clean:
-	rm -f $(OBJs)
+	rm -f $(COMPILEs)
 
-install: 
-	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
-		-d $(JMSCOTT_PREFIX)
-	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
-		-d $(JMSCOTT_PREFIX)/include
+install-dirs: 
+	cd .. && $(_MAKE) install-dirs
+
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/include/jmscott
+install:
+	$(_MAKE) install-dirs
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
-		$(COMPILEs)						\
+		$(INCLUDEs)						\
 		$(JMSCOTT_PREFIX)/include/jmscott
 
 distclean:
 	rm -rf $(JMSCOTT_PREFIX)/include/jmscott
 world:
-	$(MAKE) $(MFLAGS) clean
-	$(MAKE) $(MFLAGS) all
-	$(MAKE) $(MFLAGS) distclean
-	$(MAKE) $(MFLAGS) install
+	$(_MAKE) clean
+	$(_MAKE) all
+	$(_MAKE) distclean
+	$(_MAKE) install
 
 *.c: include_link
 
@@ -81,3 +64,6 @@ die.o: die.c
 
 ecpg.o: ecpg.c
 	cc $(CFLAGS) -I$(PGINC) -c ecpg.c
+
+dist:
+	make-dist tar $(DIST)
