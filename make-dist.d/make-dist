@@ -46,8 +46,7 @@
 
 die()
 {
-	echo "$PROG: ERROR: $@" >&2
-	echo "usage: $USAGE"
+	echo "make-dist: ERROR: $@" >&2
 	exit 1
 }
 
