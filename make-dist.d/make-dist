@@ -73,6 +73,11 @@ tar)
 		die "tar: wrong number of arguments: got $#, expected 1"
 	exec $JMSCOTT_ROOT/libexec/make-dist-tar $@
 	;;
+tars)
+	test $# -lt 3 && die 						\
+		"tars: wrong number of arguments: got $#, expected at least 2"
+	exec $JMSCOTT_ROOT/libexec/make-dist-tars $@
+	;;
 *.dist)
 	test $# = 0							||
 		die "compat: wrong number of arguments: got $#, expected 0"

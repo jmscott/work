@@ -91,4 +91,5 @@ LIBEXECs="
 	make-dist-compat
 	make-dist-help
 	make-dist-tar
+	make-dist-tars
 "

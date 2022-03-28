@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	Bundle dists into one tar file named <dist>-all-YYYYMMDD_hhmm.tar.bz2 
+#  Usage:
+#	make-dist tars setspace.dist setspace-schema-pdfbox.dist
+#	make-dist tars <file1.dist> <file2.dist> ...
+#
+
+die()
+{
+	echo "make-dist-tars: ERROR: $@" >&2
+	exit 1
+}
+
+test $# -lt 2 && die "wrong number of arguments: got $#, expected < 2"
