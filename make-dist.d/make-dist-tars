@@ -1,16 +1,71 @@
 #!/bin/bash
 #
 #  Synopsis:
-#	Bundle dists into one tar file named <dist>-all-YYYYMMDD_hhmm.tar.bz2 
+#	Merge the files of several *.dist tar files into a single tar file.
+#  Description:
+#	Merge the files from several different *.dist files into a single
+#	tar file suitable for deployment.  The merged tar file can be unpacked
+#	in the target directory.
+#
+#	The first dist file in the argument list is used to name the merged
+#	tar file
+#
+#		<first-dist>-MERGE-YYYYMMDD_hhmm.tar.bz2
 #  Usage:
-#	make-dist tars setspace.dist setspace-schema-pdfbox.dist
-#	make-dist tars <file1.dist> <file2.dist> ...
+#	cd ~/src/github.com/jmscott/setspace
+#	git pull
+#
+#	DIST1=setspace.dist
+#	DIST2=schema/setcore/setspace-schema-setcore.dist
+#	DIST3=schema/pdfbox/setspace-schema-pdfbox.dist
+#	make-dist tars $DIST1 $DIST2 $DIST3			|| exit 1
+#	LABEL=setspace-
+#	cp $TAR ~/opt/setspace/dist/
+#	cd ~/opt/setspace
+#	#  stop processes for setcore and pdfbox
+#	tar xvf dist/$TAR
+#	#  start processes for setcore and pdfbox
+#	
+#  Exit Status:
+#	0	tar merged into <dist>-MERGE-YYYYMMDD_hhmm.tar.bz2
+#	1	failure
 #
 
 die()
 {
-	echo "make-dist-tars: ERROR: $@" >&2
+	echo "make-dist tars: ERROR: $@" >&2
 	exit 1
 }
 
-test $# -lt 2 && die "wrong number of arguments: got $#, expected < 2"
+#  verify paths to dist files
+
+TAG=$1;  shift
+NOW=$(date +'%Y%m%d_%H%M%S')
+MERGE_TAR=$TAG-$NOW.tar.bz2
+echo ">$MERGE_TAR"
+
+purge_tar()
+{
+	DIST_PATH=$1
+	DIST=$(basename $DIST_PATH .dist)
+	DIST_DIR=$(dirname $DIST_PATH)
+
+	find $DIST_DIR							\
+		-maxdepth 1						\
+		-type f							\
+		-regextype posix-extended				\
+		-regex "$DIST-[0-9]{8}_[0-9]{6}.tar.bz2"
+}
+
+for DIST in $*;  do
+	case $DIST in
+	*.dist)
+		echo "✓$DIST"
+		test -r $DIST || die "can not read dist file: $DIST"
+		purge_tar $DIST
+		;;
+	*)
+		die "dist file must has .dist suffix: $DIST"
+		;;
+	esac
+done
