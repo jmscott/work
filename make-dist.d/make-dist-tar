@@ -21,7 +21,7 @@
 #		SRCs := $(shell  (. ./$(DIST) && echo $$SRCs))
 #		INCLUDEs := $(shell  (. ./$(DIST) && echo $$INCLUDEs))
 #
-#	Config variables to create directories are these:
+#	Config variables to create directories bit not touch contents are:
 #
 #		ARCHIVE=""
 #		ATTIC=""
@@ -29,6 +29,7 @@
 #		CACHE=""
 #		CGIBINs="[files] ..."
 #		DATA=""
+#		DIST=""
 #		ETC=""
 #		HTDOCSs="[files] ..."
 #		LIBEXECs="[files] ..."
@@ -112,6 +113,7 @@ declare -A dir2perm=(
 	[cache]='u=wrx,go='
 	[cgi-bin]='u=rwx,g=rx,o='
 	[data]='u=wrx,go='
+	[dist]='u=wrx,go='
 	[etc]='u=wrx,g=rx,o='
 	[htdocs]='u=wrx,g=rx,o='
 	[include]='u=rwx,go=rx'
@@ -145,6 +147,7 @@ declare -A VAR2dir=(
 	[CACHE]='cache'
 	[CGIBINs]='cgi-bin'
 	[DATA]='data'
+	[DIST]='dist'
 	[ETC]='etc'
 	[HTDOCSs]='htdocs'
 	[INCLUDEs]='include'
@@ -410,6 +413,7 @@ make_dir BINs
 make_dir CACHE
 make_dir CGIBINs
 make_dir DATA
+make_dir DIST
 make_dir ETC
 make_dir HTDOCSs
 make_dir INCLUDEs
@@ -471,7 +475,7 @@ test -s $TAR_FILE || die "empty tar file $TAR_FILE"
 echo "-$WORK_TMP"
 find $WORK_TMP ! -type l -print | xargs chmod +w
 STATUS="${PIPESTATUS[*]}"
-test "$STATUS" = '0 0' || die "find workd dir | chmod +w failed: "	\
+test "$STATUS" = '0 0' || die "find work tmp dir | chmod +w failed: "	\
 			      "exit status=$?"
 
 rm -rf $WORK_TMP || die "rm -rf $WORK_TMP failed"

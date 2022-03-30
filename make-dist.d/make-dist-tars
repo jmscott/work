@@ -29,20 +29,57 @@
 #  Exit Status:
 #	0	tar merged into <dist>-MERGE-YYYYMMDD_hhmm.tar.bz2
 #	1	failure
+#  Note:
+#	The cool symbol ꛷ for a question comes from the banum people of
+#	west africa.
 #
+
+PROG=make-dist-tars
+WORK_TMP=
+ROOT_DIR=$(pwd)
+
+log()
+{
+	echo "$PROG: $@"
+}
+
+leave()
+{
+	if [ -n "$WORK_TMP" ];  then
+		cd ..
+		"-$WORK_TMP"
+		rm -rf "$WORK_TMP"					||
+			log "WARN: rm work dir failed: exit status=$?"
+		WORK_TMP=
+	fi
+	echo '!good bye, cruel world'
+}
 
 die()
 {
-	echo "make-dist tars: ERROR: $@" >&2
+	log "ERROR: $@" >&2
 	exit 1
 }
 
 #  verify paths to dist files
 
+trap leave EXIT
+
 TAG=$1;  shift
+case "$TAG" in
+*.dist)
+	die "expected tag, got a dist file: $TAG"
+	;;
+*.*)
+	die "label contains a period char: $TAG"
+	;;
+esac
+
 NOW=$(date +'%Y%m%d_%H%M%S')
 MERGE_TAR=$TAG-$NOW.tar.bz2
-echo ">$MERGE_TAR"
+echo "!hello, world: $ROOT_DIR"
+echo "@$MERGE_TAR"
+test -e "$MERGE_TAR" && die "refuse to overwrite tar: $MERGE_TAR"
 
 purge_tar()
 {
@@ -51,11 +88,16 @@ purge_tar()
 	DIST_DIR=$(dirname $DIST_PATH)
 
 	find $DIST_DIR							\
-		-maxdepth 1						\
 		-type f							\
 		-regextype posix-extended				\
-		-regex "$DIST-[0-9]{8}_[0-9]{6}.tar.bz2"
+		-regex '.*-[0-9]{8}_[0-9]{4,8}.tar.bz2$'		|
+	  while read TAR;  do
+	  	echo "-$TAR"
+		rm -f $TAR || die "rm old tar failed: exit status=$?"
+	  done
 }
+
+#  verify the dist files exist
 
 for DIST in $*;  do
 	case $DIST in
@@ -68,4 +110,25 @@ for DIST in $*;  do
 		die "dist file must has .dist suffix: $DIST"
 		;;
 	esac
+done
+
+#  make the temporary work and work/dist directories
+
+WORK_TMP=${TMPDIR:=/tmp}/$PROG-$$.d
+echo ">$WORK_TMP"
+mkdir "$WORK_TMP" || die "mkdir work failed: exit status=$?"
+echo ">$WORK_TMP/dist"
+mkdir "$WORK_TMP/dist" || die "mkdir work/dist failed: exit status=$?"
+
+#  build a tar file for each dist file and move the built tar to $WORK_TMP/dist
+
+for DIST in $*;  do
+	TAR_REGEX="^$(basename $DIST .dist)-[0-9]{8}_[0-9]{4,8}.tar.bz2$"
+	echo "꛷$TAR_REGEX"
+	DIST_DIR=$(dirname $DIST)
+	echo "⇢$DIST_DIR"
+	cd "$DIST_DIR" || die "cd dist dir failed: exit status=$?"
+	BASE_DIST=$(basename $DIST)
+	echo "<$BASE_DIST"
+	make-dist tar $BASE_DIST || die "make-dist bsefailed: exit status=$?"
 done
