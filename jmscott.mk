@@ -13,9 +13,10 @@ ifeq "$(UNAME)" "Linux"
 endif
 
 #  Setting SHELL forces gmake to disable optimizing of single line productions,
-#  forcing make to honor $PATH
+#  forcing make to honor $PATH.  Also, overrides ubuntu20 legacy /bin/sh
+#  (unlike fedora).
 
-SHELL?=/bin/bash
+SHELL=/bin/bash
 
 INSTALL_USER?=$(USER)
 ifeq "$(UNAME)" "Darwin"
