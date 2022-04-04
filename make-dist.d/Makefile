@@ -1,6 +1,8 @@
 #
 #  Synopsis:
 #	Makefile for pgsnap utility.
+#  Note:
+#	Consider renaming script to "make-stuff".
 #
 include ../local.mk
 include ../jmscott.mk
