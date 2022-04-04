@@ -112,4 +112,10 @@ if [ "$RESPONSE" = Y ];  then
 else
 	log "remote file: not updated (ok)"
 fi
+
+echo -n "copy idiff.out to dir $START_DIR (Y/n)? "
+read RESPONSE
+if [ "$RESPONSE" = Y ];  then
+	cp -v idiff.out $START_DIR || die "cp idiff.out failed: exit status=$?"
+fi
 exit 0
