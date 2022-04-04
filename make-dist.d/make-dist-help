@@ -1,4 +1,4 @@
-#/bin/bash
+#!/usr/bin/env bash
 #
 #  Synopsis:
 #	exec "make-dist help" command by pulling preamble from make-dist script.
