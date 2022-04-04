@@ -1,18 +1,20 @@
 #!/bin/bash
 #
 #  Synopsis:
-#	RSync a local file and a remote version using interactive diff.
+#	Synchronize a local and remote text file using idiff and rsync.
 #  Usage:
 #	ridiff /path/to/local/file <remote-ssh-auth>
 #  See:
 #	https://github.com/jmscott/work/blob/master/idiff.c
-#  Note:
-#	Recent changes render this script WAY too buggy to use, even in beta.
+#  GNU Depends:
+#	realpath
+#	chmod		#  needs --reference
 #
 
 PROG=$(basename $0)
-CWD=$(pwd)
+START_DIR=$(pwd)
 WORK_DIR=${TMPDIR:=/tmp}/$PROG.$$.d
+WORK_DIR=$(realpath $WORK_DIR)
 
 log()
 {
@@ -31,27 +33,31 @@ trap leave EXIT
 
 usage()
 {
-	echo "usage: $PROG sshauth:path/to/remote/file"
+	echo "usage: $PROG path/to/local/file remote-ssh-auth"
 }
 
 die()
 {
 	log "ERROR: $PROG: $@" >&2
-	log "usage: $PROG sshauth:path/to/remote/file" >&2
+	usage >&2
 	exit 1
 }
 
 test $# = 2 || die "wrong number arguments: got $#, expected 1"
+
 LOCAL_PATH="$1"
 SSH_AUTH="$2"
 log "local path: $LOCAL_PATH"
 log "ssh auth: $SSH_AUTH"
-log "current directory: $CWD"
+log "start directory: $START_DIR"
 
 test -r "$LOCAL_PATH" || die "can not read local file: $LOCAL_PATH"
+log "testing existance of remote file: $SSH_AUTH:$LOCAL_PATH"
 ssh $SSH_AUTH "test -r $LOCAL_PATH"					||
 	die "can not read remote file: $SSH_AUTH:$LOCAL_PATH"
 REAL_LOCAL_PATH=$(realpath $LOCAL_PATH)
+log "real local path: $REAL_LOCAL_PATH"
+test -r "$REAL_LOCAL_PATH" || die 'can not read real local path'
 
 log "work dir: $WORK_DIR"
 mkdir -p $WORK_DIR || die "mkdir work dir failed: exit status=$?"
@@ -60,10 +66,10 @@ cd $WORK_DIR || die "cd work dir failed: exit status=$?"
 FILE_A=$(basename $LOCAL_PATH).a
 log "local file: $FILE_A"
 cp $REAL_LOCAL_PATH $FILE_A						||
-	die "cp local failed: erxit status=$?"
+	die "cp local file failed: exit status=$?"
 
 FILE_B=$(basename $LOCAL_PATH).b
-log "fetch remote version: $SSH_AUTH -> $FILE_B"
+log "fetch remote file: $SSH_AUTH -> $FILE_B"
 rsync -va $SSH_AUTH:$LOCAL_PATH $FILE_B					||
 	die "rsync remote failed: exit status=$?"
 
@@ -73,21 +79,37 @@ if cmp $FILE_A $FILE_B;  then
 fi
 
 log "invoke: idiff $FILE_A $FILE_B"
-idiff $FILE_A $FILE_B							||
-	die "idiff aborted: exit status=$?"
+idiff $FILE_A $FILE_B || die "idiff aborted: exit status=$?"
+if [ ! -e idiff.out ];  then
+	log 'no idiff.out file: bye'
+	exit 0
+fi
 
-echo -n "Update local $LOCAL_PATH? (Y/n)? "
+if [ ! -s idiff.out ];  then
+	log 'idiff.out is empty: refuse to overwrite local/remote files'
+	exit 0
+fi
+
+chmod --reference "$REAL_LOCAL_PATH" idiff.out				||
+	die "chmod --reference idiff.out failed: exit status=$?"
+
+echo -n "update local $LOCAL_PATH? (Y/n)? "
 read RESPONSE
-test "$RESPONSE" != Y && exit 0
-log "local file: update: $LOCAL_PATH"
-
-echo -n "Update remote $SSH_AUTH:$LOCAL_PATH? (Y/n)? "
+if [ "$RESPONSE" = Y ];  then
+	rsync -va idiff.out $REAL_LOCAL_PATH				||
+		die "rsync local update failed: exit status=$?"
+	log "local file: update: $LOCAL_PATH"
+else
+	log "local file: not updated (ok)"
+fi
+	
+echo -n "update remote $SSH_AUTH:$LOCAL_PATH? (Y/n)? "
 read RESPONSE
-test "$RESPONSE" != Y && exit 0
-log "remote file: update: $SSH_AUTH:$LOCAL_PATH"
-
-rsync -va idiff.out $LOCAL_PATH						||
-	die "rsync local update failed: exit status=$?"
-rsync -va idiff.out $SSH_AUTH:$LOCAL_PATH				||
-	die "rsync remote update failed: exit status=$?"
+if [ "$RESPONSE" = Y ];  then
+	rsync -va idiff.out $SSH_AUTH:$LOCAL_PATH			||
+		die "rsync remote update failed: exit status=$?"
+	log "remote file: update: $SSH_AUTH:$LOCAL_PATH"
+else
+	log "remote file: not updated (ok)"
+fi
 exit 0
