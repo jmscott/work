@@ -9,6 +9,11 @@
 #  GNU Depends:
 #	realpath
 #	chmod		#  needs --reference
+#  Note:
+#	Resolving the remote path is still problematic if the file system
+#	full path is different from the local.  For example, the path to
+#	$HOME is /Users/jmscott on MacOS and /home/jmscott on linux,
+#	which affects "realpath --relative-to" in the current code.
 #
 
 PROG=$(basename $0)
@@ -43,18 +48,29 @@ die()
 	exit 1
 }
 
-test $# = 2 || die "wrong number arguments: got $#, expected 1"
+test $# = 2 || die "wrong number arguments: got $#, expected 2"
 
 LOCAL_PATH="$1"
 SSH_AUTH="$2"
 log "local path: $LOCAL_PATH"
+
 log "ssh auth: $SSH_AUTH"
+case "$SSH_AUTH" in
+*:*)
+	die "colon in ssh auth: $SSH_AUTH"
+	;;
+esac
 log "start directory: $START_DIR"
 
 test -r "$LOCAL_PATH" || die "can not read local file: $LOCAL_PATH"
-log "testing existance of remote file: $SSH_AUTH:$LOCAL_PATH"
-ssh $SSH_AUTH "test -r $LOCAL_PATH"					||
-	die "can not read remote file: $SSH_AUTH:$LOCAL_PATH"
+
+# Note: may break when LOCAL_PATH is relative to root.  algo needs rumination.
+
+REMOTE_PATH=$(realpath --relative-to $HOME "$LOCAL_PATH")
+log "testing existance of remote file: $SSH_AUTH:$REMOTE_PATH"
+ssh $SSH_AUTH "exec test -r $REMOTE_PATH"				||
+	die "can not read remote file: $SSH_AUTH:$REMOTE_PATH"
+
 REAL_LOCAL_PATH=$(realpath $LOCAL_PATH)
 log "real local path: $REAL_LOCAL_PATH"
 test -r "$REAL_LOCAL_PATH" || die 'can not read real local path'
@@ -70,7 +86,7 @@ cp $REAL_LOCAL_PATH $FILE_A						||
 
 FILE_B=$(basename $LOCAL_PATH).b
 log "fetch remote file: $SSH_AUTH -> $FILE_B"
-rsync -va $SSH_AUTH:$LOCAL_PATH $FILE_B					||
+rsync -va $SSH_AUTH:$REMOTE_PATH $FILE_B				||
 	die "rsync remote failed: exit status=$?"
 
 if cmp $FILE_A $FILE_B;  then
