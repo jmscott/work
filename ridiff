@@ -112,7 +112,7 @@ chmod --reference "$REAL_LOCAL_PATH" idiff.out				||
 echo -n "update local $LOCAL_PATH? (Y/n)? "
 read RESPONSE
 if [ "$RESPONSE" = Y ];  then
-	rsync -va idiff.out $REAL_LOCAL_PATH				||
+	rsync idiff.out $REAL_LOCAL_PATH				||
 		die "rsync local update failed: exit status=$?"
 	log "local file: update: $LOCAL_PATH"
 else
