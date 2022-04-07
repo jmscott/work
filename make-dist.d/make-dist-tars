@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 #
 #  Synopsis:
-#	Merge the files of several *.dist tar files into a single tar file.
+#	Merge multiple tar files into a single tar file.
 #  Description:
 #	Merge the files from several different *.dist files into a single
 #	tar file suitable for deployment.  The merged tar file can be unpacked
 #	in the root target directory.
-#
 #  Usage:
 #	cd ~/src/github.com/jmscott/setspace
 #	git pull
@@ -14,9 +13,10 @@
 #	DIST1=setspace.dist
 #	DIST2=schema/setcore/setspace-schema-setcore.dist
 #	DIST3=schema/pdfbox/setspace-schema-pdfbox.dist
-#	TAG=
-#	make-dist tars $DIST1 $DIST2 $DIST3			|| exit 1
-#	LABEL=setspace-
+#	TAG=setspace-$(git rev-parse --short HEAD)
+#	
+#	make-dist tars $TAG $DIST1 $DIST2 $DIST3		|| exit 1
+#	TAR=$(echo $TAG-[0-9]*.tar.bz)
 #	cp $TAR ~/opt/setspace/dist/
 #	cd ~/opt/setspace
 #	#  stop processes for setcore and pdfbox
@@ -66,9 +66,6 @@ trap leave EXIT
 
 TAG="$1";  shift
 case "$TAG" in
-*[ 	]*)
-	die "space or tab not allowed in tag: $TAG"
-	;;
 *.dist)
 	die "expected tag, got a dist file: $TAG"
 	;;
