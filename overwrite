@@ -17,10 +17,7 @@ Description:
 
   	This script is derived from an example in the mighty fine book
 	titled "The Unix Programming Environment" by Rob Pike and Brian
-	Kernighan.
-	
-Github:
-	https://github.com/jmscott/work
+	Kernighan.	
 See:
 	http://www.amazon.com/Unix-Programming-Environment-Prentice-Hall-Software/dp/013937681X
 END
