@@ -24,6 +24,8 @@
 #	#  start processes for setcore and pdfbox
 #  Requires:
 #	gnu "realpath" command
+#	gnu "find" command with regex
+#	gnu "bash" version 5
 #	
 #  Exit Status:
 #	0	tars merged into single tar <tag>-YYYYMMDD_hhmm.tar.bz2
@@ -36,6 +38,12 @@
 PROG=make-dist-tars
 WORK_TMP=
 START_DIR=$(pwd)
+TAR_BZ2_REGEX='-[123][0-9]{7}_[0-5][0-9]{3}.tar.bz2$'
+
+#  map dist base to realpath of containing directory
+tarbz2path=(
+       [CGIBINs]='cgi-bin/schema'
+)
 
 log()
 {
@@ -44,7 +52,7 @@ log()
 
 leave()
 {
-	if [ -n "$WORK_TMP" -a -d "$WORK_TMP" ];  then
+	if [ -n "$XWORK_TMP" -a -d "$WORK_TMP" ];  then
 		cd "$START_DIR"
 		"-$WORK_TMP"
 		rm -rf "$WORK_TMP"					||
@@ -60,50 +68,82 @@ die()
 	exit 1
 }
 
+find_dist_tar()
+{
+	DIST_PATH="$1"
+	DIST=$(basename "$DIST_PATH" .dist)
+	DIST_DIR=$(dirname "$DIST_PATH")
+
+	find "$DIST_DIR"						\
+		-maxdepth 1						\
+		-type f							\
+		-regextype posix-extended				\
+		-regex '^'"$DIST-$TAR_BZ2_REGEX"
+}
+
+#  remove stale tar.bz2 files of previous dist pulls.
+
+purge_tar()
+{
+	#  Note: what about regex metachars in $DIST?
+
+	find_dist_tar $1							|
+	  while read TAR;  do
+	  	echo "-$TAR"
+		rm -f $TAR || die "rm old tar.bz failed: exit status=$?"
+	  done
+}
+
+make_dist_tar()
+{
+	local DIST=$1
+
+	cd "$START_DIR" || die "cd start dir failed: exit status=$?"
+
+	DIST_DIR=$(dirname $DIST)
+	echo "->$DIST_DIR"
+	DIST_DIR=$(realpath $DIST_DIR)
+	cd $DIST_DIR || die "cd dist dir failed: exit status=$?"
+	BASE_DIST=$(basename $DIST)
+	echo "<$BASE_DIST"
+	make-dist tar $BASE_DIST || die "make-dist failed: exit status=$?"
+
+	find_dist_tar $BASE_DIST | while read TAR;  do
+		mv $TAR $WORK_DIR/dist				||
+			die "mv tar to work-tmp/dist failed: exit status=#?"
+		tarbz2path[$TAR]=$DIST_DIR
+	done
+}
+
 #  verify paths to dist files
 
 trap leave EXIT
 
 TAG="$1";  shift
 case "$TAG" in
+*' '*)
+	die "space not allowed in tag: $TAG"
+	;;
 *.dist)
 	die "expected tag, got a dist file: $TAG"
 	;;
 *.*)
-	die "label contains a period char: $TAG"
+	die "tag contains a period char: $TAG"
 	;;
 esac
 
-NOW=$(date +'%Y%m%d_%H%M%S')
-MERGE_TAR=$TAG-$NOW.tar.bz2
-echo "!hello, world: $START_DIR"
-echo ">>$MERGE_TAR"
-test -e "$MERGE_TAR" && die "refuse to overwrite tar: $MERGE_TAR"
-
-purge_tar()
-{
-	DIST_PATH=$1
-	DIST=$(basename $DIST_PATH .dist)
-	DIST_DIR=$(dirname $DIST_PATH)
-
-	find $DIST_DIR							\
-		-type f							\
-		-regextype posix-extended				\
-		-regex '.*-[0-9]{8}_[0-9]{4,8}.tar.bz2$'		|
-	  while read TAR;  do
-	  	echo "-$TAR"
-		rm -f $TAR || die "rm old tar failed: exit status=$?"
-	  done
-}
 
 #  verify the dist files exist
 
 for DIST in $*;  do
-	case $DIST in
+	case "$DIST" in
+	*' '*)
+		die "space not allowed in dist path: $DIST"
+		;;
 	*.dist)
 		echo "✓$DIST"
 		test -r $DIST || die "can not read dist file: $DIST"
-		purge_tar $DIST
+		purge_tar $DIST || exit
 		;;
 	*)
 		die "dist file must has .dist suffix: $DIST"
@@ -111,24 +151,21 @@ for DIST in $*;  do
 	esac
 done
 
-#  make the temporary work and work/dist directories
+exit
 
+#  assemble the temp work dir to unpack the indvidually built tar.bz2
+#  files.
 WORK_TMP=${TMPDIR:=/tmp}/$PROG-$$.d
+echo "+>$WORK_TMP/dist"
+mkdir -p "$WORK_TMP"/dist || die "mkdir -p work-tmp/dist failed: exit status=$?"
 
-echo ">$WORK_TMP"
-mkdir "$WORK_TMP" || die "mkdir work failed: exit status=$?"
-echo ">$WORK_TMP/dist"
-mkdir "$WORK_TMP/dist" || die "mkdir work/dist failed: exit status=$?"
+WORK_TMP=$(realpath $WORK_TMP)
 
-#  build a tar file for each dist file and move the built tar to $WORK_TMP/dist
+#  build a tar file for each dist file by executing "make dist" in thel
+#  containing directory.
 
 for DIST in $*;  do
-	TAR_REGEX="^$(basename $DIST .dist)-[0-9]{8}_[0-9]{4,8}.tar.bz2$"
-	echo "꛷$TAR_REGEX"
-	DIST_DIR=$(dirname $DIST)
-	echo "→$DIST_DIR"
-	cd "$DIST_DIR" || die "cd dist dir failed: exit status=$?"
-	BASE_DIST=$(basename $DIST)
-	echo "<$BASE_DIST"
-	make-dist tar $BASE_DIST || die "make-dist bsefailed: exit status=$?"
+	make_dist_tar $DIST || exit
 done
+
+exit 0
