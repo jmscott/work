@@ -44,11 +44,12 @@
 #
 #	Empty string implies directory is created, if needed.
 #	Any files
-#
 #  See:
 #	https://github.com/jmscott/work/blob/master/make-dist
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
+#	Added variable TAR_FILE_BASE to replace var PRODUCT.
+#
 #	Add startup test for GNU sed!
 #
 #	- VAR->dir remaps only for a single directory.  for example,
