@@ -38,7 +38,7 @@
 PROG=make-dist-tars
 WORK_TMP=
 START_DIR=$(pwd)
-TAR_BZ2_REGEX='-[123][0-9]{7}_[0-5][0-9]{3}.tar.bz2$'
+TAR_BZ2_REGEX='-[123][0-9]{7}_[0-5][0-9]{3}[.]tar[.]bz2$'
 
 #  map dist base to realpath of containing directory
 tarbz2path=(
@@ -68,6 +68,12 @@ die()
 	exit 1
 }
 
+#
+#  rm stale tar files built with make-dist tar
+#
+#  Note:
+#	what about regex metachars in $DIST?
+#
 find_dist_tar()
 {
 	DIST_PATH="$1"
@@ -78,16 +84,14 @@ find_dist_tar()
 		-maxdepth 1						\
 		-type f							\
 		-regextype posix-extended				\
-		-regex '^'"$DIST-$TAR_BZ2_REGEX"
+		-regex '.*/'"$DIST$TAR_BZ2_REGEX"
 }
 
 #  remove stale tar.bz2 files of previous dist pulls.
 
 purge_tar()
 {
-	#  Note: what about regex metachars in $DIST?
-
-	find_dist_tar $1							|
+	find_dist_tar $1						|
 	  while read TAR;  do
 	  	echo "-$TAR"
 		rm -f $TAR || die "rm old tar.bz failed: exit status=$?"
