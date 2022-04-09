@@ -6,6 +6,9 @@
 #	Merge the files from several different *.dist files into a single
 #	tar file suitable for deployment.  The merged tar file can be unpacked
 #	in the root target directory.
+#
+#	The cool symbol ꛷ for a question comes from the Banum people of
+#	west africa.
 #  Usage:
 #	cd ~/src/github.com/jmscott/setspace
 #	git pull
@@ -31,8 +34,8 @@
 #	0	tars merged into single tar <tag>-YYYYMMDD_hhmm.tar.bz2
 #	1	failure
 #  Note:
-#	The cool symbol ꛷ for a question comes from the Banum people of
-#	west africa.
+#	Extract the name of the individual tar file from the new var
+#	$TAR_FILE_BASE in the *.dist file.
 #
 
 PROG=make-dist-tars
