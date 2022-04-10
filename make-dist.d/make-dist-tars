@@ -29,6 +29,7 @@
 #	gnu "realpath" command
 #	gnu "find" command with regex
 #	gnu "bash" version 5
+#	gnu "tar"
 #	
 #  Exit Status:
 #	0	tars merged into single tar <tag>-YYYYMMDD_hhmm.tar.bz2
@@ -44,9 +45,7 @@ START_DIR=$(pwd)
 TAR_BZ2_REGEX='-[123][0-9]{7}_[0-5][0-9]{3}[.]tar[.]bz2$'
 
 #  map dist base to realpath of containing directory
-tarbz2path=(
-       [CGIBINs]='cgi-bin/schema'
-)
+declare -A tarbz2dir_path
 
 log()
 {
@@ -72,10 +71,10 @@ die()
 }
 
 #
-#  rm stale tar files built with make-dist tar
+#  rm stale tar files built with "make-dist tar"
 #
 #  Note:
-#	what about regex metachars in $DIST?
+#	what about escaping regex metachars in $DIST?
 #
 find_dist_tar()
 {
@@ -109,17 +108,35 @@ make_dist_tar()
 
 	DIST_DIR=$(dirname $DIST)
 	echo "->$DIST_DIR"
-	DIST_DIR=$(realpath $DIST_DIR)
+	DIST_DIR=$(realpath $DIST_DIR --relative-to "$START_DIR")
 	cd $DIST_DIR || die "cd dist dir failed: exit status=$?"
 	BASE_DIST=$(basename $DIST)
 	echo "<$BASE_DIST"
 	make-dist tar $BASE_DIST || die "make-dist failed: exit status=$?"
 
-	find_dist_tar $BASE_DIST | while read TAR;  do
-		mv $TAR $WORK_DIR/dist				||
+	for TAR in $(find_dist_tar $BASE_DIST);  do
+		mv $TAR $WORK_TMP/dist				||
 			die "mv tar to work-tmp/dist failed: exit status=#?"
-		tarbz2path[$TAR]=$DIST_DIR
+
+		local _TAR
+		_TAR=$(basename $TAR)
+		#  Note: need to verify no duplicates!
+		tarbz2dir_path["$_TAR"]=$DIST_DIR
 	done
+}
+
+unpack_dist_tar()
+{
+	local _PATH
+	local _TAR
+
+	_TAR=$(basename $TAR)
+
+	_PATH="${tarbz2dir_path[$_TAR]}"
+	echo "+$_PATH"
+	mkdir -p $_PATH || die "mkdir unpack failed: exit status=$?"
+	echo "꛷$TAR"
+	tar xvf $TAR
 }
 
 #  verify paths to dist files
@@ -158,9 +175,7 @@ for DIST in $*;  do
 	esac
 done
 
-exit
-
-#  assemble the temp work dir to unpack the indvidually built tar.bz2
+#  assemble the temp work dir in which to unpack the indvidually built tar.bz2
 #  files.
 WORK_TMP=${TMPDIR:=/tmp}/$PROG-$$.d
 echo "+>$WORK_TMP/dist"
@@ -174,5 +189,18 @@ WORK_TMP=$(realpath $WORK_TMP)
 for DIST in $*;  do
 	make_dist_tar $DIST || exit
 done
+
+echo "->$WORK_TMP"
+cd $WORK_TMP || die "cd work tmp failed: exit status=$?"
+
+for TAR in dist/*.tar.bz2;  do
+	unpack_dist_tar $TAR
+done
+
+tar cf - $(ls | fgrep -vw dist)				|
+	bzip2 >$START_DIR/$TAG-$(date +'%Y%m%d_%H%M').tar.bz2
+
+STATUS="${PIPESTATUS[*]}"
+test "$STATUS" = '0 0' || die "tar cf work/tmp failed: exit status=$STATUS"
 
 exit 0
