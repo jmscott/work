@@ -31,11 +31,6 @@
 #
 #	- Add command "env" or "fs" to document environment variables in config
 #	file that describe directories.
-#	
-#	Think deepky about recursive version that can combine *.dist files
-#
-#	Why are the dirs/ for copy_file() hardwired for BINs, SBINs, etc?
-#	Should not thast list be derived from the dist file?
 #
 #	Add "unpack" action, which properly removes and unpacks *.tar.bz2
 #	directories.  Will need to make no assumptions about the root directory

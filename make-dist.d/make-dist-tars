@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #  Synopsis:
-#	Merge multiple tar files into a single tar file.
+#	Libexecs script to merge multiple tar files into a single tar file.
 #  Description:
 #	Merge the files from several different *.dist files into a single
 #	tar file suitable for deployment.  The merged tar file can be unpacked
@@ -26,20 +26,22 @@
 #	tar xvf dist/$TAR
 #	#  start processes for setcore and pdfbox
 #  Requires:
-#	gnu "realpath" command
-#	gnu "find" command with regex
-#	gnu "bash" version 5
-#	gnu "tar"
+#	gnu realpath find bash tar date
+#	jmscott elapsed-english
 #	
 #  Exit Status:
 #	0	tars merged into single tar <tag>-YYYYMMDD_hhmm.tar.bz2
 #	1	failure
 #  Note:
+#	Consider moving the individual tar files into the respective dirs/dist.
+#
 #	Extract the name of the individual tar file from the new var
 #	$TAR_FILE_BASE in the *.dist file.
 #
 
 PROG=make-dist-tars
+START_EPOCH=$(date +%s)
+TAG=
 WORK_TMP=
 START_DIR=$(pwd)
 TAR_BZ2_REGEX='-[123][0-9]{7}_[0-5][0-9]{3}[.]tar[.]bz2$'
@@ -47,26 +49,33 @@ TAR_BZ2_REGEX='-[123][0-9]{7}_[0-5][0-9]{3}[.]tar[.]bz2$'
 #  map dist base to realpath of containing directory
 declare -A tarbz2dir_path
 
-log()
+WARN()
 {
-	echo "$PROG: $@"
+	PREAMBLE=$PROG
+	test -n "$TAG" && PREAMBLE="$PREAMBLE-$TAG"
+	echo "$PREAMBLE: WARN: $@" >&2
+}
+
+zap_work_tmp()
+{
+	test -n "$WORK_DIR" -a -d $WORK_DIR || return
+	cd "$START_DIR"
+	"-$WORK_TMP"
+	rm -rf $WORK_TMP || WARN "rm tmp/work/ failed: exit status=$?"
+	WORK_TMP=
 }
 
 leave()
 {
-	if [ -n "$XWORK_TMP" -a -d "$WORK_TMP" ];  then
-		cd "$START_DIR"
-		"-$WORK_TMP"
-		rm -rf "$WORK_TMP"					||
-			log "WARN: rm work dir failed: exit status=$?"
-		WORK_TMP=
-	fi
-	echo '!good bye, cruel world'
+	zap_work_tmp
+	echo "#  $PROG: good bye, cruel world: $(elapsed-english $START_EPOCH)"
 }
 
 die()
 {
-	log "ERROR: $@" >&2
+	PREAMBLE="$PROG"
+	test -n "$TAG" && PREAMBLE="$PREAMBLE-$TAG"
+	echo "$PREAMBLE: ERROR: $@" >&2
 	exit 1
 }
 
@@ -116,7 +125,7 @@ make_dist_tar()
 
 	for TAR in $(find_dist_tar $BASE_DIST);  do
 		mv $TAR $WORK_TMP/dist				||
-			die "mv tar to work-tmp/dist failed: exit status=#?"
+			die "mv tar to tmp/work/dist failed: exit status=#?"
 
 		local _TAR
 		_TAR=$(basename $TAR)
@@ -127,40 +136,37 @@ make_dist_tar()
 
 unpack_dist_tar()
 {
-	local _PATH
-	local _TAR
+	local TAR_NAME
+	local TAR_PATH
+	local DIST_PATH
 
-	_TAR=$(basename $TAR)
+	cd $WORK_TMP || die "cd work/tmp start unpack failed: exit status=$?"
+	TAR_PATH=$1
+	TAR_NAME=$(basename $TAR_PATH)
+	echo "꛷$TAR_PATH"
 
-	_PATH="${tarbz2dir_path[$_TAR]}"
-	echo "+$_PATH"
-	mkdir -p $_PATH || die "mkdir unpack failed: exit status=$?"
-	echo "꛷$TAR"
-	tar xvf $TAR
+	DIST_PATH="${tarbz2dir_path[$TAR_NAME]}"
+	test -n "$DIST_PATH" || die "can not find dist path: $TAR_NAME"
+	echo "+>$DIST_PATH"
+	mkdir -p $DIST_PATH || die "mkdir unpack dist failed: exit status=$?"
+
+	TAR_PATH=$(realpath --relative-to $DIST_PATH $TAR_PATH)
+	cd $DIST_PATH || die "cd unpack dist path failed: exit status=$?"
+	tar xvf $TAR_PATH || die "tar x unpack failed: exit status=$?"
 }
 
 #  verify paths to dist files
 
 trap leave EXIT
+echo
+echo "#  $PROG: hello, world"
 
 TAG="$1";  shift
-case "$TAG" in
-*' '*)
-	die "space not allowed in tag: $TAG"
-	;;
-*.dist)
-	die "expected tag, got a dist file: $TAG"
-	;;
-*.*)
-	die "tag contains a period char: $TAG"
-	;;
-esac
-
 
 #  verify the dist files exist
 
 for DIST in $*;  do
-	case "$DIST" in
+	case $DIST in
 	*' '*)
 		die "space not allowed in dist path: $DIST"
 		;;
@@ -179,11 +185,11 @@ done
 #  files.
 WORK_TMP=${TMPDIR:=/tmp}/$PROG-$$.d
 echo "+>$WORK_TMP/dist"
-mkdir -p "$WORK_TMP"/dist || die "mkdir -p work-tmp/dist failed: exit status=$?"
+mkdir -p $WORK_TMP/dist || die "mkdir -p tmp/work/dist failed: exit status=$?"
 
 WORK_TMP=$(realpath $WORK_TMP)
 
-#  build a tar file for each dist file by executing "make dist" in thel
+#  build a tar file for each dist file by executing "make dist" in the
 #  containing directory.
 
 for DIST in $*;  do
@@ -194,13 +200,14 @@ echo "->$WORK_TMP"
 cd $WORK_TMP || die "cd work tmp failed: exit status=$?"
 
 for TAR in dist/*.tar.bz2;  do
-	unpack_dist_tar $TAR
+	unpack_dist_tar $TAR || exit
 done
 
-tar cf - $(ls | fgrep -vw dist)				|
-	bzip2 >$START_DIR/$TAG-$(date +'%Y%m%d_%H%M').tar.bz2
+cd $WORK_TMP || die "cd work/tmp post unpack failed: exit status=$?"
 
-STATUS="${PIPESTATUS[*]}"
-test "$STATUS" = '0 0' || die "tar cf work/tmp failed: exit status=$STATUS"
+#  bundle the temp directory into single tar in $START_DIR
+
+tar cf $START_DIR/$TAG-$(date +'%Y%m%d_%H%M').tar.bz2 . --bzip2		||
+	die "tar tmp/work failed: exit status=$?"
 
 exit 0
