@@ -92,4 +92,5 @@ LIBEXECs="
 	make-dist-help
 	make-dist-tar
 	make-dist-tars
+	make-dist-template
 "

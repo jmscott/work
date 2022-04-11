@@ -66,7 +66,7 @@ template)
 	#  generate template file
 	test $# = 0							||
 		die "template: wrong number of arguments: got $#, expected 0"
-	exec cat $JMSCOTT_ROOT/lib/make-dist-template.dist
+	exec $JMSCOTT_ROOT/libexec/make-dist-template
 	;;
 tar)
 	#  make-dist tar foobar.dist
