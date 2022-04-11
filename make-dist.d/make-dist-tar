@@ -384,7 +384,7 @@ done
 #
 TAR_FILE=$(basename $DIST .dist)
 
-echo "# tar file is $TAR_FILE"
+echo "# tar file base name is $TAR_FILE"
 
 #
 #  Verify that files are readable.
