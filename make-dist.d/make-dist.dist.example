@@ -33,14 +33,12 @@
 #COMPILEs="
 #"
 
-LIBs="
-	make-dist-template.dist
-"
+#LIBs="
+#"
 
 #  Uncoment to create bin/ directory
-BINs="
-	make-dist
-"
+#BINs="
+#"
 
 #SBINs="
 #"
@@ -94,13 +92,9 @@ BINs="
 #"
 
 #  Uncomment to create directory libexec/
-LIBEXECs="
-	make-dist-compat
-	make-dist-help
-	make-dist-tar
-"
+#LIBEXECs="
+#"
 
 #  Uncomment to create directory include/
 #INCLUDEs="
 #"
-END
