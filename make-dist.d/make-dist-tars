@@ -207,7 +207,7 @@ cd $WORK_TMP || die "cd work/tmp post unpack failed: exit status=$?"
 
 #  bundle the temp directory into single tar in $START_DIR
 
-tar cf $START_DIR/$TAG-$(date +'%Y%m%d_%H%M').tar.bz2 . --bzip2		||
+tar cvf $START_DIR/$TAG-$(date +'%Y%m%d_%H%M').tar.bz2 . --bzip2	||
 	die "tar tmp/work failed: exit status=$?"
 
 exit 0
