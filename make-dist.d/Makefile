@@ -36,11 +36,9 @@ world:
 	$(_MAKE) install
 
 distclean:
-	rm -f $(JMSCOTT_PREFIX)/bin/make-dist
-	rm -f $(JMSCOTT_PREFIX)/libexec/make-dist-compat
-	rm -f $(JMSCOTT_PREFIX)/libexec/make-dist-help
-	rm -f $(JMSCOTT_PREFIX)/libexec/make-dist-tar
-	rm -f $(JMSCOTT_PREFIX)/lib/make-dist.dist.example
+	cd $(JMSCOTT_PREFIX)/bin && rm -f $(BINs)
+	cd $(JMSCOTT_PREFIX)/libexec && rm -f $(LIBEXECs)
+	cd $(JMSCOTT_PREFIX)/lib && rm -f $(LIBs)
 
 dev-links:
 	test -e log || ln -s . log
