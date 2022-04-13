@@ -37,6 +37,7 @@ COMPILEs="
 	posio.o
 	string.o
 	time.o
+	udig.o
 "
 
 #LIBs="
@@ -110,4 +111,5 @@ INCLUDEs="
 	posio.c
 	string.c
 	time.c
+	udig.c
 "
