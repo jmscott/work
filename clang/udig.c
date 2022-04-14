@@ -18,15 +18,31 @@
 
 #include <ctype.h>
 
+/*
+ *  Synopsis:
+ *	Frisk a udig matching: [a-z][a-z0-9]{0,7}:([:graph:]&&[:ascii:]){32,128}
+ *  Returns:
+ *	- null string if udig is syntactically correct.
+ *	- a static string describing the error.
+ *  See:
+ *	https://github.com/jmscott/blobio
+ */
 char *
 jmscott_frisk_udig(char *udig)
 {
 	if (!udig)
 		return "udig is null";
+	if (!*udig)
+		return "udig is zero legnth";
 
 	//  scan the algorithm matching [a-z][a-z]{0,7}:
 
 	char *u = udig, c;
+
+	c = *u++;
+	if (!isalpha(c) || !islower(c))
+		return "first char of algorithm not in [a-z]";
+
 	while ((c = *u++)) {
 		if (c == ':')
 			break;
@@ -37,14 +53,9 @@ jmscott_frisk_udig(char *udig)
 			return "char in algo is not ascii";
 		if (isalpha(c)) {
 			if (!islower(c))
-				return "char in algo is not lower";
+				return "alpha char in algo is not lower";
 		} else if (!isdigit(c))
-			return "char in algo not a digit";
-
-		//  first char of algo must match [a-z]
-
-		if (u - udig == 1 && (c < 'a' || c > 'z'))
-			return "first char of algorithm not in [a-z]";
+			return "char in algo not in [a-z0-9]";
 	}
 	if (c != ':')
 		return "algorithm not terminated with a colon";
@@ -59,6 +70,8 @@ jmscott_frisk_udig(char *udig)
 		if (!isgraph(c))
 			return "character in digest is not graphable";
 	}
+	if (u - udig < 32)
+		return "digest < 32 chars";
 	return (char *)0;
 }
 
