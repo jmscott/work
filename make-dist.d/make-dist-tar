@@ -12,6 +12,8 @@
 #	jmscott elapsed-english
 #	gnu date
 #  Note:
+#	Need option to keep temp work directory!
+#
 #	- VAR->dir remaps only for a single directory.  for example,
 #
 #		LIBs->lib/schema
@@ -157,7 +159,7 @@ make_SYMLINKs()
 	test -n "$SYMLINKs" || return
 	for S in $SYMLINKs;  do
 		echo $S | fgrep -e '->' | sed 's/->/ /' | while read A B;  do
-		echo "+$B -> $A" && (
+		echo "+$A -> $B" && (
 			cd $WORK_TMP || die "cd symlink failed: exit status=$?"
 			BD=$(dirname $B)
 			if [ ! -d $BD ];  then
@@ -167,7 +169,7 @@ make_SYMLINKs()
 					die 'make_SYMLINKs: mkdir failed: '\
 					     "exit status=$?"
 			fi
-			ln -sf $A $B || die "ln -fs failed: exit status=$?"
+			ln -sf $B $A || die "ln -fs failed: exit status=$?"
 		)
 		done
 	done
@@ -403,8 +405,7 @@ echo ">>$TAR_FILE"
 	#  Tar up files in scratch directory.
 	#  Need to check tar error status with ${PIPSTATUS[]}.
 	#
-	tar cf - $(find . -mindepth 1 -maxdepth 1 -type d)		||
-		die "tar cf failed: exit status=$?"
+	tar cf - . || die "tar cf failed: exit status=$?"
 ) | bzip2 --best >$TAR_FILE
 STATUS=${PIPESTATUS[*]}
 test "$STATUS" = '0 0'							||
