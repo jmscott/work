@@ -4,7 +4,16 @@
 #  See:
 #	https://github.com/jmscott/work/blob/master/make-dist
 #  Note:
-#	Rename make-dist-template.dist to make.dist.example
+#	Consider adding "d" suffix to empty dirs like, say, spool/ .
+#	Also, any values in, say, SPOOLd would be subdirectores with
+#	the same permisions as the top level directory.  For example,
+#
+#		SPOOLd="
+#			wrap
+#		"
+#	
+#	create the dir spool/wrap the via "mkdir -p spool/wrap" command,
+#	with the same permisions as the spool/directory.
 #
 #	Makefile variables can be extracted and defined from the the
 #	root.dist file with these recipes.  Example make code follows:
@@ -97,4 +106,8 @@
 
 #  Uncomment to create directory include/
 #INCLUDEs="
+#"
+
+#  Uncomment to create directory sync/
+#SYNC="
 #"
