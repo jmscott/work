@@ -11,14 +11,14 @@
 #
 #		DIST=product.dist
 #
-#		COMPILEs := \$(shell  (. ./\$(DIST) && echo \$\$COMPILEs))
-#		SBINs := \$(shell  (. ./\$(DIST) && echo \$\$SBINs))
-#		LIBs := \$(shell  (. ./\$(DIST) && echo \$\$LIBs))
-#		SRCs := \$(shell  (. ./\$(DIST) && echo \$\$SRCs))
-#		BINs := \$(shell  (. ./\$(DIST) && echo \$\$BINs))
-#		HTDOCSs := \$(shell  (. ./\$(DIST) && echo \$\$HTDOCSs))
-#		CGIBINs := \$(shell  (. ./\$(DIST) && echo \$\$CGIBINs))
-#		LIBEXEC := \$(shell  (. ./\$(DIST) && echo \$\$LIBEXECs))
+#		COMPILEs := $(shell  (. ./$(DIST) && echo $$COMPILEs))
+#		SBINs := $(shell  (. ./$(DIST) && echo $$SBINs))
+#		LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
+#		SRCs := $(shell  (. ./$(DIST) && echo $$SRCs))
+#		BINs := $(shell  (. ./$(DIST) && echo $$BINs))
+#		HTDOCSs := $(shell  (. ./$(DIST) && echo $$HTDOCSs))
+#		CGIBINs := $(shell  (. ./$(DIST) && echo $$CGIBINs))
+#		LIBEXEC := $(shell  (. ./$(DIST) && echo $$LIBEXECs))
 #
 
 #  Uncomment to override default mappings of VARs to target directory
