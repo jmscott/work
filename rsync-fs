@@ -40,6 +40,10 @@
 #	FAULT=/var/run/rsync-fs-var.fault
 #
 #	rsync-fs --sunk-root /sunk --mount-point / >$LOG
+#	#
+#	#  catalina+ on mac forbids writes to root!
+#	#
+#	rsync-fs --filter /tmp/rsync-filter --sunk-root /sunk --mount-point /
 #	rsync-fs --mount-point /var --sunk-root /backup/sunk
 #	rsync-fs --mount-point /var --fault $FAULT --sunk-root /sunk
 #	rsync-fs --mount-point /var --ignore-24 --sunk-root /sunk
@@ -59,6 +63,7 @@
 #  Note:
 #	Need to add notify.
 #
+START_EPOCH=$(date +%s)
 PROG=$(basename $0)
 HOST=$(hostname -f)
 MOUNT_POINT=
@@ -66,7 +71,6 @@ SUNK_ROOT=
 FAULT=
 SUNK=
 IGNORE_24=no
-LOG_GOODBYE=no
 USER=${USER:=$LOGNAME}
 
 #
@@ -124,7 +128,7 @@ die()
 
 leave()
 {
-	test $LOG_GOODBYE = yes && log 'good bye, cruel world'
+	log "good bye, cruel world: $(elapsed-english $START_EPOCH) elapsed"
 }
 
 test "$1" = '--help' && help
@@ -201,6 +205,10 @@ while [ "$1" ];  do
 			warn "contents fault file: $(cat $FAULT)"
 		fi
 		;;
+	--filter)
+		test -z "$FILTER" || die 'option --filter given more than once'
+		FILTER="$1";  shift
+		;;
 	--ignore-24)
 		IGNORE_24=yes
 		;;
@@ -238,11 +246,11 @@ log "ignore rsync error 24 (files vanished): $IGNORE_24"
 case $MOUNT_POINT in
 /)
 	SUNK=$SUNK_ROOT/host/$HOST/root
-	FILTER='dir-merge /.rsync-filter'
+	test -n "$FILTER" || FILTER='dir-merge /.rsync-filter'
 	;;
 /*)
 	SUNK=$(dirname $SUNK_ROOT/$HOST/root/$MOUNT_POINT)
-	FILTER="dir-merge $MOUNT_POINT/.rsync-filter"
+	test -n "$FILTER" || FILTER="dir-merge $MOUNT_POINT/.rsync-filter"
 	;;
 *)
 	die "PANIC: first char not / in mount directory: $MOUNT_POINT"
