@@ -154,6 +154,24 @@ AGAIN:
 	return -1;
 }
 
+/*
+ *  Synopsis:
+ *	close a file, restarting on interrupt.
+ *  Returns:
+ *	0	closed file
+ *	-1	error in open(), consult errno.
+ */
+int
+jmscott_close(int fd)
+{
+AGAIN:
+	if (close(fd) == 0)
+		return 0;
+	if (errno == EINTR)
+		goto AGAIN;
+	return -1;
+}
+
 int
 jmscott_fstat(int fd, struct stat *buf)
 {
