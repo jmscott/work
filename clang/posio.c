@@ -95,6 +95,8 @@ AGAIN:
  *  Returns:
  *	0	wrote "nbytes" with no error.
  *	-1	error in write(), consult errno.
+ *  Note:
+ *	Need to rename to jmscott_write_all().
  */
 int
 jmscott_write(int fd, void *p, ssize_t nbytes)
@@ -193,5 +195,58 @@ AGAIN:
 		goto AGAIN;
 	return -1;
 }
+
+/*
+ *  Make a directory path.
+ */
+int
+jmscott_mkdir(const char *path, mode_t mode)
+{
+again:
+        if (mkdir(path, mode)) {
+                if (errno == EINTR)
+                        goto again;
+                return -1;
+        }
+        return 0;
+}
+
+int
+jmscott_link(const char *old_path, const char *new_path)
+{
+again:
+        errno = 0;
+        if (link(old_path, new_path) == 0)
+                return 0;
+        if (errno == EINTR)
+                goto again;
+        return -1;
+}
+
+
+int
+jmscott_unlink(const char *path)
+{
+again:
+        errno = 0;
+        if (unlink(path) == 0)
+                return 0;
+        if (errno == EINTR)
+                goto again;
+        return -1;
+}
+
+int
+jmscott_access(const char *path, int mode)
+{
+again:
+        errno = 0;
+        if (access(path, mode) == 0)
+                return 0;
+        if (errno == EINTR)
+                goto again;
+        return -1;
+}
+
 
 #endif	//  JMSCOTT_CLANG_POSIO
