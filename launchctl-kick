@@ -8,7 +8,7 @@
 #
 #	alias kickjms=launchctl-kick jmsdesk.blobio.*
 #  Note:
-#	Consider calling script launchctl-unload.
+#	Consider refactoring to call scripts launchctl-{load,unload}
 #
 #	is "stop" done by "unload"?
 #

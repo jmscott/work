@@ -32,18 +32,6 @@ WARN()
 	log "WARN (ok): $@" >&2
 }
 
-#
-#  Extract a value from plist, cause the path syntax for extract lacks
-#  documentation
-#
-get_plist_value()
-{
-        plutil -p $PLIST						|
-		fgrep "\"$1\""						|
-		awk '{print $3}'					|
-		sed 's/"//g'
-}
-
 test $(pwd) = $LD && die "can not run in services dir: $D"
 test $# = 1 || die "wrong argument count: got $#, expected 1"
 
