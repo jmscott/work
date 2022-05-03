@@ -2,7 +2,7 @@
  *  Synopsis
  *	Create a test and set lock in a posix file system.
  *  Usage:
- *	fs-tas-lock <path/to/lock/file>
+ *	tas-lock-fs <path/to/lock/file>
  *  Exit Status:
  *	0  -  no lock exists, so create lock file in <path/to/lock/file>
  *	1  -  lock already exists
