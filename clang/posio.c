@@ -223,7 +223,6 @@ again:
         return -1;
 }
 
-
 int
 jmscott_unlink(const char *path)
 {
@@ -247,6 +246,5 @@ again:
                 goto again;
         return -1;
 }
-
 
 #endif	//  JMSCOTT_CLANG_POSIO
