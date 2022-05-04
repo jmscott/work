@@ -119,4 +119,3 @@ jmscott_a2size_t(char *a, size_t *sz)
 }
 
 #endif	// define JMSCOTT_CLANG_STRING
-
