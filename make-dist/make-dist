@@ -49,6 +49,12 @@ die()
 	exit 1
 }
 
+can_read_dist()
+{
+	DIST="$1"
+	test -r "$DIST" || die "dist file not readable: $DIST"
+}
+
 [ "${BASH_VERSINFO:-0}" -ge 4 ] 					||
 	die "bash version must be >= 4: ver ${BASH_VERSINFO:-0}" 
 
@@ -73,18 +79,23 @@ tar)
 
 	test $# = 1							||
 		die "tar: wrong number of arguments: got $#, expected 1"
-	exec $JMSCOTT_ROOT/libexec/make-dist-tar "$@"
+	can_read_dist "$1"
+	exec $JMSCOTT_ROOT/libexec/make-dist-tar "$1"
 	;;
 tars)
 	#  make-dist tars <tag> foo.dist bar.dist ... 
 
 	test $# -lt 2 && die 						\
 		"tars: wrong number of arguments: got $#, expected at least 2"
+	for DIST in $@;  do
+		can_read_dist $DIST
+	done
 	exec $JMSCOTT_ROOT/libexec/make-dist-tars "$@"
 	;;
-*.dist)
+*.dist)			#  legacy version of make-dist
 	test $# = 0							||
 		die "compat: wrong number of arguments: got $#, expected 0"
+	can_read_dist "$ACTION"
 	exec $JMSCOTT_ROOT/libexec/make-dist-compat $ACTION
 	;;
 *)
