@@ -38,7 +38,9 @@ jmscott_hexdump(
 	char direction,
 	char *tgt,
 	int tgt_size
-) {
+)
+#ifndef JMSCOTT_STATIC_LIB
+{
 	char *t;
 	unsigned char *s, *s_end;
 	int need;
@@ -124,4 +126,8 @@ jmscott_hexdump(
 	}
 	tgt[need - 1] = 0;
 }
+#else
+	;
+#endif
+
 #endif

@@ -24,11 +24,7 @@ VAR2dir_local=(
 	[INCLUDEs]='include/jmscott'
 )
 
-#
-#  Uncomment for compiled programs to be installed in bin/ or sbin/ and
-#  removed in "clean" recipes.
-#
-COMPILEs="
+OBJs="
 	die.o
 	ecpg.o
 	halloc.o
@@ -40,8 +36,14 @@ COMPILEs="
 	udig.o
 "
 
-#LIBs="
-#"
+COMPILEs="
+	$OBJs
+	libjmscott.a
+"
+
+LIBs="
+	libjmscott.a
+"
 
 #  Uncoment to create bin/ directory
 #BINs="

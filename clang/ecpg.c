@@ -39,7 +39,9 @@ jmscott_ecpg_fault(
 	int status,
 	char *what,
 	struct jmscott_ecpg_state_fault *fault
-) {
+)
+#ifndef JMSCOTT_STATIC_LIB
+{
 	char msg[4096];
 
 	msg[0] = 0;
@@ -97,6 +99,9 @@ jmscott_ecpg_fault(
 	}
 	jmscott_die(status, msg);
 }
+#else
+	;
+#endif
 
 /*
  *  Synopsis:
@@ -104,9 +109,13 @@ jmscott_ecpg_fault(
  */
 void
 jmscott_ecpg_error(struct jmscott_ecpg_state_fault *fault)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	jmscott_ecpg_fault(jmscott_ecpg_error_code, "ERROR", fault);
 }
+#else
+	;
+#endif
 
 /*
 *  Synopsis:
@@ -128,8 +137,12 @@ jmscott_ecpg_error(struct jmscott_ecpg_state_fault *fault)
 */
 void
 jmscott_ecpg_warning(struct jmscott_ecpg_state_fault *fault)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	jmscott_ecpg_fault(jmscott_ecpg_warn_code, "WARNING", fault);
 }
+#else
+	;
+#endif
 
 #endif	//  define JMSCOTT_CLANG_ECPG

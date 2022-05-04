@@ -11,6 +11,8 @@ _MAKE=$(MAKE) $(MFLAGS)
 
 DIST=work-clang.dist
 COMPILEs := $(shell  (. ./$(DIST) && echo $$COMPILEs))
+OBJs := $(shell  (. ./$(DIST) && echo $$OBJs))
+LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
 INCLUDEs := $(shell  (. ./$(DIST) && echo $$INCLUDEs))
 
 all: $(COMPILEs) include_link
@@ -25,11 +27,14 @@ install-dirs:
 
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/include/jmscott
-install:
+install: all
 	$(_MAKE) install-dirs
-	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=xr	\
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r	\
 		$(INCLUDEs)						\
 		$(JMSCOTT_PREFIX)/include/jmscott
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r		\
+		$(LIBs)						\
+		$(JMSCOTT_PREFIX)/lib
 
 distclean:
 	rm -rf $(JMSCOTT_PREFIX)/include/jmscott
@@ -67,3 +72,6 @@ ecpg.o: ecpg.c
 
 dist:
 	make-dist tar $(DIST)
+
+libjmscott.a: $(OBJs)
+	ar crs libjmscott.a $(OBJs)

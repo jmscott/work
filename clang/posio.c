@@ -24,6 +24,7 @@
  */
 static ssize_t
 jmscott_read(int fd, void *p, ssize_t nbytes)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	ssize_t nb;
 
@@ -35,6 +36,9 @@ AGAIN:
 		goto AGAIN;
 	return -1;
 }
+#else
+	;
+#endif
 
 /*
  *  Synopsis:
@@ -64,6 +68,7 @@ AGAIN:
  */
 int
 jmscott_read_exact(int fd, void *blob, ssize_t size)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	int nread = 0, nr;
 
@@ -88,6 +93,9 @@ AGAIN:
 	}
 	return -2;
 }
+#else
+	;
+#endif
 
 /*
  *  Synopsis:
@@ -100,6 +108,7 @@ AGAIN:
  */
 int
 jmscott_write(int fd, void *p, ssize_t nbytes)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	int nb = 0;
 
@@ -115,6 +124,9 @@ AGAIN:
 		goto AGAIN;
 	return 0;
 }
+#else
+	;
+#endif
 
 /*
  *  Synopsis:
@@ -125,6 +137,7 @@ AGAIN:
  */
 off_t
 jmscott_lseek(int fd, off_t offset, int whence)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	off_t where;
 AGAIN:
@@ -135,6 +148,9 @@ AGAIN:
 		goto AGAIN;
 	return -1;
 }
+#else
+	;
+#endif
 
 /*
  *  Synopsis:
@@ -145,6 +161,7 @@ AGAIN:
  */
 int
 jmscott_open(char *path, int oflag, mode_t mode)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	int fd;
 AGAIN:
@@ -155,6 +172,9 @@ AGAIN:
 		goto AGAIN;
 	return -1;
 }
+#else
+	;
+#endif
 
 /*
  *  Synopsis:
@@ -165,6 +185,7 @@ AGAIN:
  */
 int
 jmscott_close(int fd)
+#ifndef JMSCOTT_STATIC_LIB
 {
 AGAIN:
 	if (close(fd) == 0)
@@ -173,9 +194,13 @@ AGAIN:
 		goto AGAIN;
 	return -1;
 }
+#else
+	;
+#endif
 
 int
 jmscott_fstat(int fd, struct stat *buf)
+#ifndef JMSCOTT_STATIC_LIB
 {
 AGAIN:
 	if (fstat(fd, buf) == 0)
@@ -184,9 +209,13 @@ AGAIN:
 		goto AGAIN;
 	return -1;
 }
+#else
+	;
+#endif
 
 int
 jmscott_stat(char *path, struct stat *buf)
+#ifndef JMSCOTT_STATIC_LIB
 {
 AGAIN:
 	if (stat(path, buf) == 0)
@@ -195,12 +224,16 @@ AGAIN:
 		goto AGAIN;
 	return -1;
 }
+#else
+	;
+#endif
 
 /*
  *  Make a directory path.
  */
 int
 jmscott_mkdir(const char *path, mode_t mode)
+#ifndef JMSCOTT_STATIC_LIB
 {
 again:
         if (mkdir(path, mode)) {
@@ -210,9 +243,13 @@ again:
         }
         return 0;
 }
+#else
+	;
+#endif
 
 int
 jmscott_link(const char *old_path, const char *new_path)
+#ifndef JMSCOTT_STATIC_LIB
 {
 again:
         errno = 0;
@@ -222,9 +259,13 @@ again:
                 goto again;
         return -1;
 }
+#else
+	;
+#endif
 
 int
 jmscott_unlink(const char *path)
+#ifndef JMSCOTT_STATIC_LIB
 {
 again:
         errno = 0;
@@ -234,9 +275,13 @@ again:
                 goto again;
         return -1;
 }
+#else
+	;
+#endif
 
 int
 jmscott_access(const char *path, int mode)
+#ifndef JMSCOTT_STATIC_LIB
 {
 again:
         errno = 0;
@@ -246,5 +291,8 @@ again:
                 goto again;
         return -1;
 }
+#else
+	;
+#endif
 
 #endif	//  JMSCOTT_CLANG_POSIO

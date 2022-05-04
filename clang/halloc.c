@@ -57,13 +57,14 @@ struct jmscott_memory
 };
 
 /*
- *  A new parent adopts an halloc()ed memory blob.
+ *  A new parent adopts a halloc()ed memory blob.
  *
  *  Note:
  *	No loop detections.  uggh.
  */
 void *
 jmscott_halloc_adopt(void *parent, void *p) 
+#ifndef JMSCOTT_STATIC_LIB
 {
 	struct jmscott_memory *parent_mp;
 	struct jmscott_memory *mp;
@@ -77,7 +78,9 @@ jmscott_halloc_adopt(void *parent, void *p)
 		return (void *)0;
 	}
 
-	parent_mp = (struct jmscott_memory *)((char *)parent - sizeof *parent_mp);
+	parent_mp = (struct jmscott_memory *)
+			((char *)parent - sizeof *parent_mp)
+	;
 	mp = (struct jmscott_memory *)((char *)p - sizeof *mp);
 
 	/*
@@ -126,7 +129,9 @@ jmscott_halloc_adopt(void *parent, void *p)
 	parent_mp->child_tail = mp;
 	return mp;
 }
-
+#else
+	;
+#endif
 
 /*
  *  Hierarchical memory allocation.
@@ -139,6 +144,7 @@ jmscott_halloc_adopt(void *parent, void *p)
  */
 void *
 jmscott_halloc(void *parent, size_t size)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	struct jmscott_memory *parent_p;
 	struct jmscott_memory *p;
@@ -147,14 +153,18 @@ jmscott_halloc(void *parent, size_t size)
 	 *  Assume malloc set errno?
 	 */
 	errno = 0;
-	p = (struct jmscott_memory *)malloc(sizeof (struct jmscott_memory) + size);
+	p = (struct jmscott_memory *)malloc(
+		sizeof (struct jmscott_memory) + size
+	);
 	if (p == (void *)0)
 		return (void *)0;
 
 	bzero((void *)p, sizeof *p);
 
 	if (parent)
-		parent_p = (struct jmscott_memory *)((char *)parent - sizeof *parent_p);
+		parent_p = (struct jmscott_memory *)
+			((char *)parent - sizeof *parent_p)
+		;
 	else
 		parent_p = (struct jmscott_memory *)0;
 
@@ -168,6 +178,9 @@ jmscott_halloc(void *parent, size_t size)
 	}
 	return (void *)((char *)p + sizeof (struct jmscott_memory));
 }
+#else
+	;
+#endif
 
 /*
  *  Descent first free of memory and children.
@@ -232,6 +245,7 @@ fire_free_callbacks(struct jmscott_memory *m)
 
 void
 jmscott_halloc_free(void *p)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	struct jmscott_memory *m;
 
@@ -261,13 +275,18 @@ jmscott_halloc_free(void *p)
 	 */
 	_free(m);
 }
+#else
+	;
+#endif
 
 void
 jmscott_halloc_add_callback(
 	void *p,
 	void (*func)(void *, void *),
 	void *private_data
-){
+)
+#ifndef JMSCOTT_STATIC_LIB
+{
 	struct jmscott_memory *m;
 	struct jmscott_memory_callback *cb;
 
@@ -290,9 +309,13 @@ jmscott_halloc_add_callback(
 	} else
 		m->callback_head = cb;
 }
+#else
+	;
+#endif
 
 char *
 jmscott_halloc_strdup(void *parent, char *cp)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	char *p;
 
@@ -306,6 +329,9 @@ jmscott_halloc_strdup(void *parent, char *cp)
 	strcpy(p, cp);
 	return p;
 }
+#else
+	;
+#endif
 
 /*
  *  Resize/realloc a chunk of memory and move children of old chunk
@@ -313,6 +339,7 @@ jmscott_halloc_strdup(void *parent, char *cp)
  */
 void *
 jmscott_halloc_resize(void *p, size_t size)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	struct jmscott_memory *m, *newm;
 	struct jmscott_memory *tmp;
@@ -355,3 +382,6 @@ jmscott_halloc_resize(void *p, size_t size)
 		newm->parent->child_head = newm;
 	return (void *)(newm + 1);
 }
+#else
+	;
+#endif

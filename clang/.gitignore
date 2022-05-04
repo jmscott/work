@@ -1,5 +1,10 @@
+die.o
+ecpg.o
 halloc.o
 hexdump.o
+json.o
+libjmscott.a
 posio.o
 string.o
 time.o
+udig.o

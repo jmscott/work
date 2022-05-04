@@ -28,6 +28,7 @@
 
 void
 jmscott_strcat(char *restrict tgt, int tgtsize, const char *restrict src)
+#ifndef JMSCOTT_STATIC_LIB
 {
         //  find null terminated end of target buffer
         while (*tgt++)
@@ -41,6 +42,9 @@ jmscott_strcat(char *restrict tgt, int tgtsize, const char *restrict src)
         // target always null terminated
         *tgt = 0;
 }
+#else
+	;
+#endif
 
 /*
  *  Convert unsigned long long to decimal ascii string.
@@ -48,6 +52,7 @@ jmscott_strcat(char *restrict tgt, int tgtsize, const char *restrict src)
  */
 char *
 jmscott_ulltoa(unsigned long long ull, char *digits)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	char const digit[] = "0123456789";
 	char* p, *end_p;
@@ -74,6 +79,9 @@ jmscott_ulltoa(unsigned long long ull, char *digits)
 	} while (ull);
 	return end_p;
 }
+#else
+	;
+#endif
 
 /*
  *  Strictly convert an ascii string to an unsigned 63bit
@@ -84,6 +92,7 @@ jmscott_ulltoa(unsigned long long ull, char *digits)
  */
 char *
 jmscott_a2ui63(char *a, unsigned long long *ull)
+#ifndef JMSCOTT_STATIC_LIB
 {
 
 	if (*a == 0)
@@ -102,9 +111,13 @@ jmscott_a2ui63(char *a, unsigned long long *ull)
 		*ull = u;
 	return (char *)0;
 }
+#else
+	;
+#endif
 
 char *
 jmscott_a2size_t(char *a, size_t *sz)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	char *err;
 	unsigned long long ull;
@@ -117,5 +130,8 @@ jmscott_a2size_t(char *a, size_t *sz)
 		*sz = (size_t)ull;
 	return (char *)0;
 }
+#else
+	;
+#endif
 
 #endif	// define JMSCOTT_CLANG_STRING
