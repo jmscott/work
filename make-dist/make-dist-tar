@@ -53,9 +53,6 @@ die()
 	exit 1
 }
 
-[ "${BASH_VERSINFO:-0}" -ge 4 ] 					||
-	die "bash version must be >= 4: ver ${BASH_VERSINFO:-0}" 
-
 WARN()
 {
 	echo "$PROG: WARN: $@" >&2
