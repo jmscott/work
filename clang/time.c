@@ -20,6 +20,7 @@ static char	*RFC3339Micro = "%04d-%02d-%02dT%02d:%02d:%02d.%03ld+00:00";
  */
 char *
 jmscott_RFC3339_timeval(char *buf, int buf_size, struct timeval *tv)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	if (!tv)
 		return "null timeval";
@@ -40,9 +41,13 @@ jmscott_RFC3339_timeval(char *buf, int buf_size, struct timeval *tv)
 		tv->tv_usec
 	) < buf_size ? (char *)0 : "time buffer too small";
 }
+#else
+	;
+#endif
 
 char *
 jmscott_RFC3339Nano_now(char *buf, int buf_size)
+#ifndef JMSCOTT_STATIC_LIB
 {
 	struct timespec	now;
 	struct tm *t;
@@ -65,5 +70,8 @@ jmscott_RFC3339Nano_now(char *buf, int buf_size)
 		now.tv_nsec
 	) < buf_size ? (char *)0 : "time buffer too small";
 }
+#else
+	;
+#endif
 
 #endif
