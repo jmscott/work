@@ -10,6 +10,8 @@
 #	realpath
 #	chmod		#  needs --reference
 #  Note:
+#	Consider moving idiff.out to starting dir instead of $HOME.
+#
 #	Resolving the remote path is still problematic if the file system
 #	full path is different from the local.  For example, the path to
 #	$HOME is /Users/jmscott on MacOS and /home/jmscott on linux,
@@ -129,9 +131,10 @@ else
 	log "remote file: not updated (ok)"
 fi
 
-echo -n "copy idiff.out to dir $START_DIR (Y/n)? "
+SAVE=$START_DIR/ridiff.out
+echo -n "mv idiff.out to $SAVE: (Y/n)? "
 read RESPONSE
 if [ "$RESPONSE" = Y ];  then
-	cp -v idiff.out $START_DIR || die "cp idiff.out failed: exit status=$?"
+	mv -v idiff.out $SAVE || die "mv idiff.out failed: exit status=$?"
 fi
 exit 0
