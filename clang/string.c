@@ -27,7 +27,7 @@
  */
 
 void
-jmscott_strcat(char *restrict tgt, int tgtsize, const char *restrict src)
+jmscott_strcat(char *tgt, int tgtsize, const char *src)
 #ifndef JMSCOTT_STATIC_LIB
 {
         //  find null terminated end of target buffer
