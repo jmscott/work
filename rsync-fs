@@ -1,11 +1,11 @@
 #!/bin/bash
 #
 #  Synopsis:
-#	rsync an entire file system to /<sunk>/host/$(hostname)/root/<mount>
+#	rsync an entire file system to <sunk-root>/host/$(hostname)/root/<mount>
 #  Description:
 #  	Create a full rsunk snapshot of a single file system to a local
 #
-#	  	/<sunk>/host/$(hostname)/root/<mount>
+#	  	<sunk-root>/host/$(hostname)/root/<mount>
 #
 #	Typically the file system <mount> directory is / or /var and the
 #	<sunk> directory is /backup/sunk or /sunk.
@@ -61,6 +61,14 @@
 #  See:
 #	https://github.com/jmscott/work/blob/master/rsync-fs
 #  Note:
+#	Add rync option "--checksum"
+#
+#	Robust tests on multiple level dirs like /var/lib have not been
+#	exercised.
+#
+#	Think about verifying the source is a file system, in a portable
+#	manner.
+#
 #	Need to add notify.
 #
 START_EPOCH=$(date +%s)
@@ -69,7 +77,7 @@ HOST=$(hostname -f)
 MOUNT_POINT=
 SUNK_ROOT=
 FAULT=
-SUNK=
+SUNK_TGT=
 IGNORE_24=no
 USER=${USER:=$LOGNAME}
 
@@ -223,7 +231,6 @@ done
 test -z "$MOUNT_POINT" && die 'missing required option: --mount-point'
 test -z "$SUNK_ROOT" && die 'missing required option: --sunk-root'
 
-LOG_GOODBYE=yes
 trap leave INT QUIT TERM EXIT
 log 'hello, world'
 
@@ -245,24 +252,24 @@ log "ignore rsync error 24 (files vanished): $IGNORE_24"
 #
 case $MOUNT_POINT in
 /)
-	SUNK=$SUNK_ROOT/host/$HOST/root
+	SUNK_TGT=$SUNK_ROOT/host/$HOST/root
 	test -n "$FILTER" || FILTER='dir-merge /.rsync-filter'
 	;;
 /*)
-	SUNK=$(dirname $SUNK_ROOT/$HOST/root/$MOUNT_POINT)
+	SUNK_TGT=$(dirname $SUNK_ROOT/host/$HOST/root$MOUNT_POINT)
 	test -n "$FILTER" || FILTER="dir-merge $MOUNT_POINT/.rsync-filter"
 	;;
 *)
-	die "PANIC: first char not / in mount directory: $MOUNT_POINT"
+	die "first char not / in mount directory: $MOUNT_POINT"
 	;;
 esac
+log "sunk target: $SUNK_TGT"
 
-if [ ! -d $SUNK ];  then
-	log "creating target sunk directory: $SUNK"
-	mkdir -p $SUNK || die "mkdir $SUNK failed"
+if [ ! -d $SUNK_TGT ];  then
+	log "creating sunk target directory: $SUNK_TGT"
+	mkdir -p $SUNK_TGT || die "mkdir sunk target failed: exit status=$?"
 fi
 
-log "target backup sunk directory: $SUNK"
 log "rsync filter: $FILTER"
 
 log 'starting rsync ...'
@@ -276,8 +283,8 @@ time rsync $INPLACE $DRY_RUN						\
 	--human-readable 						\
 	--itemize-changes						\
 	--one-file-system						\
-	--exclude $SUNK							\
-	$MOUNT_POINT $SUNK
+	--exclude $SUNK_TGT						\
+	$MOUNT_POINT $SUNK_TGT
 STATUS=$?
 log "rsync exit status: $STATUS"
 
