@@ -1,6 +1,6 @@
 /*
  *  Synopsis:
- *	Write english description elapsed time from duration in integer seconds
+ *	Translate integer duration in seconds into english, similar to golang.
  *  Usage:
  *	#!/bin/bash
  *
