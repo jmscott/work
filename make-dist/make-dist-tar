@@ -67,15 +67,32 @@ leave()
 		find $WORK_TMP ! -type l -print | xargs chmod +w
 		rm -rf $WORK_TMP || WARN "rm work tmp failed: exit status=$?"
 	fi
-	echo "#  $PROG: good bye, cruel world: $(elapsed-english $START_EPOCH)"
+	cat <<END
+#
+#  Date: $(date)
+#
+#  $PROG: good bye, cruel world: $(elapsed-english $START_EPOCH) elapsed
+#
+END
 }
+
 trap leave EXIT QUIT TERM
 DIST=$1;  shift
 PROG="$PROG: $DIST"
 
 echo
-echo "#  $PROG:  hello, world"
-
+cat <<END
+#
+#  $PROG:  hello, world
+#  which make-dist: $(which make-dist)
+#
+#  JMSCOTT_ROOT=$JMSCOTT_ROOT
+#  PATH=$PATH
+#
+#  bash version: $(bash --version | head -1)
+#  Date: $(date)
+#
+END
 
 #  map directory name to create permisions.
 
