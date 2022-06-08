@@ -5,8 +5,7 @@
  *	Investigate scoping rules for cpp macros, such as those defined in
  *	function jmscott_ascii2json().
  */
-#ifndef JMSCOTT_CLANG_JSON
-#define JMSCOTT_CLANG_JSON
+#include <sys/errno.h>
 
 #include <ctype.h>
 #include <string.h>
@@ -14,15 +13,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "jmscott/posio.c"
+#include "jmscott/libjmscott.h"
 
-struct jmscott_json
-{
-	int		out_fd;
-	int		indent;
-
-	int		trace;
-};
+extern int	errno;
 
 /*
  *  Convert an ascii string to escaped json "string".
@@ -30,7 +23,6 @@ struct jmscott_json
  */
 char *
 jmscott_ascii2json_string(char *src, char *tgt, int tgt_size)
-#ifndef JMSCOTT_STATIC_LIB
 {
 
 //  investigate scoping rules for c preprocessor.
@@ -88,13 +80,9 @@ jmscott_ascii2json_string(char *src, char *tgt, int tgt_size)
 	_PUT('\0');
 	return (char *)0;
 }
-#else
-	;
-#endif
 
 struct jmscott_json *
 jmscott_json_new()
-#ifndef JMSCOTT_STATIC_LIB
 {
 	struct jmscott_json *jp = malloc(sizeof (struct jmscott_json));
 	if (!jp)
@@ -104,29 +92,21 @@ jmscott_json_new()
 	jp->trace = 0;
 	return jp;
 }
-#else
-	;
-#endif
 
 void
 jmscott_json_trace(struct jmscott_json *jp, char *what, char *value)
-#ifndef JMSCOTT_STATIC_LIB
 {
 	if (!jp->trace)
 		return;
-	write(2, "TRACE: ", 7);
-	write(2, what, strlen(what));
-	write(2, ": ", 2);
-	write(2, value, strlen(value));
-	write(2, "\n", 1);
+	jmscott_write(2, "TRACE: ", 7);
+	jmscott_write(2, what, strlen(what));
+	jmscott_write(2, ": ", 2);
+	jmscott_write(2, value, strlen(value));
+	jmscott_write(2, "\n", 1);
 }
-#else
-	;
-#endif
 
 void
 jmscott_json_trace_c(struct jmscott_json *jp, char c)
-#ifndef JMSCOTT_STATIC_LIB
 {
 	if (!jp->trace)
 		return;
@@ -139,9 +119,6 @@ jmscott_json_trace_c(struct jmscott_json *jp, char c)
 	} else
 		jmscott_json_trace(jp, "c", "null");
 }
-#else
-	;
-#endif
 
 /*
  *  Synopsis:
@@ -156,7 +133,6 @@ jmscott_json_trace_c(struct jmscott_json *jp, char c)
  */
 char *
 jmscott_json_write(struct jmscott_json *jp, char *format, ...)
-#ifndef JMSCOTT_STATIC_LIB
 {
 
 	char *f, c;
@@ -267,8 +243,3 @@ step:
 	}
 	goto step;
 }
-#else
-	;
-#endif
-
-#endif

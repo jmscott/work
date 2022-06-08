@@ -15,22 +15,15 @@
  *	being used.
  */
 
-#ifndef JMSCOTT_CLANG_DIE
-#define JMSCOTT_CLANG_DIE
-
-//  big enough for government work.
-#define JMSCOTT_ATOMIC_MSG_SIZE		4096	// all modern unici
-
 #include <unistd.h>
 #include <string.h>
 
-#include "jmscott/string.c"
+#include "jmscott/libjmscott.h"
 
 extern char	*jmscott_progname;
 
 void
 jmscott_die(int status, char *msg1)
-#ifndef JMSCOTT_STATIC_LIB
 {
 	char msg[4096];
 
@@ -51,13 +44,9 @@ jmscott_die(int status, char *msg1)
 
         _exit(status);
 }
-#else
-;
-#endif
 
 void
 jmscott_die2(int status, char *msg1, char *msg2)
-#ifndef JMSCOTT_STATIC_LIB
 {
         static char colon[] = ": ";
         char msg[4096];
@@ -69,13 +58,9 @@ jmscott_die2(int status, char *msg1, char *msg2)
 
         jmscott_die(status, msg);
 }
-#else
-;
-#endif
 
 void
 jmscott_die3(int status, char *msg1, char *msg2, char *msg3)
-#ifndef JMSCOTT_STATIC_LIB
 {
         static char colon[] = ": ";
         char msg[4096];
@@ -87,8 +72,3 @@ jmscott_die3(int status, char *msg1, char *msg2, char *msg3)
 
         jmscott_die2(status, msg, msg3);
 }
-#else
-;
-#endif
-
-#endif 	// define JMSCOTT_CLANG_DIE

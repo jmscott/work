@@ -1,6 +1,3 @@
-#ifndef JMSCOTT_CLANG_HEXDUMP
-#define JMSCOTT_CLANG_HEXDUMP
-
 /*
  *  Synopsis:
  *	Write ye old hexdump to file stderr (fd=2).
@@ -31,6 +28,8 @@
 #include <stdio.h>
 #include <ctype.h>
 
+#include "jmscott/libjmscott.h"
+
 void
 jmscott_hexdump(
 	unsigned char *src,
@@ -39,7 +38,6 @@ jmscott_hexdump(
 	char *tgt,
 	int tgt_size
 )
-#ifndef JMSCOTT_STATIC_LIB
 {
 	char *t;
 	unsigned char *s, *s_end;
@@ -126,8 +124,3 @@ jmscott_hexdump(
 	}
 	tgt[need - 1] = 0;
 }
-#else
-	;
-#endif
-
-#endif

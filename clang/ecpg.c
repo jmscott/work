@@ -5,30 +5,17 @@
  *	Need to make code reentrant, via a jmscott_clang data structure!
  */
 
-#ifndef JMSCOTT_CLANG_ECPG
-#define JMSCOTT_CLANG_ECPG
+#include <unistd.h>
+#include <string.h>
 
 #include "sqlca.h"
 
-#include "jmscott/die.c"
+#include "jmscott/libjmscott.h"
 
 //  default values when fault map has not mapping for a particular
 //  sql error code
-int	jmscott_ecpg_error_code = 127;
-int	jmscott_ecpg_warn_code = 126;
-
-//  map sql state codes onto process exit status.
-//  only used when query faults.  caller code
-//  defines mapping.
-
-struct jmscott_ecpg_state_fault
-{
-	char	*sql_state;
-
-	// -1 implies ignore fault, 0 <= 255 implies remap exit status
-
-	int	action;
-};
+static int	jmscott_ecpg_error_code = 127;
+static int	jmscott_ecpg_warn_code = 126;
 
 /*
  *  Synopsis:
@@ -39,9 +26,7 @@ jmscott_ecpg_fault(
 	int status,
 	char *what,
 	struct jmscott_ecpg_state_fault *fault
-)
-#ifndef JMSCOTT_STATIC_LIB
-{
+) {
 	char msg[4096];
 
 	msg[0] = 0;
@@ -99,9 +84,6 @@ jmscott_ecpg_fault(
 	}
 	jmscott_die(status, msg);
 }
-#else
-	;
-#endif
 
 /*
  *  Synopsis:
@@ -109,13 +91,9 @@ jmscott_ecpg_fault(
  */
 void
 jmscott_ecpg_error(struct jmscott_ecpg_state_fault *fault)
-#ifndef JMSCOTT_STATIC_LIB
 {
 	jmscott_ecpg_fault(jmscott_ecpg_error_code, "ERROR", fault);
 }
-#else
-	;
-#endif
 
 /*
 *  Synopsis:
@@ -137,12 +115,6 @@ jmscott_ecpg_error(struct jmscott_ecpg_state_fault *fault)
 */
 void
 jmscott_ecpg_warning(struct jmscott_ecpg_state_fault *fault)
-#ifndef JMSCOTT_STATIC_LIB
 {
 	jmscott_ecpg_fault(jmscott_ecpg_warn_code, "WARNING", fault);
 }
-#else
-	;
-#endif
-
-#endif	//  define JMSCOTT_CLANG_ECPG
