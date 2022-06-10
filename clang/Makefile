@@ -29,11 +29,12 @@ install-dirs:
 		-d $(JMSCOTT_PREFIX)/include/jmscott
 install: all
 	$(_MAKE) install-dirs
-	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r	\
+
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r		\
 		$(INCLUDEs)						\
 		$(JMSCOTT_PREFIX)/include/jmscott
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r		\
-		$(LIBs)						\
+		$(LIBs)							\
 		$(JMSCOTT_PREFIX)/lib
 
 distclean:
