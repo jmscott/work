@@ -10,7 +10,9 @@
 #ifndef JMSCOTT_LIBJMSCOTT_H
 #define JMSCOTT_LIBJMSCOTT_H
 
+#include <sys/time.h>
 #include <sys/stat.h>
+#include <time.h>
 
 #define JMSCOTT_ATOMIC_MSG_SIZE		4096	// mac osx and linux >= 2.32 */
 
@@ -82,7 +84,7 @@ extern void	jmscott_hexdump(
 			int tgt_size
 );
 
-extern int	jmscott_read(int fd, void *p, ssize_t nbytes);
+extern ssize_t	jmscott_read(int fd, void *p, ssize_t nbytes);
 extern int	jmscott_read_exact(int fd, void *blob, ssize_t size);
 extern int	jmscott_write(int fd, void *p, ssize_t nbytes);
 extern off_t	jmscott_lseek(int fd, off_t offset, int whence);
@@ -123,4 +125,13 @@ extern char			*jmscott_json_write(
 					char *format, ...
 				);
 
+extern char			*jmscott_RFC3339_timeval(
+					char *buf,
+					int buf_size,
+					struct timeval *tv
+				);
+extern char			*jmscott_RFC3339Nano_now(
+					char *buf,
+					int buf_size
+				);
 #endif //  JMSCOTT_LIBJMSCOTT_H

@@ -12,11 +12,9 @@
  *	https://github.com/jmscott/blobio
  */
 #include <stdio.h>
-
-#ifndef JMSCOTT_CLANG_UDIG
-#define JMSCOTT_CLANG_UDIG
-
 #include <ctype.h>
+
+#include "jmscott/libjmscott.h"
 
 /*
  *  Synopsis:
@@ -29,7 +27,6 @@
  */
 char *
 jmscott_frisk_udig(char *udig)
-#ifndef JMSCOATT_STATIC_LIB
 {
 	if (!udig)
 		return "udig is null";
@@ -75,8 +72,3 @@ jmscott_frisk_udig(char *udig)
 		return "digest < 32 chars";
 	return (char *)0;
 }
-#else
-	;
-#endif
-
-#endif 	// define JMSCOTT_CLANG_UDIG

@@ -64,7 +64,8 @@ AGAIN:
 int
 jmscott_read_exact(int fd, void *blob, ssize_t size)
 {
-	int nread = 0, nr;
+	int nread = 0;
+	ssize_t nr;
 
 AGAIN:
 	nr = jmscott_read(fd, blob + nread, size - nread);
