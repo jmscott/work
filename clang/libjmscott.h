@@ -12,21 +12,10 @@
 
 #include <sys/time.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include <time.h>
 
 #define JMSCOTT_ATOMIC_MSG_SIZE		4096	// mac osx and linux >= 2.32 */
-
-/*
-die.c
-ecpg.c
-halloc.c
-hexdump.c
-json.c
-posio.c
-string.c
-time.c
-udig.c
-*/
 
 extern void	jmscott_strcat(char *tgt, int tgtsize, const char *src);
 extern char 	*jmscott_ulltoa(unsigned long long ull, char *digits);
