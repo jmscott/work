@@ -12,15 +12,14 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "jmscott/die.c"
+#include "jmscott/libjmscott.h"
 
 extern int	errno;
+char *		jmscott_progname = "tas-unlock-fs";
 
 #define EXIT_EXIST		0
 #define EXIT_NO_EXIST		1
 #define EXIT_ERR		2
-
-char *jmscott_progname = "tas-unlock-fs";
 
 static void
 die(char *arg1)
@@ -43,12 +42,9 @@ main(int argc, char **argv)
 		die("wrong number of command arguments");
 
 	lock_path = argv[1];
-AGAIN:
-	if (unlink(lock_path) == 0)
+	if (jmscott_unlink(lock_path) == 0)
 		_exit(EXIT_EXIST);
 	if (errno == ENOENT)
 		_exit(EXIT_NO_EXIST);
-	if (errno != EINTR)
-		die2("unlink(lock) failed", strerror(errno));
-	goto AGAIN;
+	die2("unlink(lock) failed", strerror(errno));
 }

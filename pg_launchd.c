@@ -35,6 +35,8 @@
  *	2	unexpected error
  *	3	unexpected exit of postmaster process
  *  Note:
+ *	Convert to libjmscott.a
+ *
  *	A simpler method must exist to send a SIGINT to a process started
  *	by launchd.
  */
@@ -47,9 +49,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#ifndef PIPE_MAX
-#define PIPE_MAX	512
-#endif
+#include "jmscott/libjmscott.h"
 
 extern int	errno;
 
@@ -89,7 +89,7 @@ _strcat(char *tgt, int tgtsize, char *src)
 static void
 info(char *msg1)
 {
-	char msg[PIPE_MAX];
+	char msg[JMSCOTT_ATOMIC_WRITE_SIZE];
 	static char nl[] = "\n";
 
 	msg[0] = 0;
@@ -106,7 +106,7 @@ again:
 static void
 info2(char *msg1, char *msg2)
 {
-	char msg[PIPE_MAX];
+	char msg[JMSCOTT_ATOMIC_WRITE_SIZE];
 
 	msg[0] = 0;
 	_strcat(msg, sizeof msg, msg1);
@@ -141,7 +141,7 @@ ERROR(char *msg)
 static void
 ERROR2(char *msg1, char *msg2)
 {
-	char msg[PIPE_MAX];
+	char msg[JMSCOTT_ATOMIC_WRITE_SIZE];
 
 	msg[0] = 0;
 	_strcat(msg, sizeof msg, msg1);
@@ -163,7 +163,7 @@ die(char *msg)
 static void
 die2(char *msg1, char *msg2)
 {
-	char msg[PIPE_MAX];
+	char msg[JMSCOTT_ATOMIC_WRITE_SIZE];
 
 	msg[0] = 0;
 	_strcat(msg, sizeof msg, msg1);
@@ -176,7 +176,7 @@ die2(char *msg1, char *msg2)
 static void
 die3(char *msg1, char *msg2, char *msg3)
 {
-	char msg[PIPE_MAX];
+	char msg[JMSCOTT_ATOMIC_WRITE_SIZE];
 
 	msg[0] = 0;
 	_strcat(msg, sizeof msg, msg1);
@@ -195,7 +195,7 @@ info_wait_status(int status)
 	 *  Unexpected exit of postmaster
 	 */
 
-	char what[PIPE_MAX];
+	char what[JMSCOTT_ATOMIC_WRITE_SIZE];
 
 	if (WIFSIGNALED(status))
 		snprintf(what, sizeof what, "signaled: sig #%d", status);
@@ -319,7 +319,7 @@ postmaster(int pargc, char **pargv)
 	}
 	signal(SIGTERM, catch_TERM);
 
-	char buf[PIPE_MAX];
+	char buf[JMSCOTT_ATOMIC_WRITE_SIZE];
 
 	snprintf(buf, sizeof buf, "postmaster pid: #%d", postmaster_pid);
 	info(buf);

@@ -27,14 +27,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 #include <ctype.h>
-#include <unistd.h>
 
 extern int	errno;
 
-#include "jmscott/die.c"
-#include "jmscott/posio.c"
+#include "jmscott/libjmscott.h"
 
 #define ROUND(n, d) ((((n) < 0) ^ ((d) < 0)) ? (((n) - (d)/2)/(d)) : (((n) + (d)/2)/(d)))
 

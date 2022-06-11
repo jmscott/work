@@ -13,9 +13,12 @@
  *
  *	An empty stream exits 0.  Why?
  */
-#include "jmscott/die.c"
-#include "jmscott/string.c"
-#include "jmscott/posio.c"
+#include <string.h>
+#include <fcntl.h>
+
+#include "jmscott/libjmscott.h"
+
+extern int	errno;
 
 char *jmscott_progname = "slice-file";
 
@@ -94,7 +97,7 @@ int main(int argc, char **argv)
 		die("impossible: lseek(start) != start");
 
 	//  write slice to standard output
-	unsigned char buf[JMSCOTT_ATOMIC_MSG_SIZE];
+	unsigned char buf[JMSCOTT_ATOMIC_WRITE_SIZE];
 
 	int nwrite = stop - start;
 	while (nwrite > 0) {

@@ -10,12 +10,14 @@
 #ifndef JMSCOTT_LIBJMSCOTT_H
 #define JMSCOTT_LIBJMSCOTT_H
 
-#include <sys/time.h>
+#include <sys/time.h>		//  is needed?
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
 
-#define JMSCOTT_ATOMIC_MSG_SIZE		4096	// mac osx and linux >= 2.32 */
+//  smaller than 4096 to include udp4.
+//  https://www.rfc-editor.org/rfc/rfc1122
+#define JMSCOTT_ATOMIC_WRITE_SIZE	508	// mac osx and linux >= 2.32 */
 
 extern void	jmscott_strcat(char *tgt, int tgtsize, const char *src);
 extern char 	*jmscott_ulltoa(unsigned long long ull, char *digits);

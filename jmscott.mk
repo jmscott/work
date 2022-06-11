@@ -6,7 +6,10 @@ UNAME=$(shell uname)
 
 #  Strict compilation flags
 
-CFLAGS?=-Wall -Wextra -Werror -I.
+CFLAGS?=-Wall -Wextra -Werror
+CLINK?=-L. -Lclang -ljmscott
+
+CCBUILD?=cc $(CFLAGS) $(CLINK) 
 
 ifeq "$(UNAME)" "Linux"
 	CFLAGS+=-std=gnu99

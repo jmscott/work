@@ -32,6 +32,8 @@ LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
 BINs := $(shell  (. ./$(DIST) && echo $$BINs))
 SRCs := $(shell  (. ./$(DIST) && echo $$SRCs))
 
+JMSLIB=clang/libjmscott.a
+
 all: $(COMPILEs)
 	cd clang && $(_MAKE) all
 	cd www && $(_MAKE) all
@@ -85,50 +87,53 @@ distclean:
 	rm -rf $(JMSCOTT_PREFIX)/src
 	rm -rf $(JMSCOTT_PREFIX)/lib
 
+$JMSLIB:
+	cd clang && $(_MAKE) libjmscott.a 
+
 RFC3339Nano: RFC3339Nano.c
-	cc $(CFLAGS) -o RFC3339Nano RFC3339Nano.c
+	$(CCBUILD) -o RFC3339Nano RFC3339Nano.c
 
 idiff: idiff.c
-	cc $(CFLAGS) -o idiff idiff.c
+	$(CCBUILD) $(CFLAGS) -o idiff idiff.c
 
-duration-english: duration-english.c
-	cc $(CFLAGS) -o duration-english duration-english.c
+duration-english: duration-english.c $JMSLIB
+	$(CCBUILD) $(CFLAGS) -o duration-english duration-english.c
 
 istext: istext.c
-	cc $(CFLAGS) -o istext istext.c
+	$(CCBUILD) $(CFLAGS) -o istext istext.c
 
 fork-me: fork-me.c
-	cc $(CFLAGS) -o fork-me fork-me.c
+	$(CCBUILD) $(CFLAGS) -o fork-me fork-me.c
 
-stale-mtime: stale-mtime.c
-	cc $(CFLAGS) -o stale-mtime stale-mtime.c
+stale-mtime: stale-mtime.c $JMSLIB
+	$(CCBUILD) -o stale-mtime stale-mtime.c
 
-stat-mtime: stat-mtime.c
-	cc $(CFLAGS) -o stat-mtime stat-mtime.c
+stat-mtime: stat-mtime.c $JMSLIB
+	$(CCBUILD) -o stat-mtime stat-mtime.c
 
-file-stat-size: file-stat-size.c
-	cc $(CFLAGS) -o file-stat-size file-stat-size.c
+file-stat-size: file-stat-size.c $JMSLIB
+	$(CCBUILD) -o file-stat-size file-stat-size.c
 
 flatx: flatx.c
-	cc $(CFLAGS) -o flatx flatx.c -lexpat
+	$(CCBUILD) -o flatx flatx.c -lexpat
 
-escape-json-string: escape-json-string.c
-	cc $(CFLAGS) -o escape-json-string escape-json-string.c
+escape-json-string: escape-json-string.c $JMSLIB
+	$(CCBUILD) -o escape-json-string escape-json-string.c
 
-duration-mtime: duration-mtime.c
-	cc $(CFLAGS) -o duration-mtime duration-mtime.c
+duration-mtime: duration-mtime.c $JMSLIB
+	$(CCBUILD) -o duration-mtime duration-mtime.c
 
-tas-lock-fs: tas-lock-fs.c
-	cc $(CFLAGS) -o tas-lock-fs tas-lock-fs.c
+tas-lock-fs: tas-lock-fs.c $JMSLIB
+	$(CCBUILD) -o tas-lock-fs tas-lock-fs.c
 
-tas-unlock-fs: tas-unlock-fs.c
-	cc $(CFLAGS) -o tas-unlock-fs tas-unlock-fs.c
+tas-unlock-fs: tas-unlock-fs.c $JMSLIB
+	$(CCBUILD) -o tas-unlock-fs tas-unlock-fs.c
 
 pg_launchd: pg_launchd.c
-	cc $(CFLAGS) -o pg_launchd pg_launchd.c
+	$(CCBUILD) -o pg_launchd pg_launchd.c
 
-slice-file: slice-file.c
-	cc $(CFLAGS) -I$(JMSCOTT_ROOT)/include -o slice-file slice-file.c
+slice-file: slice-file.c $JMSLIB
+	$(CCBUILD) -o slice-file slice-file.c
 
 world:
 	$(_MAKE) clean

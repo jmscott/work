@@ -11,15 +11,10 @@
  *	3	unexpected error
  */
 #include <sys/errno.h>
-#include <sys/stat.h>
-
-#include <time.h>
 #include <string.h>
-#include <unistd.h>
 #include <stdlib.h>
 
-#include "jmscott/die.c"
-#include "jmscott/posio.c"
+#include "jmscott/libjmscott.h"
 
 #define EXIT_STALE	0
 #define EXIT_FRESH	1

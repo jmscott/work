@@ -47,32 +47,32 @@ world:
 
 *.c: include_link
 
-json.o: json.c
+json.o: json.c libjmscott.h
 	cc $(CFLAGS) -Wno-implicit-fallthrough -c json.c
 
-halloc.o: halloc.c
+halloc.o: halloc.c libjmscott.h
 	cc $(CFLAGS) -c halloc.c
 
-string.o: string.c
+string.o: string.c libjmscott.h
 	cc $(CFLAGS) -c string.c
 
-hexdump.o: hexdump.c
+hexdump.o: hexdump.c libjmscott.h
 	cc $(CFLAGS) -c hexdump.c
 
-posio.o: posio.c
+posio.o: posio.c libjmscott.h
 	cc $(CFLAGS) -c posio.c
 
-time.o: time.c
+time.o: time.c libjmscott.h
 	cc $(CFLAGS) -c time.c
 
-die.o: die.c
+die.o: die.c libjmscott.h
 	cc $(CFLAGS) -c die.c
 
-ecpg.o: ecpg.c
+ecpg.o: ecpg.c libjmscott.h
 	cc $(CFLAGS) -I$(PGINC) -c ecpg.c
 
 dist:
 	make-dist tar $(DIST)
 
-libjmscott.a: $(OBJs)
+libjmscott.a: $(OBJs) libjmscott.h
 	ar crs libjmscott.a $(OBJs)

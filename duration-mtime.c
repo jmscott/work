@@ -8,18 +8,14 @@
  *	1	file does not exist
  *	2	error
  */
-#include <sys/stat.h>
 #include <sys/errno.h>
-#include <time.h>
 #include <string.h>
-#include <unistd.h>
 
-#include "jmscott/die.c"
-#include "jmscott/posio.c"
+#include "jmscott/libjmscott.h"
 
-extern int errno;
+extern int	errno;
 
-char *jmscott_progname = "duration-mtime";
+char *		jmscott_progname = "duration-mtime";
 
 static void
 die(char *msg)

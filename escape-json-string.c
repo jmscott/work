@@ -14,13 +14,12 @@
  *	Is code safe for UTF-8?
  */
 
-#include <unistd.h>
 #include <sys/errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "jmscott/die.c"
+#include "jmscott/libjmscott.h"
 
 extern int errno;
 

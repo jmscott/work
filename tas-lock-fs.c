@@ -21,12 +21,11 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "jmscott/die.c"
-#include "jmscott/string.c"
+#include "jmscott/libjmscott.h"
 
 extern int	errno;
 
-char *jmscott_progname = "tas-lock-fs";
+char *		jmscott_progname = "tas-lock-fs";
 
 #define EXIT_CREATED		0
 #define EXIT_EXISTS		1
@@ -56,21 +55,14 @@ main(int argc, char **argv)
 	lock_path = argv[1];
 	if (!lock_path[0])
 		die("empty lock path");
-AGAIN_OPEN:
-	fd = open(lock_path, O_CREAT | O_EXCL, 0640);
+	fd = jmscott_open(lock_path, O_CREAT | O_EXCL, 0640);
 	if (fd < 0) {
 		if (errno == EEXIST)
 			_exit(EXIT_EXISTS);
-		if (errno == EINTR)
-			goto AGAIN_OPEN;
 		die3("open(lock) failed", lock_path, strerror(errno));
 	}
 
-AGAIN_CLOSE:
-	if (close(fd) < 0) {
-		if (errno == EINTR)
-			goto AGAIN_CLOSE;
+	if (jmscott_close(fd) < 0)
 		die3("close(lock) failed", lock_path, strerror(errno));
-	}
 	_exit(EXIT_CREATED);
 }

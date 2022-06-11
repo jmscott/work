@@ -7,21 +7,17 @@
  *	0	size written to standard out
  *	1	unexpected error
  */
-#include <sys/stat.h>
 #include <sys/errno.h>
 #include <string.h>
-#include <unistd.h>
 
-#include "jmscott/die.c"
-#include "jmscott/string.c"
-#include "jmscott/posio.c"
+#include "jmscott/libjmscott.h"
 
 #define EXIT_OK		0
 #define EXIT_FAULT	1
 
 extern int	errno;
 
-char	*jmscott_progname = "file-stat-size";
+char*		jmscott_progname = "file-stat-size";
 
 static void
 die(char *msg)
