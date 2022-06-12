@@ -6,6 +6,8 @@
 #	local-darwin.mk.example
 #	https://github.com/jmscott/work
 #  Note:
+#	Probably time to retire flatx.
+#
 #	Add warning when running ./make-dist instead of previously installed
 #	version in $JMSCOTT_ROOT/bin.
 #
@@ -76,7 +78,7 @@ install: all
 clean:
 	cd clang && $(_MAKE) clean
 	cd www && $(_MAKE) clean
-	rm -f $(COMPILED)
+	rm -f $(COMPILEs)
 distclean:
 	cd clang && $(_MAKE) $(MFLAGS) distclean
 	cd www && $(_MAKE) distclean
@@ -90,50 +92,50 @@ distclean:
 $JMSLIB:
 	cd clang && $(_MAKE) libjmscott.a 
 
-RFC3339Nano: RFC3339Nano.c
-	$(CCBUILD) -o RFC3339Nano RFC3339Nano.c
+RFC3339Nano: RFC3339Nano.c $JMSLIB
+	$(CCOMPILE) -o RFC3339Nano RFC3339Nano.c $(CLINK)
 
-idiff: idiff.c
-	$(CCBUILD) $(CFLAGS) -o idiff idiff.c
+idiff: idiff.c $JMSLIB
+	$(CCOMPILE) -o idiff idiff.c $(CLINK)
 
 duration-english: duration-english.c $JMSLIB
-	$(CCBUILD) $(CFLAGS) -o duration-english duration-english.c
+	$(CCOMPILE) -o duration-english duration-english.c $(CLINK)
 
-istext: istext.c
-	$(CCBUILD) $(CFLAGS) -o istext istext.c
+istext: istext.c $JMSLIB
+	$(CCOMPILE)  -o istext istext.c $(CLINK)
 
-fork-me: fork-me.c
-	$(CCBUILD) $(CFLAGS) -o fork-me fork-me.c
+fork-me: fork-me.c $JMSLIB
+	$(CCOMPILE) -o fork-me fork-me.c $(CLINK)
 
 stale-mtime: stale-mtime.c $JMSLIB
-	$(CCBUILD) -o stale-mtime stale-mtime.c
+	$(CCOMPILE) -o stale-mtime stale-mtime.c $(CLINK)
 
 stat-mtime: stat-mtime.c $JMSLIB
-	$(CCBUILD) -o stat-mtime stat-mtime.c
+	$(CCOMPILE) -o stat-mtime stat-mtime.c $(CLINK)
 
 file-stat-size: file-stat-size.c $JMSLIB
-	$(CCBUILD) -o file-stat-size file-stat-size.c
+	$(CCOMPILE) -o file-stat-size file-stat-size.c $(CLINK)
 
-flatx: flatx.c
-	$(CCBUILD) -o flatx flatx.c -lexpat
+flatx: flatx.c $JMSLIB
+	$(CCOMPILE) -o flatx flatx.c -lexpat $(CLINK)
 
 escape-json-string: escape-json-string.c $JMSLIB
-	$(CCBUILD) -o escape-json-string escape-json-string.c
+	$(CCOMPILE) -o escape-json-string escape-json-string.c $(CLINK)
 
 duration-mtime: duration-mtime.c $JMSLIB
-	$(CCBUILD) -o duration-mtime duration-mtime.c
+	$(CCOMPILE) -o duration-mtime duration-mtime.c $(CLINK)
 
 tas-lock-fs: tas-lock-fs.c $JMSLIB
-	$(CCBUILD) -o tas-lock-fs tas-lock-fs.c
+	$(CCOMPILE) -o tas-lock-fs tas-lock-fs.c $(CLINK)
 
 tas-unlock-fs: tas-unlock-fs.c $JMSLIB
-	$(CCBUILD) -o tas-unlock-fs tas-unlock-fs.c
+	$(CCOMPILE) -o tas-unlock-fs tas-unlock-fs.c $(CLINK)
 
-pg_launchd: pg_launchd.c
-	$(CCBUILD) -o pg_launchd pg_launchd.c
+pg_launchd: pg_launchd.c $JMSLIB
+	$(CCOMPILE) -o pg_launchd pg_launchd.c $(CLINK)
 
-slice-file: slice-file.c $JMSLIB
-	$(CCBUILD) -o slice-file slice-file.c
+slice-file: slice-file.c $JMSLIB $JMSLIB
+	$(CCOMPILE) -o slice-file slice-file.c $(CLINK)
 
 world:
 	$(_MAKE) clean

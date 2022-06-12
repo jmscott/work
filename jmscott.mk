@@ -9,7 +9,7 @@ UNAME=$(shell uname)
 CFLAGS?=-Wall -Wextra -Werror
 CLINK?=-L. -Lclang -ljmscott
 
-CCBUILD?=cc $(CFLAGS) $(CLINK) 
+CCOMPILE?=cc $(CFLAGS)
 
 ifeq "$(UNAME)" "Linux"
 	CFLAGS+=-std=gnu99
