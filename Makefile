@@ -32,14 +32,17 @@ LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
 BINs := $(shell  (. ./$(DIST) && echo $$BINs))
 SRCs := $(shell  (. ./$(DIST) && echo $$SRCs))
 
-JMSLIB=clang/libjmscott.a
+JMSLIB=clib/libjmscott.a
 
 all: $(COMPILEs)
-	cd clang && $(_MAKE) all
+	cd clib && $(_MAKE) all
 	cd www && $(_MAKE) all
 
-include_link: *.c
-	test -e jmscott || ln -s clang jmscott
+.PHONY: clean all distclean nstall install-dirs world
+
+jmscott:
+	test -e jmscott || ln -s clib jmscott
+$(COMPILEs): jmscott
 
 install-dirs:
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
@@ -72,16 +75,16 @@ install: all
 		$(SRCs)							\
 		$(JMSCOTT_PREFIX)/src
 	cd make-dist && $(_MAKE) install
-	cd clang && $(_MAKE) install
+	cd clib && $(_MAKE) install
 	cd pgsnap && $(_MAKE) install
 	cd www && $(_MAKE) install
 
 clean:
-	cd clang && $(_MAKE) clean
+	cd clib && $(_MAKE) clean
 	cd www && $(_MAKE) clean
-	rm -f $(COMPILEs)
+	rm -f $(COMPILEs) jmscott
 distclean:
-	cd clang && $(_MAKE) $(MFLAGS) distclean
+	cd clib && $(_MAKE) $(MFLAGS) distclean
 	cd www && $(_MAKE) distclean
 	cd pgsnap && $(_MAKE) distclean
 	cd make-dist && $(_MAKE) distclean
@@ -91,7 +94,7 @@ distclean:
 	rm -rf $(JMSCOTT_PREFIX)/lib
 
 $JMSLIB:
-	cd clang && $(_MAKE) libjmscott.a 
+	cd clib && $(_MAKE) libjmscott.a 
 
 RFC3339Nano: RFC3339Nano.c $JMSLIB
 	$(CCOMPILE) -o RFC3339Nano RFC3339Nano.c $(CLINK)
@@ -144,7 +147,7 @@ world:
 	$(_MAKE) distclean
 	$(_MAKE) install
 	cd make-dist && $(_MAKE) world
-	cd clang && $(_MAKE) world
+	cd clib && $(_MAKE) world
 	cd pgsnap && $(_MAKE) pgsnap
 	cd www && $(_MAKE) world
 dist:

@@ -7,7 +7,7 @@ UNAME=$(shell uname)
 #  Strict compilation flags
 
 CFLAGS?=-Wall -Wextra -Werror
-CLINK?=-L. -Lclang -ljmscott
+CLINK?=-L. -Lclib -ljmscott
 
 CCOMPILE?=cc $(CFLAGS)
 

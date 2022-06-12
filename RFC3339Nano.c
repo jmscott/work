@@ -25,9 +25,7 @@
 
 extern int	errno;
 
-#include "jmscott/die.c"
-#include "jmscott/posio.c"
-#include "jmscott/time.c"
+#include "jmscott/libjmscott.h"
 
 char 	*jmscott_progname = "RFC3339Nano";
 

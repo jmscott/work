@@ -1,0 +1,119 @@
+#
+#  Synopsis:
+#	Configuration file read by make-dist to build tar files.
+#  See:
+#	https://github.com/jmscott/work/blob/master/make-dist
+#  Note:
+#	Makefile variables can be extracted and defined from the the
+#	root.dist file with these recipes.  Example make code follows:
+#
+#		DIST=product.dist
+#
+#		COMPILEs := $(shell  (. ./$(DIST) && echo $$COMPILEs))
+#		SBINs := $(shell  (. ./$(DIST) && echo $$SBINs))
+#		LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
+#		SRCs := $(shell  (. ./$(DIST) && echo $$SRCs))
+#		BINs := $(shell  (. ./$(DIST) && echo $$BINs))
+#		HTDOCSs := $(shell  (. ./$(DIST) && echo $$HTDOCSs))
+#		CGIBINs := $(shell  (. ./$(DIST) && echo $$CGIBINs))
+#		LIBEXEC := $(shell  (. ./$(DIST) && echo $$LIBEXECs))
+#
+
+#  Uncomment to override default mappings of VARs to target directory
+VAR2dir_local=(
+	[INCLUDEs]='include/jmscott'
+)
+
+OBJs="
+	die.o
+	ecpg.o
+	halloc.o
+	hexdump.o
+	json.o
+	posio.o
+	string.o
+	time.o
+	udig.o
+"
+
+COMPILEs="
+	$OBJs
+	libjmscott.a
+"
+
+LIBs="
+	libjmscott.a
+"
+
+#  Uncoment to create bin/ directory
+#BINs="
+#"
+
+#SBINs="
+#"
+
+#  Uncomment to create tmp/ directory
+#TMP="
+#"
+
+#  Uncomment to create cgibin/ directory
+#CGIBINs="
+#"
+
+#  Uncomment to create htdocs/ directory
+#HTDOCSs="
+#"
+
+#  Uncomment to create src/ directory
+SRCs="
+	die.c
+	ecpg.c
+	halloc.c
+	hexdump.c
+	json.c
+	libjmscott.h
+	posio.c
+	string.c
+	time.c
+	udig.c
+"
+
+#  Uncomment to create attic/ directory
+#ATTIC="
+#"
+
+#  Uncomment to create archive/ directory
+#ARCHIVE="
+#"
+
+#  Uncomment to create etc/ directory
+#ETC="
+#"
+
+#  Uncomment to create spool/ directory
+#SPOOL="
+#"
+
+#  Uncomment to create data/ directory
+#DATA="
+#"
+
+#  Uncomment to create run/ directory
+#RUN="
+#"
+
+#  Uncomment to create log/ directory
+#LOG="
+#"
+
+#  Uncomment to create cache/ directory
+#CACHE="
+#"
+
+#  Uncomment to create directory libexec/
+#LIBEXECs="
+#"
+
+INCLUDEs="
+	libjmscott.h
+"
