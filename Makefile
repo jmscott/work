@@ -23,8 +23,6 @@
 include local.mk
 include jmscott.mk
 
-$(shell test -h jmscott || ln -s clang jmscott)
-
 _MAKE=$(MAKE) $(MFLAGS)
 
 DIST=work.dist
@@ -39,6 +37,9 @@ JMSLIB=clang/libjmscott.a
 all: $(COMPILEs)
 	cd clang && $(_MAKE) all
 	cd www && $(_MAKE) all
+
+include_link: *.c
+	test -e jmscott || ln -s clang jmscott
 
 install-dirs:
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\

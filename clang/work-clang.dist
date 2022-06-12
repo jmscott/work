@@ -65,8 +65,18 @@ LIBs="
 #"
 
 #  Uncomment to create src/ directory
-#SRCs="
-#"
+SRCs="
+	die.c
+	ecpg.c
+	halloc.c
+	hexdump.c
+	json.c
+	libjmscott.h
+	posio.c
+	string.c
+	time.c
+	udig.c
+"
 
 #  Uncomment to create attic/ directory
 #ATTIC="
@@ -105,14 +115,5 @@ LIBs="
 #"
 
 INCLUDEs="
-	die.c
-	ecpg.c
-	halloc.c
-	hexdump.c
-	json.c
 	libjmscott.h
-	posio.c
-	string.c
-	time.c
-	udig.c
 "

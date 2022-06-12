@@ -13,9 +13,12 @@ DIST=work-clang.dist
 COMPILEs := $(shell  (. ./$(DIST) && echo $$COMPILEs))
 OBJs := $(shell  (. ./$(DIST) && echo $$OBJs))
 LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
+SRCs := $(shell  (. ./$(DIST) && echo $$SRCs))
 INCLUDEs := $(shell  (. ./$(DIST) && echo $$INCLUDEs))
 
 all: $(COMPILEs) include_link
+
+#  for c code #include "jmscott/libjmscott.h"
 
 include_link:
 	test -e jmscott || ln -s . jmscott
@@ -27,6 +30,8 @@ install-dirs:
 
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/include/jmscott
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=rwx,go=rx	\
+		-d $(JMSCOTT_PREFIX)/src/libjmscott
 install: all
 	$(_MAKE) install-dirs
 
@@ -36,9 +41,13 @@ install: all
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r		\
 		$(LIBs)							\
 		$(JMSCOTT_PREFIX)/lib
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r		\
+		$(SRCs)							\
+		$(JMSCOTT_PREFIX)/src/libjmscott
 
 distclean:
 	rm -rf $(JMSCOTT_PREFIX)/include/jmscott
+	rm -rf $(JMSCOTT_PREFIX)/src/libjmscott
 world:
 	$(_MAKE) clean
 	$(_MAKE) all
