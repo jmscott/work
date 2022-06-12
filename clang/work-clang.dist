@@ -110,6 +110,7 @@ INCLUDEs="
 	halloc.c
 	hexdump.c
 	json.c
+	libjmscott.h
 	posio.c
 	string.c
 	time.c
