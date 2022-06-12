@@ -13,6 +13,7 @@
  *
  *	An empty stream exits 0.  Why?
  */
+#include <sys/errno.h>
 #include <string.h>
 #include <fcntl.h>
 
