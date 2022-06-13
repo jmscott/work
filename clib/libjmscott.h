@@ -5,6 +5,8 @@
  *	cc -I$JMSCOTT_ROOT/include ...
  *	
  *	#include "jmscott/libjmscott.h"
+ *  Note:
+ *	should struct jmscott_ecpg_state_fault containt the	
  */
 
 #ifndef JMSCOTT_LIBJMSCOTT_H
@@ -18,6 +20,9 @@
 //  smaller than 4096 to include udp4.
 //  https://www.rfc-editor.org/rfc/rfc1122
 #define JMSCOTT_ATOMIC_WRITE_SIZE	508	// mac osx and linux >= 2.32 */
+
+extern int	jmscott_ecpg_error_code;
+extern int	jmscott_ecpg_warn_code;
 
 extern void	jmscott_strcat(char *tgt, int tgtsize, const char *src);
 extern char 	*jmscott_ulltoa(unsigned long long ull, char *digits);

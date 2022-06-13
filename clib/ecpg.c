@@ -2,6 +2,9 @@
  *  Synopsis:
  *	Helpful routines for compile simple PostgreSQL *.ecpg programs.
  *  Note:
+ *	Should struct jmscott_ecpg_state_fault{} contain the exit codes,
+ *	instead of declaring vars jmscott_ecpg_{error,warn}_code global?
+ *
  *	Need to make code reentrant, via a jmscott_clib data structure!
  */
 
@@ -14,8 +17,8 @@
 
 //  default values when fault map has not mapping for a particular
 //  sql error code
-static int	jmscott_ecpg_error_code = 127;
-static int	jmscott_ecpg_warn_code = 126;
+int	jmscott_ecpg_error_code = 127;
+int	jmscott_ecpg_warn_code = 126;
 
 /*
  *  Synopsis:
