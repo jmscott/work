@@ -19,6 +19,7 @@ die()
 	exit 2
 }
 
+# valid path to eexecutable
 is_exec()
 {
 	EXE=$1
@@ -40,7 +41,10 @@ case $# in
 	;;
 esac
 
-#  Find python.  the pain never ends.
+#  Find executable "python", which is python2.
+#  otherwise, use python3, if exists.
+#  the pain never ends.
+
 PYTHON=python
 if is_exec $PYTHON;  then
 	true
