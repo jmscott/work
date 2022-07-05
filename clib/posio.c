@@ -11,6 +11,7 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <poll.h>
 
 #include "jmscott/libjmscott.h"
 
@@ -33,6 +34,42 @@ AGAIN:
 	if (errno == EINTR)
 		goto AGAIN;
 	return -1;
+}
+
+/*
+ *  Synopsis:
+ *	Restartable read() of up to "nbytes", with timeout 
+ *  Exit Status:
+ *	>=0	nb bytes read() successfully
+ *	-1	unknown error, see errno
+ *	-2	timeout
+ *
+ *  Note:
+ *	How does poll() handle end of file?
+ */
+ssize_t
+jmscott_read_timeout(int fd, void *p, ssize_t nbytes, int millisec)
+{
+	if (millisec == 0)
+		return jmscott_read(fd, p, nbytes);
+
+	struct pollfd fds[1];
+
+	fds[0].fd = fd;
+	fds[0].events = POLLIN;
+	int status;
+AGAIN:
+	status = poll(fds, 1, millisec);
+	if (status == 0)
+		return -2;		//  timeout
+	if (status < 0) {
+		if (errno == EINTR || errno == EAGAIN)
+			goto AGAIN;
+		return -1;
+	}
+	if ((fds[0].revents & POLLIN) == 0)
+		return -1;
+	return jmscott_read(fd, p, nbytes);
 }
 
 /*
