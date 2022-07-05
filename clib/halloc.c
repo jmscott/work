@@ -323,6 +323,15 @@ jmscott_halloc_resize(void *p, size_t size)
 	 *  Realloc the block.
 	 */
 	m = ((struct jmscott_memory *)p - 1);
+
+	/*
+	 *  GCC issues incorrect warning about realloc() always moving.
+	 *
+	 * 	gcc (GCC) 12.1.1 20220507 (Red Hat 12.1.1-1)
+	 *
+	 *  Fool the compiler
+	 */
+	struct jmscott_memory *gcc_bug = ((struct jmscott_memory *)p - 1);;
 	newm = (struct jmscott_memory *)realloc(m, sizeof *m + size);
 	if (!newm)
 		return (void *)0;
@@ -330,8 +339,8 @@ jmscott_halloc_resize(void *p, size_t size)
 	/*
 	 *  Block didn't move, so just return.
 	 */
-	if (newm == m)
-		return (void *)(m + 1);
+	if (newm == gcc_bug)
+		return (void *)(gcc_bug + 1);
 	/*
 	 *  Block moved, so point kin to new incarnation.
 	 */
