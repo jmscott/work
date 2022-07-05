@@ -3,6 +3,8 @@
  *	Restartable versions of well known posix i/o functions.
  *  Usage:
  *	#include "jmscott/include/posio.c"
+ *  Note:
+ *	Consider refactoring indefinite reads to simply set timeout==0.
  */
 
 #include <sys/errno.h>
@@ -37,6 +39,38 @@ AGAIN:
 }
 
 /*
+ *  Posix poll() for readable input data, timeout in milliseconds.
+ *
+ *  Exit Status:
+ *	0	readable data exists
+ *	1	timeout, no readable data exists
+ *	-1	unknown error, see errno.
+ *  Note:
+ *	Not clear if signals in fds[0].revents interpreted correctly.
+ */
+int
+jmscott_poll_POLLIN(int fd, int msec)
+{
+	struct pollfd fds[1];
+
+	fds[0].fd = fd;
+	fds[0].events = POLLIN;
+	int status;
+AGAIN:
+	status = poll(fds, 1, msec);
+	if (status == 0)
+		return 1;
+	if (status < 0) {
+		if (errno == EINTR || errno == EAGAIN)
+			goto AGAIN;
+		return -1;
+	}
+
+	//  signals handled properly?
+	return (fds[0].revents & POLLIN) ? 0 : 1;
+}
+
+/*
  *  Synopsis:
  *	Restartable read() of up to "nbytes", with timeout 
  *  Exit Status:
@@ -48,45 +82,37 @@ AGAIN:
  *	How does poll() handle end of file?
  */
 ssize_t
-jmscott_read_timeout(int fd, void *p, ssize_t nbytes, int millisec)
+jmscott_read_timeout(int fd, void *p, ssize_t nbytes, int msec)
 {
-	if (millisec == 0)
+	if (msec == 0)
 		return jmscott_read(fd, p, nbytes);
 
-	struct pollfd fds[1];
-
-	fds[0].fd = fd;
-	fds[0].events = POLLIN;
 	int status;
-AGAIN:
-	status = poll(fds, 1, millisec);
-	if (status == 0)
-		return -2;		//  timeout
-	if (status < 0) {
-		if (errno == EINTR || errno == EAGAIN)
-			goto AGAIN;
+	status = jmscott_poll_POLLIN(fd, msec);
+	if (status == 1)
+		return -2;
+	if (status < 0)
 		return -1;
-	}
-	if ((fds[0].revents & POLLIN) == 0)
-		return -1;
+	
+	//  readable data exists, do the read
 	return jmscott_read(fd, p, nbytes);
 }
 
 /*
  *  Synopsis:
- *	Read exactly "size" bytes into "blob".
+ *	Read exactly "size" bytes into "blob" or indicate why not.
  *  Usage:
  *	static void
  *	_slurp(int fd, void *blob, ssize_t size) {
- *		switch (jmscott_read_blob(fd, blob, size)) {
+ *		switch (jmscott_read_exact(fd, blob, size)) {
  *		case 0:
  *			return 0;
  *		case -1:
- *			jmscott_die2("error slurping blob", strerror(errno));
+ *			jmscott_die2("read(exact) failed", strerror(errno));
  *		case -2:
- *			jmscott_die("unexpected end-of-file on blob");
+ *			jmscott_die("unexpected end-of-file");
  *		case -3:
- *			jmscott_die("end-of-file not sean slurping blob");
+ *			jmscott_die("unread bytes > size");
  *		}
  *	}
  *  Returns:
@@ -112,16 +138,70 @@ AGAIN:
 		nread += nr;
 		if (nread < size)
 			goto AGAIN;
-		/*
-		 *  Prove no unread bytes exist.
-		 */
-		switch (jmscott_read(fd, blob, 1)) {
-		case -1:
-			return -1;
-		case 0:
+
+		//  prove no remaining bytes exist to read
+		nr = jmscott_poll_POLLIN(fd, 0);
+		if (nr == 1)
 			return 0;
-		}
-		return -3;
+		if (nr == 0)
+			return -3;
+		return -1;
+	}
+	return -2;
+}
+
+/*
+ *  Synopsis:
+ *	Read exactly "size" bytes into "blob" or indicate why not.
+ *  Usage:
+ *	static void
+ *	_slurp(int fd, void *blob, ssize_t size) {
+ *		switch (jmscott_read_exact(fd, blob, size)) {
+ *		case 0:
+ *			return 0;
+ *		case -1:
+ *			jmscott_die2("read(exact) failed", strerror(errno));
+ *		case -2:
+ *			jmscott_die("unexpected end-of-file");
+ *		case -3:
+ *			jmscott_die("unread bytes > size");
+ *		}
+ *	}
+ *  Returns:
+ *	0	read exactly "size" bytes into "blob".
+ *	
+ *	Upon error byte values in *blob are undefined.
+ *
+ *	-1	read() error, consult errno
+ *	-2	unexpected  end-of-file reading.
+ *	-3	unread bytes remain on stream.
+ *	-4	timeout before reading exactly "size" bytes
+ */
+int
+jmscott_read_exact_timeout(int fd, void *blob, ssize_t size, int msec)
+{
+	int nread = 0;
+	ssize_t nr;
+
+AGAIN:
+	nr = jmscott_read_timeout(fd, blob + nread, size - nread, msec);
+	if (nr < 0) {
+		if (nr == -2)
+			return -4;
+		return -1;
+	}
+	if (nr > 0) {
+		nread += nr;
+		if (nread < size)
+			goto AGAIN;
+
+		//  prove no remaining bytes exist to read
+		nr = jmscott_poll_POLLIN(fd, 0);
+		if (nr == 1)
+			return 0;
+		if (nr == 0)
+			return -3;
+		return -1;
 	}
 	return -2;
 }

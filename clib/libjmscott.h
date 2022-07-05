@@ -81,6 +81,7 @@ extern void	jmscott_hexdump(
 );
 
 extern ssize_t	jmscott_read(int fd, void *p, ssize_t nbytes);
+extern int	jmscott_poll_POLLIN(int fd, int millisec);
 extern ssize_t	jmscott_read_timeout(
 			int fd,
 			void *p,
@@ -88,6 +89,12 @@ extern ssize_t	jmscott_read_timeout(
 			int millisec
 		);
 extern int	jmscott_read_exact(int fd, void *blob, ssize_t size);
+extern int	jmscott_read_exact_timeout(
+			int fd,
+			void *blob,
+			ssize_t size,
+			int millisec
+		);
 extern int	jmscott_write(int fd, void *p, ssize_t nbytes);
 extern off_t	jmscott_lseek(int fd, off_t offset, int whence);
 extern int	jmscott_open(char *path, int oflag, mode_t mode);
