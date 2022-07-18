@@ -1,6 +1,6 @@
 #
 #  Synopsis:
-#	Development or Instalation Makefile
+#	Standalone install of $JMSCOTT_ROOT/www
 #
 
 include ../local.mk
@@ -38,6 +38,18 @@ install: all
 		-d $(WWW_PREFIX)/src
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)/lib
+
+	#
+	#  create the symlink, so in apache
+	#
+	#	PERL5LIB=$(WWW_PREFIX)/lib:$PERL5LIB
+	#
+	#  and in perl code, namespace jmscott code via
+	#
+	#	require jmscott/dbi-pg.pl
+	#
+	test -h $(WWW_PREFIX)/lib/jmscott				||\
+		ln -s $(WWW_PREFIX)/lib $(WWW_PREFIX)/lib/jmscott
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)/lib/env.d
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
