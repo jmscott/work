@@ -194,8 +194,8 @@ $QUERY_ARG{class_att} = " class=\"$QUERY_ARG{class}\""
 
 if ($ENV{QUERY_STRING} =~ /${left_RE}PGDUMP$right_RE/) {
 	my $v = $1;
-	print STDERR "PGDUMP=$v\n";
 	die "query arg: PGDUMP: unexpected value: $v" unless $v =~ $PGDUMP_re;
+	print STDERR "query arg: PGDUMP=$v\n";
 	$ENV{PGDUMP} = $v;
 }
 return require "$CGI{name}.d/$QUERY_ARG{out}.pl";
