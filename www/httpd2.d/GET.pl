@@ -10,6 +10,8 @@ our (
 	$right_RE,
 );
 
+our $PGDUMP_re = qr/^(STDOUT|STDERR|1|on|yes|y|t|true)$/i;
+
 #
 #  Synopsis:
 #	Set values in %QUERY_ARG based on default attribute <query-args> twig.
@@ -187,4 +189,13 @@ END
 $QUERY_ARG{id_att} = " id=\"$QUERY_ARG{id}\"" if defined $QUERY_ARG{id};
 $QUERY_ARG{class_att} = " class=\"$QUERY_ARG{class}\""
 						if defined $QUERY_ARG{class};
+
+#  move the query arg trigger for an sql dump (locally) to $ENV{PGDUMP}.
+
+if ($ENV{QUERY_STRING} =~ /${left_RE}PGDUMP$right_RE/) {
+	my $v = $1;
+	print STDERR "PGDUMP=$v\n";
+	die "query arg: PGDUMP: unexpected value: $v" unless $v =~ $PGDUMP_re;
+	$ENV{PGDUMP} = $v;
+}
 return require "$CGI{name}.d/$QUERY_ARG{out}.pl";

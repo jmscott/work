@@ -19,11 +19,11 @@
 #  LD_LIBRARY_PATH.  Not sure why.
 #
 
+our $PGDUMP_re;
+
 $ENV{LD_LIBRARY_PATH} = "$ENV{PGHOME}:$ENV{LD_LIBRARY_PATH}" if $ENV{PGHOME};
 
 use DBD::Pg;
-
-our %QUERY_ARG;
 
 my (@OPEN);
 
@@ -94,42 +94,50 @@ sub dbi_pg_connect
 }
 
 #
-#  Note:
-#	>$tag.sql silently fails!
+#  Dump an sql query to $TMPDIR/$tag.$$.sql
 #
-sub dbi_pg_dump
+#  Note:
+#	Need to dump $argv as sql comments!
+#
+sub dbi_PGDUMP
 {
 	my %arg = @_;
 	my (
 		$sql,
 		$tag,
-		$pgdump,
+		$argv,
+		$PGDUMP,
 	) = (
 		$arg{sql},
 		$arg{tag},
-		$arg{pgdump} ? $arg{pgdump} : $ENV{pgdump},
+		$arg{argv},
+
+		$arg{PGDUMP} ? $arg{PGDUMP} : $ENV{PGDUMP},
 	);
 
-	print STDERR "dbi_pg_dump: $tag: requested, pgdump=$pgdump\n";
+	return unless $PGDUMP;
+	die "dbi_PGDUMP: unexpected value: $PGDUMP"
+		unless $PGDUMP_re =~ $PGDUMP
+	;
 
-	if ($pgdump eq 'STDERR') {
+	print STDERR "dbi_PGDUMP: $tag: requested, PGDUMP=$PGDUMP\n";
+
+	if ($PGDUMP eq 'STDERR') {
 		print STDERR $tag, ': sql: ', $sql, "\n";
-	} elsif ($pgdump eq 'STDOUT') {
+	} elsif ($PGDUMP eq 'STDOUT') {
 		print STDOUT $tag, ': sql: ', $sql, "\n";
-	} elsif ($pgdump eq '1' || $pgdump eq 'yes') {
+	} else {
 
 		my ($TMPDIR, $sql_path) = ($ENV{TMPDIR});
 
 		$TMPDIR = '/tmp' unless $TMPDIR;
-		$sql_path = ">$TMPDIR/$tag.sql";
-		print STDERR "dbi_pg_dump: sql path: $sql_path\n";
+		$sql_path = ">$TMPDIR/$tag.$$.sql";
+		print STDERR "dbi_PGDUMP: sql path: $sql_path\n";
 
 		my $T;
 		open($T, $sql_path) or die "$tag: open($sql_path) failed: $!";
 		print $T $sql, ";\n";
 		close $T or die "close($sql_path) failed: $!";
-	} elsif ($pgdump ne '0' && $pgdump ne 'off') {
-		die "dbi_pg_dump: unknown dump arg: $pgdump";
 	}
 }
 
@@ -137,13 +145,13 @@ sub dbi_pg_dump
 #  Synopsis:
 #	Prepare&execute an sql select query and return readable results handle.
 #  Arguments:
-#	All are required, including empty argv[].
+#	All are required, including empty argv[], expect PGDUMP.
 #
 #	db	=>	DBI handle opened with dbi_pg_connect()
 #	tag	=>	short tag describing query (required)
 #	argv	=>	query arguments: argv => [$1, $2, ...]
 #	sql	=>	sql to execute
-#	pgdump	=>	STDERR|STDOUT|1|yes
+#	PGDUMP	=>	/^(STDERR|STDOUT|1|t|true|y|yes|on)/i
 #  Returns:
 #	DBI->prepare() query handle, after query has been executed.
 #
@@ -168,7 +176,7 @@ sub dbi_pg_select
 	die 'dbi_pg_select: missing variable: sql' unless $sql;
 	die 'dbi_pg_select: missing variable: argv' unless $argv;
 
-	dbi_pg_dump(%arg) if $QUERY_ARG{pgdump} || $arg{pgdump};
+	di_PGDUMP(%arg) if $arg{PGDUMP} || $ENV{PGDUMP};
 
 	my $q = $db->prepare($sql) or die
 			'dbi_pg_select: prepare($tag) failed: ' . $db->errstr;
@@ -186,16 +194,17 @@ sub dbi_pg_select
 #  Synopsis:
 #	Prepare&execute an sql query and return readable results handle.
 #  Arguments:
-#	All are required, including empty argv[].
+#	All are required, including empty argv[], except PGDUMP.
 #
 #	db	=>	DBI handle opened with dbi_pg_connect()
 #	tag	=>	short tag describing query (required)
 #	argv	=>	query arguments: argv => [$1, $2, ...]
 #	sql	=>	sql to execute
+#	PGDUMP	=>	/^(STDERR|STDOUT|1|t|true|y|yes|on)/i
 #  Returns:
 #	DBI->prepare() query handle, after query has been executed.
 #
-sub dbi_pg_exec
+sub dbi_pg_execute
 {
 	my %arg = @_;
 
@@ -211,16 +220,18 @@ sub dbi_pg_exec
 		$arg{tag},
 	);
 
-	die 'dbi_pg_exec: missing variable: tag' unless $tag;
-	die 'dbi_pg_exec: missing variable: db' unless $db;
-	die 'dbi_pg_exec: missing variable: sql' unless $sql;
-	die 'dbi_pg_exec: missing variable: argv' unless $argv;
+	die 'dbi_pg_execute: missing variable: tag' unless $tag;
+	die 'dbi_pg_execute: missing variable: db' unless $db;
+	die 'dbi_pg_execute: missing variable: sql' unless $sql;
+	die 'dbi_pg_execute: missing variable: argv' unless $argv;
 
-	dbi_pg_dump(%arg) if $QUERY_ARG{pgdump};
+	dbi_PGDUMP(%arg) if $arg{PGDUMP} || $ENV{PGDUMP};
 
 	my $q = $db->prepare($sql) or die
-			'dbi_pg_exec: prepare($tag) failed: ' . $db->errstr;
-	$q->execute(@{$argv}) or die "dbi_pg_exec: ($tag) failed: ". $q->errstr;
+			'dbi_pg_execute: prepare($tag) failed: ' . $db->errstr;
+	$q->execute(@{$argv}) or
+		die "dbi_pg_execute: ($tag) failed: ". $q->errstr
+	;
 	return $q;
 }
 

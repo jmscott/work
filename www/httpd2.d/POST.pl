@@ -2,6 +2,8 @@
 #  Synopsis:
 #	Handle a POST http method, invoking code based on %CGI contents.
 #  Note:
+#	Need to added support for PGDUMP variable.
+#
 #	Multipart mime is not supported, which is wrong.
 #	Need to investigate
 #
