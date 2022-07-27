@@ -36,6 +36,12 @@
 #)
 
 #
+#SYMLINKs="
+#	cgi-bin/jmscott->$JMSCOTT_ROOT/www/cgi-bin
+#	lib/jmscott->$JMSCOTT_ROOT/www/lib
+#"
+
+#
 #  Uncomment for compiled programs to be installed in bin/ or sbin/ and
 #  removed in "clean" recipes.
 #
