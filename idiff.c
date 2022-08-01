@@ -195,6 +195,12 @@ idiff(FILE *f1, FILE *f2, FILE *fin, FILE *fout)
 			from1++;
 		else if (cmd == 'd')
 			from2++;
+		else {
+			char buf[2];
+			buf[0] = cmd;
+			buf[1] = 0;
+			die2("unknown diff command", buf);
+		}
 		printf("%s", buf); fflush(stdout);
 
 		while (n-- > 0) {
@@ -210,11 +216,13 @@ idiff(FILE *f1, FILE *f2, FILE *fin, FILE *fout)
 			case '>':
 				nskip(f1, to1 - nf1);
 				ncopy(f2, to2 - nf2, fout);
+				again = 0;
 				break;
 
 			case '<':
 				nskip(f2, to2 - nf2);
 				ncopy(f1, to1 - nf1, fout);
+				again = 0;
 				break;
 
 			case 'v':
@@ -259,11 +267,13 @@ idiff(FILE *f1, FILE *f2, FILE *fin, FILE *fout)
 				fclose(ft);
 				unlink(tempfile);
 				tempfile[0] = 0;
+				again = 0;
 			}	break;
 			
 			case '!':
 				system(buf + 1);
 				printf("!\n");
+				again = 0;
 				break;
 			default:
 				printf("< or > or e or !\n");
