@@ -33,6 +33,8 @@ extern void	jmscott_die(int status, char *msg1);
 extern void	jmscott_die2(int status, char *msg1, char *msg2);
 extern void	jmscott_die3(int status, char *msg1, char *msg2, char *msg3);
 
+extern char *	jmscott_frisk_udig(char *udig);
+
 //  map sql state codes onto process exit status.
 //  only used when query faults.  caller code
 //  defines mapping.
