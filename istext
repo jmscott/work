@@ -6,6 +6,8 @@
 #	istext /etc/*
 #	find / -xdev -print0 | xargs -0 istext | xargs fgrep -l PATTERN
 #  Note:
+#	Need option "--reverse-match".
+#
 #	Investigate why bash versionof istext is 100 times slower then
 #	old c version.  probably because only a fraction of the file
 #	is searched.
