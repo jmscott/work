@@ -7,7 +7,7 @@ flatx
 fork-me
 halloc.o
 idiff
-istext
+is-utf8wf
 jmscott
 local.mk
 pg_launchd

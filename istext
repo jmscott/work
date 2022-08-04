@@ -1,0 +1,52 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	List UTF-8 text compliant files path in either argv or standard input.
+#  Usage:
+#	istext /etc/*
+#	find / -xdev -print0 | xargs -0 istext | xargs fgrep -l PATTERN
+#  Note:
+#	Investigate why bash versionof istext is 100 times slower then
+#	old c version.  probably because only a fraction of the file
+#	is searched.
+#
+#	Consider an option "--frisk" that uses jmscott/slice-file.
+#	frisk would only look at a fraction of the file.
+#
+
+_istext()
+{
+	local F;
+	F="$1"
+
+	if [ ! -f "$F" ];  then
+		if [ ! -e "$F" ];  then
+			echo "$FL does not exist" >&2
+		fi
+		return
+	fi
+	is-utf8wf <"$F"
+	STATUS=$?
+	case $STATUS in
+	0)
+		echo "$F"
+		;;
+	1|2)
+		;;
+	*)
+		echo "$PROG: ERROR: is-utf8wf failed: exit status=$STATUS" >&2
+		exit 2
+		;;
+	esac
+	return 0
+}
+
+if [ $# = 0 ]; then			#  read file list from standard input
+	while read F;  do
+		_istext "$F"
+	done
+else
+	for F in $@;  do
+		_istext "$F"
+	done
+fi

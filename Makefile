@@ -138,8 +138,11 @@ tas-unlock-fs: tas-unlock-fs.c $JMSLIB
 pg_launchd: pg_launchd.c $JMSLIB
 	$(CCOMPILE) -o pg_launchd pg_launchd.c $(CLINK)
 
-slice-file: slice-file.c $JMSLIB $JMSLIB
+slice-file: slice-file.c $JMSLIB
 	$(CCOMPILE) -o slice-file slice-file.c $(CLINK)
+
+is-utf8wf: is-utf8wf.c $JMSLIB
+	$(CCOMPILE) -o is-utf8wf is-utf8wf.c $(CLINK)
 
 world:
 	$(_MAKE) clean
@@ -151,4 +154,4 @@ world:
 	cd pgsnap && $(_MAKE) pgsnap
 	cd www && $(_MAKE) world
 dist:
-	make-dist $(DIST)
+	make-dist tar $(DIST)

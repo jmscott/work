@@ -24,7 +24,7 @@ COMPILEs="
 	flatx
 	fork-me
 	idiff
-	istext
+	is-utf8wf
 	pg_launchd
 	slice-file
 	stale-mtime
@@ -43,6 +43,7 @@ BINs="
 	elapsed-english
 	exec-logoff
 	isjson
+	istext
 	overwrite
 	pdf-merge
 	pg2pg
@@ -78,7 +79,7 @@ SBINs="
 #HTDOCSs="
 #"
 
-#  Uncomment to create src/ directory
+#  create src/ directory
 SRCs="
 	RFC3339Nano.c
 	duration-english.c
@@ -88,8 +89,10 @@ SRCs="
 	flatx.c
 	fork-me.c
 	idiff.c
+	is-utf8wf.c
 	istext.c
 	pg_launchd.c
+	slice-file.c
 	stale-mtime.c
 	stat-mtime.c
 	tas-lock-fs.c
