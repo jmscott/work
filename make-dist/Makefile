@@ -39,7 +39,7 @@ distclean:
 	test ! -e $(JMSCOTT_PREFIX)/bin		||			\
 		(cd $(JMSCOTT_PREFIX)/bin && rm -f $(BINs))
 	test ! -e $(JMSCOTT_PREFIX)/libexec	||			\
-		(cd $(JMSCOTT_PREFIX)/bin && rm -f $(LIBEXECs))
+		(cd $(JMSCOTT_PREFIX)/libexec && rm -f $(LIBEXECs))
 	test ! -e $(JMSCOTT_PREFIX)/lib		||			\
 		(cd $(JMSCOTT_PREFIX)/lib && rm -f $(LIBs))
 
