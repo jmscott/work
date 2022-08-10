@@ -7,9 +7,13 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#include "jmscott/libjmscott.h"
+
 void
 jmscott_strcat(char *tgt, int tgtsize, const char *src)
 {
+	if (src == (char *)0)
+		return;
         //  find null terminated end of target buffer
         while (*tgt++)
                 --tgtsize;
@@ -21,6 +25,38 @@ jmscott_strcat(char *tgt, int tgtsize, const char *src)
 
         // target always null terminated
         *tgt = 0;
+}
+
+void
+jmscott_strcat2(char *tgt, int tgtsize, const char *src1, const char *src2)
+{
+	jmscott_strcat(tgt, tgtsize, src1);
+	jmscott_strcat(tgt, tgtsize, src2);
+}
+
+void
+jmscott_strcat3(
+	char *tgt,
+	int tgtsize,
+	const char *src1,
+	const char *src2,
+	const char *src3
+){
+	jmscott_strcat(tgt, tgtsize, src1);
+	jmscott_strcat2(tgt, tgtsize, src2, src3);
+}
+
+void
+jmscott_strcat4(
+	char *tgt,
+	int tgtsize,
+	const char *src1,
+	const char *src2,
+	const char *src3,
+	const char *src4
+){
+	jmscott_strcat(tgt, tgtsize, src1);
+	jmscott_strcat3(tgt, tgtsize, src2, src3, src4);
 }
 
 /*
