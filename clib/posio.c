@@ -328,6 +328,28 @@ AGAIN:
         return 0;
 }
 
+/*
+ *  Make a directory path with semantics like command "mkdir -p <path>"
+ *
+ *  Exit Status:
+ *	0	dir exists (mode may not match)
+ *	-1	error occured, consult errno
+ *
+ *  Note:
+ *	When dir exists, the mode is not rechecked, which is consistent
+ *	with the command "mkdir -p <path>".
+ */
+int
+jmscott_mkdirp(const char *path, mode_t mode)
+{
+AGAIN:
+	if (jmscott_mkdir(path, mode) == 0 || errno == EEXIST)
+		return 0;
+	if (errno == EINTR)
+		goto AGAIN;
+	return -1;
+}
+
 int
 jmscott_link(const char *old_path, const char *new_path)
 {

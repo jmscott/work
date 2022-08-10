@@ -6,6 +6,8 @@
  *	
  *	#include "jmscott/libjmscott.h"
  *  Note:
+ *	Need to abstract maximum file path length (PATH_MAX) in clib.
+ *
  *	should struct jmscott_ecpg_state_fault containt the	
  */
 
@@ -25,6 +27,27 @@ extern int	jmscott_ecpg_error_code;
 extern int	jmscott_ecpg_warn_code;
 
 extern void	jmscott_strcat(char *tgt, int tgtsize, const char *src);
+extern void	jmscott_strcat2(
+			char *tgt,
+			int tgtsize,
+			const char *src1,
+			const char *src2
+		);
+extern void	jmscott_strcat3(
+			char *tgt,
+			int tgtsize,
+			const char *src1,
+			const char *src2,
+			const char *src3
+		);
+extern void	jmscott_strcat4(
+			char *tgt,
+			int tgtsize,
+			const char *src1,
+			const char *src2,
+			const char *src3,
+			const char *src4
+		);
 extern char 	*jmscott_ulltoa(unsigned long long ull, char *digits);
 extern char	*jmscott_a2ui63(char *a, unsigned long long *ull);
 extern char	*jmscott_a2size_t(char *a, size_t *sz);
@@ -104,6 +127,7 @@ extern int	jmscott_close(int fd);
 extern int	jmscott_fstat(int fd, struct stat *buf);
 extern int	jmscott_stat(char *path, struct stat *buf);
 extern int	jmscott_mkdir(const char *path, mode_t mode);
+extern int	jmscott_mkdirp(const char *path, mode_t mode);
 extern int	jmscott_link(const char *old_path, const char *new_path);
 extern int	jmscott_unlink(const char *path);
 extern int	jmscott_access(const char *path, int mode);
