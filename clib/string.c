@@ -59,6 +59,20 @@ jmscott_strcat4(
 	jmscott_strcat3(tgt, tgtsize, src2, src3, src4);
 }
 
+void
+jmscott_strcat5(
+	char *tgt,
+	int tgtsize,
+	const char *src1,
+	const char *src2,
+	const char *src3,
+	const char *src4,
+	const char *src5
+){
+	jmscott_strcat(tgt, tgtsize, src1);
+	jmscott_strcat4(tgt, tgtsize, src2, src3, src4, src5);
+}
+
 /*
  *  Convert unsigned long long to decimal ascii string.
  *  Return the pointer to byte after final digit:

@@ -48,6 +48,15 @@ extern void	jmscott_strcat4(
 			const char *src3,
 			const char *src4
 		);
+extern void	jmscott_strcat5(
+			char *tgt,
+			int tgtsize,
+			const char *src1,
+			const char *src2,
+			const char *src3,
+			const char *src4,
+			const char *src5
+		);
 extern char 	*jmscott_ulltoa(unsigned long long ull, char *digits);
 extern char	*jmscott_a2ui63(char *a, unsigned long long *ull);
 extern char	*jmscott_a2size_t(char *a, size_t *sz);
