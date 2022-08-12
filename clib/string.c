@@ -2,6 +2,8 @@
  *  Synopsis:
  *	Various utf8 common string manipulation functions.
  *  Note:
+ *	Need version of *_strcatN() that separates args with ": ".
+ *
  *	indicate truncation as return value for functions jmscott_strcatN()
  *	in this way, apps can implement their own functions _strcatN(),
  *	that die upon truncation.
@@ -75,6 +77,21 @@ jmscott_strcat5(
 ){
 	jmscott_strcat(tgt, tgtsize, src1);
 	jmscott_strcat4(tgt, tgtsize, src2, src3, src4, src5);
+}
+
+void
+jmscott_strcat6(
+	char *tgt,
+	int tgtsize,
+	const char *src1,
+	const char *src2,
+	const char *src3,
+	const char *src4,
+	const char *src5,
+	const char *src6
+){
+	jmscott_strcat(tgt, tgtsize, src1);
+	jmscott_strcat5(tgt, tgtsize, src2, src3, src4, src5, src6);
 }
 
 /*
