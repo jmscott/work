@@ -2,8 +2,8 @@
 #  Synopsis:
 #	Makefile for populating $JMSCOTT_ROOT/lib/clang.
 #  Note:
- *	Rename dir clib/ to libjmscott/
- *
+#	Rename dir clib/ to libjmscott/
+# 
 #	Need to collapse c compiles into single recipe: *.o:*.c
 #
 include ../local.mk
