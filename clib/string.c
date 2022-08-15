@@ -2,7 +2,8 @@
  *  Synopsis:
  *	Various utf8 common string manipulation functions.
  *  Note:
- *	Need version of *_strcatN() that separates args with ": ".
+ *	Need version of *_strcatN() that separates args with ": ",
+ *	maybe named jmscott_coloncatN().
  *
  *	indicate truncation as return value for functions jmscott_strcatN()
  *	in this way, apps can implement their own functions _strcatN(),
