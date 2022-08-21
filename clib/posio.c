@@ -329,7 +329,7 @@ AGAIN:
 }
 
 /*
- *  Make a directory path with semantics like command "mkdir -p <path>"
+ *  Make a directory path with with no error if dir already exists.
  *
  *  Exit Status:
  *	0	dir exists (mode may not match)
@@ -340,7 +340,7 @@ AGAIN:
  *	with the command "mkdir -p <path>".
  */
 int
-jmscott_mkdirp(const char *path, mode_t mode)
+jmscott_mkdir_EEXIST(const char *path, mode_t mode)
 {
 AGAIN:
 	if (jmscott_mkdir(path, mode) == 0 || errno == EEXIST)

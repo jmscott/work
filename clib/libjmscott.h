@@ -6,6 +6,8 @@
  *	
  *	#include "jmscott/libjmscott.h"
  *  Note:
+ *	Create jmscott_mkdir[1234] with semantics similar to command mkdir -p.
+ *
  *	Rename dir clib/ to libjmscott/
  *
  *	Need to abstract maximum file path length (PATH_MAX) in clib.
@@ -138,7 +140,7 @@ extern int	jmscott_close(int fd);
 extern int	jmscott_fstat(int fd, struct stat *buf);
 extern int	jmscott_stat(char *path, struct stat *buf);
 extern int	jmscott_mkdir(const char *path, mode_t mode);
-extern int	jmscott_mkdirp(const char *path, mode_t mode);
+extern int	jmscott_mkdir_EEXISTS(const char *path, mode_t mode);
 extern int	jmscott_link(const char *old_path, const char *new_path);
 extern int	jmscott_unlink(const char *path);
 extern int	jmscott_access(const char *path, int mode);
