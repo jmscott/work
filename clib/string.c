@@ -16,6 +16,23 @@
 
 #include "jmscott/libjmscott.h"
 
+/*
+ *  Concatentate string to a buffer.
+ *
+ *  Usage:
+ *	char tgt[1024];
+ *
+ *	//  strcpy
+ *	tgt[0] = 0;
+ *	jmscott_strcat(tgt, sizeof tgt, "hello, world");
+ *
+ *	...
+ *
+ *	//  strcat
+ *	jmscott_strcat(tgt, sizeof tgt, ": good bye, cruel world");
+ *  Note:
+ *	tgtsize can overflow.  why not add "--tgtsize == 0" in while loop?
+ */
 void
 jmscott_strcat(char *tgt, int tgtsize, const char *src)
 {
@@ -23,7 +40,7 @@ jmscott_strcat(char *tgt, int tgtsize, const char *src)
 		return;
         //  find null terminated end of target buffer
         while (*tgt++)
-                --tgtsize;
+                --tgtsize;	//  overflow ?!
         --tgt;
 
         //  copy non-null src bytes, leaving room for trailing null
