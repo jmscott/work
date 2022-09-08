@@ -97,4 +97,5 @@
 ###  fork-me.c
 	Measure sequential fork/exec of a program
 
-
+### Note:
+	Create script is-dir-empty
