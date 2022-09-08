@@ -18,6 +18,10 @@
  *  See:
  *	https://github.com/jmscott/work/blob/master/idiff.c
  *  Notes:
+ *	Writes to idiff.out do not need to be buffered.
+ *	Bufering confuses file sizes when viewing the temp file
+ *	idiff.out for commited changes.
+ *
  *	A sporadic bug still exists when ^D exiting.  Difficult to repeat.
  *
  *	UTF-8 not tested.
