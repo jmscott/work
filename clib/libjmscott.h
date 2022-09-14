@@ -22,6 +22,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
+#include <arpa/inet.h>
 
 //  smaller than 4096 to include udp4.
 //  https://www.rfc-editor.org/rfc/rfc1122
@@ -182,4 +183,5 @@ extern char			*jmscott_RFC3339Nano_now(
 					char *buf,
 					int buf_size
 				);
+extern char			*jmscott_net_32addr2text(u_long addr);
 #endif //  JMSCOTT_LIBJMSCOTT_H

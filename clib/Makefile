@@ -83,6 +83,9 @@ time.o: time.c libjmscott.h
 die.o: die.c libjmscott.h
 	cc $(CFLAGS) -c die.c
 
+net.o: net.c libjmscott.h
+	cc $(CFLAGS) -c net.c
+
 ecpg.o: ecpg.c libjmscott.h
 	cc $(CFLAGS) -I$(PGINC) -c ecpg.c
 
