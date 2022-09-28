@@ -8,12 +8,13 @@
 #  Note:
 #	Need option "--reverse-match".
 #
-#	Investigate why bash versionof istext is 100 times slower then
+#	Investigate why bash version of istext is 100 times slower then
 #	old c version.  probably because only a fraction of the file
-#	is searched.
+#	is searched in old version.
 #
-#	Consider an option "--frisk" that uses jmscott/slice-file.
-#	frisk would only look at a fraction of the file.
+#	Consider an option "--frisk" that uses program jmscott/slice-file
+#	to extract just a portion of the file instead of the whole file
+#	(as legacy istext.c does).
 #
 
 _istext()
@@ -23,7 +24,7 @@ _istext()
 
 	if [ ! -f "$F" ];  then
 		if [ ! -e "$F" ];  then
-			echo "$FL does not exist" >&2
+			echo "file does not exist: $F" >&2
 		fi
 		return
 	fi
