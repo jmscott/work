@@ -11,9 +11,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
+
 #include <unistd.h>
 #include <fcntl.h>
 #include <poll.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "jmscott/libjmscott.h"
 
@@ -329,15 +332,21 @@ AGAIN:
 }
 
 /*
- *  Make a directory path with with no error if dir already exists.
+ *  Flat make of a directory path with with no error if dir already exists.
  *
  *  Exit Status:
  *	0	dir exists (mode may not match)
  *	-1	error occured, consult errno
  *
  *  Note:
- *	When dir exists, the mode is not rechecked, which is consistent
- *	with the command "mkdir -p <path>".
+ *	so, mmkdir -p recuses theough the path list, wheres mkdir_EEXIST()
+ *	does not.  only the $(dirname <path>) is created. so, "flat" means
+ *	not recursive and i (jmscott) can not find a constructuve term for
+ *	"nor recusive".  "flat" is my attemtp.
+ *
+ *	When dir exists, the mode is not rechecked, which is inconsistent
+ *	with the command "mkdir -p <path>".  This is a bug. the prems should be
+ *	changed.
  */
 int
 jmscott_mkdir_EEXIST(const char *path, mode_t mode)
@@ -348,6 +357,30 @@ AGAIN:
 	if (errno == EINTR)
 		goto AGAIN;
 	return -1;
+}
+
+/*
+ *  C version of cli command "mkdir -p <path>".
+ *
+ *  Note:
+ *	we just do system("mkdir -p <path>") until i can find (or write)
+ *	a posix	equivalent.
+ */
+char *
+jmscott_mkdir_p(const char *path)
+{
+	char cmd[4096];
+
+	cmd[0] = 0;
+	jmscott_strcat3(cmd, sizeof cmd,
+		"mkdir -p '",
+		path,
+		"'"
+	);
+	int status = system(cmd);
+	if (status != 0)
+		return strerror(errno);		//  not correct!
+	return (char *)0;
 }
 
 int
