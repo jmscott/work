@@ -6,6 +6,8 @@
  *	
  *	#include "jmscott/libjmscott.h"
  *  Note:
+ *	Should char *jmscott_progname be defined as extern?
+ *
  *	Create jmscott_mkdir[1234] with semantics similar to command mkdir -p.
  *
  *	Rename dir clib/ to libjmscott/
