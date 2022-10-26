@@ -71,6 +71,13 @@ extern char	*jmscott_a2size_t(char *a, size_t *sz);
 extern void	jmscott_die(int status, char *msg1);
 extern void	jmscott_die2(int status, char *msg1, char *msg2);
 extern void	jmscott_die3(int status, char *msg1, char *msg2, char *msg3);
+extern void	jmscott_die4(
+			int status,
+			char *msg1,
+			char *msg2,
+			char *msg3,
+			char *msg4
+		);
 
 extern char *	jmscott_frisk_udig(char *udig);
 
