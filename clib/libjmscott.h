@@ -187,4 +187,5 @@ extern char			*jmscott_RFC3339Nano_now(
 					int buf_size
 				);
 extern char			*jmscott_net_32addr2text(u_long addr);
+extern int			jmscott_flock(int, int);
 #endif //  JMSCOTT_LIBJMSCOTT_H

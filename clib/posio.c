@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
+#include <sys/file.h>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -417,4 +418,16 @@ AGAIN:
         if (errno == EINTR)
                 goto AGAIN;
         return -1;
+}
+
+int
+jmscott_flock(int fd, int op)
+{
+AGAIN:
+	errno = 0;
+	if (flock(fd, op) == 0)
+		return 0;
+	if (errno == EINTR)
+		goto AGAIN;
+	return -1;
 }
