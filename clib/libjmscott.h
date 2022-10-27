@@ -78,6 +78,14 @@ extern void	jmscott_die4(
 			char *msg3,
 			char *msg4
 		);
+extern void	jmscott_die5(
+			int status,
+			char *msg1,
+			char *msg2,
+			char *msg3,
+			char *msg4,
+			char *msg5
+		);
 
 extern char *	jmscott_frisk_udig(char *udig);
 
