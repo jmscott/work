@@ -115,9 +115,12 @@ jmscott_strcat6(
 /*
  *  Convert unsigned long long to decimal ascii string.
  *  Return the pointer to byte after final digit:
+ *  The caller must be sure to null terminate the string:
+ *
+ *	*jmscott_ulltoa(...) = 0;
  */
 char *
-jmscott_ulltoa(unsigned long long ull, char *digits)
+jmscott_ulltoa(unsigned long long ull, char *tgt)
 {
 	char const digit[] = "0123456789";
 	char* p, *end_p;
@@ -125,13 +128,13 @@ jmscott_ulltoa(unsigned long long ull, char *digits)
 
 	//  find the end of the formated ascii string
 
-	p = digits;
+	p = tgt;
 	do
 	{
 		++p;
 		power = power / 10;
 
-	} while (power);
+	} while (power > 0);
 	end_p = p;
 
 	//  in reverse order, replace byte with the ascii chars
