@@ -86,3 +86,23 @@ jmscott_die4(int status, char *msg1, char *msg2, char *msg3, char *msg4)
 
         jmscott_die3(status, msg, msg3, msg4);
 }
+
+void
+jmscott_die5(
+	int status,
+	char *msg1,
+	char *msg2,
+	char *msg3,
+	char *msg4,
+	char *msg5)
+{
+        static char colon[] = ": ";
+        char msg[JMSCOTT_ATOMIC_WRITE_SIZE];
+
+        msg[0] = 0;
+        jmscott_strcat(msg, sizeof msg, msg1);
+        jmscott_strcat(msg, sizeof msg, colon);
+        jmscott_strcat(msg, sizeof msg, msg2);
+
+        jmscott_die4(status, msg, msg3, msg4, msg5);
+}
