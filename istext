@@ -3,7 +3,7 @@
 #  Synopsis:
 #	List UTF-8 text compliant files path in either argv or standard input.
 #  Usage:
-#	istext /etc/*
+#	istext [-v] /etc/*
 #	find / -xdev -print0 | xargs -0 istext | xargs fgrep -l PATTERN
 #  Note:
 #	Need option "--reverse-match".
@@ -16,6 +16,8 @@
 #	to extract just a portion of the file instead of the whole file
 #	(as legacy istext.c does).
 #
+
+REVERSE=no
 
 _istext()
 {
@@ -32,9 +34,10 @@ _istext()
 	STATUS=$?
 	case $STATUS in
 	0)
-		echo "$F"
+		test $REVERSE = no && echo "$F"
 		;;
 	1|2)
+		test $REVERSE = yes && echo "$F"
 		;;
 	*)
 		echo "$PROG: ERROR: is-utf8wf failed: exit status=$STATUS" >&2
@@ -44,8 +47,13 @@ _istext()
 	return 0
 }
 
-if [ $# = 0 ]; then			#  read file list from standard input
-	while read F;  do
+if [ "$1" = -v ];  then
+	REVERSE=yes
+	shift
+fi
+
+if [ $# = 0 ];  then
+	while read -r F;  do
 		_istext "$F"
 	done
 else
