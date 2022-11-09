@@ -17,6 +17,7 @@
 
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "jmscott/libjmscott.h"
 
@@ -105,4 +106,18 @@ jmscott_die5(
         jmscott_strcat(msg, sizeof msg, msg2);
 
         jmscott_die4(status, msg, msg3, msg4, msg5);
+}
+
+void
+jmscott_die_argc(int status, int got, int expect, char *usage)
+{
+	char msg[JMSCOTT_ATOMIC_WRITE_SIZE] = {0};
+	char suffix[54] = {0};
+
+	jmscott_strcat(msg, sizeof msg, "wrong number of cli args: got ");
+	snprintf(suffix, sizeof suffix, "%d, expected %d: ", got, expect);
+	jmscott_strcat(msg, sizeof msg, suffix);
+	jmscott_strcat2(msg, sizeof msg, "\nusage: ", usage);
+
+	jmscott_die(status, msg);
 }
