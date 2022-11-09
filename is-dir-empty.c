@@ -35,7 +35,7 @@ main(int argc, char **argv)
 	(void)argv;
 	if (argc != 2)
 		jmscott_die_argc(EXIT_ERROR, 1, argc -1, usage);
-	char *path = argv[0];
+	char *path = argv[1];
 
 	struct stat st;
 	int status = jmscott_stat(path, &st);
@@ -44,5 +44,7 @@ main(int argc, char **argv)
 			_exit(EXIT_NO_ENTRY);
 		jmscott_die2(EXIT_ERROR, "stat() failed", strerror(status));
 	}
-	_exit(0);
+	if (S_ISDIR(st.st_mode))
+		_exit(0);
+	_exit(EXIT_EXISTS_NOT_DIR);
 }
