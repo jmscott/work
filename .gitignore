@@ -7,6 +7,7 @@ flatx
 fork-me
 halloc.o
 idiff
+is-dir-empty
 is-utf8wf
 jmscott
 local.mk
