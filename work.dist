@@ -24,6 +24,7 @@ COMPILEs="
 	flatx
 	fork-me
 	idiff
+	is-dir-empty
 	is-utf8wf
 	pg_launchd
 	slice-file
@@ -89,6 +90,7 @@ SRCs="
 	flatx.c
 	fork-me.c
 	idiff.c
+	is-dir-empty.c
 	is-utf8wf.c
 	istext.c
 	pg_launchd.c

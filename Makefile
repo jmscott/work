@@ -144,6 +144,9 @@ slice-file: slice-file.c $JMSLIB
 is-utf8wf: is-utf8wf.c $JMSLIB
 	$(CCOMPILE) -o is-utf8wf is-utf8wf.c $(CLINK)
 
+is-dir-empty: is-dir-empty.c $JMSLIB
+	$(CCOMPILE) -o is-dir-empty is-dir-empty.c $(CLINK)
+
 world:
 	$(_MAKE) clean
 	$(_MAKE) all
