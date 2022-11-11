@@ -6,6 +6,8 @@
 #	local-darwin.mk.example
 #	https://github.com/jmscott/work
 #  Note:
+#	Makefile dependencies are still wrong!
+#
 #	Probably time to retire flatx.
 #
 #	Add warning when running ./make-dist instead of previously installed
@@ -33,6 +35,7 @@ BINs := $(shell  (. ./$(DIST) && echo $$BINs))
 SRCs := $(shell  (. ./$(DIST) && echo $$SRCs))
 
 JMSLIB=clib/libjmscott.a
+JMSINC=clib/libjmscott.h
 
 all: $(COMPILEs)
 	cd clib && $(_MAKE) all
@@ -93,58 +96,58 @@ distclean:
 	rm -rf $(JMSCOTT_PREFIX)/src
 	rm -rf $(JMSCOTT_PREFIX)/lib
 
-$JMSLIB:
-	cd clib && $(_MAKE) libjmscott.a 
+$(JMSLIB): $(JMSINC)
+	cd clib && $(_MAKE) $(JMSLIB)
 
-RFC3339Nano: RFC3339Nano.c $JMSLIB
+RFC3339Nano: RFC3339Nano.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o RFC3339Nano RFC3339Nano.c $(CLINK)
 
-idiff: idiff.c $JMSLIB
+idiff: idiff.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o idiff idiff.c $(CLINK)
 
-duration-english: duration-english.c $JMSLIB
+duration-english: duration-english.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o duration-english duration-english.c $(CLINK)
 
-istext: istext.c $JMSLIB
+istext: istext.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE)  -o istext istext.c $(CLINK)
 
-fork-me: fork-me.c $JMSLIB
+fork-me: fork-me.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o fork-me fork-me.c $(CLINK)
 
-stale-mtime: stale-mtime.c $JMSLIB
+stale-mtime: stale-mtime.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o stale-mtime stale-mtime.c $(CLINK)
 
-stat-mtime: stat-mtime.c $JMSLIB
+stat-mtime: stat-mtime.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o stat-mtime stat-mtime.c $(CLINK)
 
-file-stat-size: file-stat-size.c $JMSLIB
+file-stat-size: file-stat-size.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o file-stat-size file-stat-size.c $(CLINK)
 
-flatx: flatx.c $JMSLIB
+flatx: flatx.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o flatx flatx.c -lexpat $(CLINK)
 
-escape-json-string: escape-json-string.c $JMSLIB
+escape-json-string: escape-json-string.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o escape-json-string escape-json-string.c $(CLINK)
 
-duration-mtime: duration-mtime.c $JMSLIB
+duration-mtime: duration-mtime.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o duration-mtime duration-mtime.c $(CLINK)
 
-tas-lock-fs: tas-lock-fs.c $JMSLIB
+tas-lock-fs: tas-lock-fs.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o tas-lock-fs tas-lock-fs.c $(CLINK)
 
-tas-unlock-fs: tas-unlock-fs.c $JMSLIB
+tas-unlock-fs: tas-unlock-fs.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o tas-unlock-fs tas-unlock-fs.c $(CLINK)
 
-pg_launchd: pg_launchd.c $JMSLIB
+pg_launchd: pg_launchd.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o pg_launchd pg_launchd.c $(CLINK)
 
-slice-file: slice-file.c $JMSLIB
+slice-file: slice-file.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o slice-file slice-file.c $(CLINK)
 
-is-utf8wf: is-utf8wf.c $JMSLIB
+is-utf8wf: is-utf8wf.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o is-utf8wf is-utf8wf.c $(CLINK)
 
-is-dir-empty: is-dir-empty.c $JMSLIB
+is-dir-empty: is-dir-empty.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o is-dir-empty is-dir-empty.c $(CLINK)
 
 world:
