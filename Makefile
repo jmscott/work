@@ -97,7 +97,7 @@ distclean:
 	rm -rf $(JMSCOTT_PREFIX)/lib
 
 $(JMSLIB): $(JMSINC)
-	cd clib && $(_MAKE) $(JMSLIB)
+	cd clib && $(_MAKE) all
 
 RFC3339Nano: RFC3339Nano.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o RFC3339Nano RFC3339Nano.c $(CLINK)
