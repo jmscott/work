@@ -123,14 +123,10 @@ die()
 	#
 	if [ -n "$FAULT" ];  then
 		log "appending error to fault file: $FAULT"
-		if [ -e "$FAULT" ];  then
-			warn "fault file exists: $FAULT"
-			warn 'an older fault may not have been cleared'
-		fi
-		log $MSG >>$FAULT || log "append to fault file failed: $FAULT"
+		log $MSG >>$FAULT					||
+			log "ERROR: append to fault file failed: $FAULT" >&2
 	fi
 	log $MSG >&2
-	log "try '$PROG --help'"
 	exit 127
 }
 
