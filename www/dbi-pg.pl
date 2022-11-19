@@ -20,6 +20,7 @@
 #
 
 our $PGDUMP_re;
+our %QUERY_ARG;
 
 $ENV{LD_LIBRARY_PATH} = "$ENV{PGHOME}:$ENV{LD_LIBRARY_PATH}" if $ENV{PGHOME};
 
@@ -176,7 +177,7 @@ sub dbi_pg_select
 	die 'dbi_pg_select: missing variable: sql' unless $sql;
 	die 'dbi_pg_select: missing variable: argv' unless $argv;
 
-	di_PGDUMP(%arg) if $arg{PGDUMP} || $ENV{PGDUMP};
+	dbi_PGDUMP(%arg);
 
 	my $q = $db->prepare($sql) or die
 			'dbi_pg_select: prepare($tag) failed: ' . $db->errstr;
@@ -225,7 +226,7 @@ sub dbi_pg_execute
 	die 'dbi_pg_execute: missing variable: sql' unless $sql;
 	die 'dbi_pg_execute: missing variable: argv' unless $argv;
 
-	dbi_PGDUMP(%arg) if $arg{PGDUMP} || $ENV{PGDUMP};
+	dbi_PGDUMP(%arg);
 
 	my $q = $db->prepare($sql) or die
 			'dbi_pg_execute: prepare($tag) failed: ' . $db->errstr;
