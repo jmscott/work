@@ -53,7 +53,7 @@ leave()
 {
 	STATUS=$?
 	ELAPSED_DURATION=$(duration-english $(expr $(date +%s) - $START_EPOCH))
-	log "elapsed duration: $ELAPSED_DURATION"
+	log "elapsed: $ELAPSED_DURATION"
 	log 'good bye, cruel world'
 	exit $STATUS
 }
