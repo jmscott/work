@@ -18,6 +18,7 @@
 #include <poll.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "jmscott/libjmscott.h"
 
@@ -50,6 +51,10 @@ AGAIN:
  *	1	timeout, no readable data exists
  *	-1	unknown error, see errno.
  *  Note:
+ *	POLLIN is set when at eof, whic is confusing.  see url
+ *
+ *		httpd://greenend.org.uk/rjk/tech/poll.html
+ *
  *	Not clear if signals in fds[0].revents interpreted correctly.
  */
 int
@@ -59,6 +64,7 @@ jmscott_poll_POLLIN(int fd, int msec)
 
 	fds[0].fd = fd;
 	fds[0].events = POLLIN;
+	fds[0].revents = 0;
 	int status;
 AGAIN:
 	status = poll(fds, 1, msec);
