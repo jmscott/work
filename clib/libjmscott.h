@@ -65,6 +65,7 @@ extern void	jmscott_strcat6(char *tgt, int tgtsize,
 			const char *src6
 		);
 extern char 	*jmscott_ulltoa(unsigned long long ull, char *digits);
+extern char 	*jmscott_lltoa(long long ull, char *digits);
 extern char	*jmscott_a2ui63(char *a, unsigned long long *ull);
 extern char	*jmscott_a2size_t(char *a, size_t *sz);
 

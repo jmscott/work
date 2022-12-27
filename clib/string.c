@@ -148,6 +148,16 @@ jmscott_ulltoa(unsigned long long ull, char *tgt)
 	return end_p;
 }
 
+char *
+jmscott_lltoa(long long ll, char *tgt)
+{
+	if (ll < 0) {
+		*tgt++ = '-';
+		return jmscott_ulltoa((unsigned long long)-ll, tgt);
+	}
+	return jmscott_ulltoa((unsigned long long)ll, tgt);
+}
+
 /*
  *  Strictly convert an ascii string to an unsigned 63bit
  *
