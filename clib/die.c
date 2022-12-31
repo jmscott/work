@@ -9,6 +9,8 @@
  *		jmscott_die(127, msg);
  *	}
  *  Note:
+ *	Consider die() NOT exiting if status == 0 or == 256.
+ *
  *	Consider renaming file die.c to exit.c
  *
  *	Should "exit()" be called instaead of "_exit()"?  Perhaps stdio is
