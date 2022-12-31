@@ -28,9 +28,9 @@ die(char *arg1)
 }
 
 static void
-die2(char *arg1, char *arg2)
+die3(char *arg1, char *arg2, char *arg3)
 {
-	jmscott_die2(EXIT_ERR, arg1, arg2);
+	jmscott_die3(EXIT_ERR, arg1, arg2, arg3);
 }
 
 int
@@ -46,5 +46,5 @@ main(int argc, char **argv)
 		_exit(EXIT_EXIST);
 	if (errno == ENOENT)
 		_exit(EXIT_NO_EXIST);
-	die2("unlink(lock) failed", strerror(errno));
+	die3("unlink(lock) failed", strerror(errno), lock_path);
 }

@@ -59,10 +59,10 @@ main(int argc, char **argv)
 	if (fd < 0) {
 		if (errno == EEXIST)
 			_exit(EXIT_EXISTS);
-		die3("open(lock) failed", lock_path, strerror(errno));
+		die3("open(lock) failed", strerror(errno), lock_path);
 	}
 
 	if (jmscott_close(fd) < 0)
-		die3("close(lock) failed", lock_path, strerror(errno));
+		die3("close(lock) failed", strerror(errno), lock_path);
 	_exit(EXIT_CREATED);
 }
