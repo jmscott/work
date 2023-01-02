@@ -387,7 +387,9 @@ make_dir RUN
 make_dir SBINs
 make_dir SPOOL
 make_dir SRCs
+make_dir SYNC
 make_dir TMP
+make_dir WWW
 
 #
 #  Copy files in various staging directories
