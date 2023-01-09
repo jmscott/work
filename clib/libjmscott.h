@@ -33,30 +33,30 @@
 extern int	jmscott_ecpg_error_code;
 extern int	jmscott_ecpg_warn_code;
 
-extern void	jmscott_strcat(char *tgt, int tgtsize, const char *src);
-extern void	jmscott_strcat2(char *tgt, int tgtsize,
+extern char *	jmscott_strcat(char *tgt, int tgtsize, const char *src);
+extern char *	jmscott_strcat2(char *tgt, int tgtsize,
 			const char *src1,
 			const char *src2
 		);
-extern void	jmscott_strcat3(char *tgt, int tgtsize,
+extern char *	jmscott_strcat3(char *tgt, int tgtsize,
 			const char *src1,
 			const char *src2,
 			const char *src3
 		);
-extern void	jmscott_strcat4(char *tgt, int tgtsize,
+extern char *	jmscott_strcat4(char *tgt, int tgtsize,
 			const char *src1,
 			const char *src2,
 			const char *src3,
 			const char *src4
 		);
-extern void	jmscott_strcat5(char *tgt, int tgtsize,
+extern char *	jmscott_strcat5(char *tgt, int tgtsize,
 			const char *src1,
 			const char *src2,
 			const char *src3,
 			const char *src4,
 			const char *src5
 		);
-extern void	jmscott_strcat6(char *tgt, int tgtsize,
+extern char *	jmscott_strcat6(char *tgt, int tgtsize,
 			const char *src1,
 			const char *src2,
 			const char *src3,

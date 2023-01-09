@@ -1,7 +1,12 @@
 /*
  *  Synopsis:
- *	Various utf8 common string manipulation functions.
+ *	Various utf8 C string manipulation functions.
  *  Note:
+ *	The BSD clib function strlcat() comes close to the behaviour of the
+ *	jmscott_strcat*() functions.  However, strlcat() is not on linux.  
+ *	
+ *	Should jmscott_strcat*() funcs return char * to terminating \0?
+ *
  *	Need version of *_strcatN() that separates args with ": ",
  *	maybe named jmscott_coloncatN().
  *
@@ -33,11 +38,11 @@
  *  Note:
  *	tgtsize can overflow.  why not add "--tgtsize == 0" in while loop?
  */
-void
+char *
 jmscott_strcat(char *tgt, int tgtsize, const char *src)
 {
 	if (src == (char *)0)
-		return;
+		return (char *)0;
         //  find null terminated end of target buffer
         while (*tgt++)
                 --tgtsize;	//  overflow ?!
@@ -49,16 +54,18 @@ jmscott_strcat(char *tgt, int tgtsize, const char *src)
 
         // target always null terminated
         *tgt = 0;
+	return tgt;
 }
 
-void
+char *
 jmscott_strcat2(char *tgt, int tgtsize, const char *src1, const char *src2)
 {
-	jmscott_strcat(tgt, tgtsize, src1);
-	jmscott_strcat(tgt, tgtsize, src2);
+	return jmscott_strcat(
+		jmscott_strcat(tgt, tgtsize, src1), tgtsize, src2
+	);
 }
 
-void
+char *
 jmscott_strcat3(
 	char *tgt,
 	int tgtsize,
@@ -66,11 +73,12 @@ jmscott_strcat3(
 	const char *src2,
 	const char *src3
 ){
-	jmscott_strcat(tgt, tgtsize, src1);
-	jmscott_strcat2(tgt, tgtsize, src2, src3);
+	return jmscott_strcat2(
+		jmscott_strcat(tgt, tgtsize, src1), tgtsize, src2, src3
+	);
 }
 
-void
+char *
 jmscott_strcat4(
 	char *tgt,
 	int tgtsize,
@@ -79,11 +87,16 @@ jmscott_strcat4(
 	const char *src3,
 	const char *src4
 ){
-	jmscott_strcat(tgt, tgtsize, src1);
-	jmscott_strcat3(tgt, tgtsize, src2, src3, src4);
+	return jmscott_strcat3(
+			jmscott_strcat(tgt, tgtsize, src1),
+			tgtsize,
+			src2,
+			src3,
+			src4
+	);
 }
 
-void
+char *
 jmscott_strcat5(
 	char *tgt,
 	int tgtsize,
@@ -93,11 +106,17 @@ jmscott_strcat5(
 	const char *src4,
 	const char *src5
 ){
-	jmscott_strcat(tgt, tgtsize, src1);
-	jmscott_strcat4(tgt, tgtsize, src2, src3, src4, src5);
+	return jmscott_strcat4(
+			jmscott_strcat(tgt, tgtsize, src1),
+			tgtsize,
+			src2,
+			src3,
+			src4,
+			src5
+	);
 }
 
-void
+char *
 jmscott_strcat6(
 	char *tgt,
 	int tgtsize,
@@ -108,8 +127,15 @@ jmscott_strcat6(
 	const char *src5,
 	const char *src6
 ){
-	jmscott_strcat(tgt, tgtsize, src1);
-	jmscott_strcat5(tgt, tgtsize, src2, src3, src4, src5, src6);
+	return jmscott_strcat5(
+			jmscott_strcat(tgt, tgtsize, src1),
+			tgtsize,
+			src2,
+			src3,
+			src4,
+			src5,
+			src6
+	);
 }
 
 /*
