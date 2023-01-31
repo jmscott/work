@@ -62,6 +62,7 @@ BINs="
 "
 
 SBINs="
+	cron-run-once
 	launchctl-kick
 	launchctl-unload
 	launchd-log
