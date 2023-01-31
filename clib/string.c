@@ -22,7 +22,7 @@
 #include "jmscott/libjmscott.h"
 
 /*
- *  Concatentate string to a buffer.
+ *  Composable string concat returning the char * terminating null.
  *
  *  Usage:
  *	char tgt[1024];
@@ -41,18 +41,17 @@
 char *
 jmscott_strcat(char *tgt, int tgtsize, const char *src)
 {
-	if (src == (char *)0)
-		return (char *)0;
         //  find null terminated end of target buffer
         while (*tgt++)
                 --tgtsize;	//  overflow ?!
-        --tgt;
+	--tgt;
+	if (src == (char *)0)
+		return tgt;
 
         //  copy non-null src bytes, leaving room for trailing null
         while (--tgtsize > 0 && *src)
                 *tgt++ = *src++;
 
-        // target always null terminated
         *tgt = 0;
 	return tgt;
 }
@@ -60,9 +59,8 @@ jmscott_strcat(char *tgt, int tgtsize, const char *src)
 char *
 jmscott_strcat2(char *tgt, int tgtsize, const char *src1, const char *src2)
 {
-	return jmscott_strcat(
-		jmscott_strcat(tgt, tgtsize, src1), tgtsize, src2
-	);
+	char *p = jmscott_strcat(tgt, tgtsize, src1);
+	return jmscott_strcat(p, tgtsize - (p - tgt), src2);
 }
 
 char *
@@ -73,9 +71,8 @@ jmscott_strcat3(
 	const char *src2,
 	const char *src3
 ){
-	return jmscott_strcat2(
-		jmscott_strcat(tgt, tgtsize, src1), tgtsize, src2, src3
-	);
+	char *p = jmscott_strcat(tgt, tgtsize, src1);
+	return jmscott_strcat2(p, tgtsize - (p - tgt), src2, src3);
 }
 
 char *
@@ -87,13 +84,8 @@ jmscott_strcat4(
 	const char *src3,
 	const char *src4
 ){
-	return jmscott_strcat3(
-			jmscott_strcat(tgt, tgtsize, src1),
-			tgtsize,
-			src2,
-			src3,
-			src4
-	);
+	char *p = jmscott_strcat(tgt, tgtsize, src1);
+	return jmscott_strcat3(p, tgtsize - (p - tgt), src2, src3, src4);
 }
 
 char *
@@ -106,14 +98,8 @@ jmscott_strcat5(
 	const char *src4,
 	const char *src5
 ){
-	return jmscott_strcat4(
-			jmscott_strcat(tgt, tgtsize, src1),
-			tgtsize,
-			src2,
-			src3,
-			src4,
-			src5
-	);
+	char *p = jmscott_strcat(tgt, tgtsize, src1);
+	return jmscott_strcat4(p, tgtsize - (p - tgt), src2, src3, src4, src5);
 }
 
 char *
@@ -127,15 +113,8 @@ jmscott_strcat6(
 	const char *src5,
 	const char *src6
 ){
-	return jmscott_strcat5(
-			jmscott_strcat(tgt, tgtsize, src1),
-			tgtsize,
-			src2,
-			src3,
-			src4,
-			src5,
-			src6
-	);
+	char *p = jmscott_strcat(tgt, tgtsize, src1);
+	return jmscott_strcat5(p, tgtsize-(p-tgt), src2, src3, src4, src5, src6);
 }
 
 /*
