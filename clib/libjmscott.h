@@ -33,6 +33,8 @@
  *  Pragmatic, reliable, atomic message size across many protocols.
  *
  *  Note:
+ *	should JMSCOTT_ATOMIC_WRITE_SIZE be renamed JMSCOTT_ATOMIC_SIZE?
+ *
  *	investigate message size of tilelink protocol for risc5 interconnect.
  *
  *		https://starfivetech.com/uploads/tilelink_spec_1.8.1.pdf
