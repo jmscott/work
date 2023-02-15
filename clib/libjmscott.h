@@ -28,7 +28,16 @@
 
 //  smaller than 4096 to include udp4.
 //  https://www.rfc-editor.org/rfc/rfc1122
-#define JMSCOTT_ATOMIC_WRITE_SIZE	508	// mac osx and linux >= 2.32 */
+
+/*
+ *  Pragmatic, reliable, atomic message size across many protocols.
+ *
+ *  Note:
+ *	investigate message size of tilelink protocol for risc5 interconnect.
+ *
+ *		https://starfivetech.com/uploads/tilelink_spec_1.8.1.pdf
+ */
+#define JMSCOTT_ATOMIC_WRITE_SIZE	508	// max "reliable" udp4 packet
 
 extern int	jmscott_ecpg_error_code;
 extern int	jmscott_ecpg_warn_code;
