@@ -26,11 +26,9 @@
 #include <time.h>
 #include <arpa/inet.h>
 
-//  smaller than 4096 to include udp4.
-//  https://www.rfc-editor.org/rfc/rfc1122
-
 /*
- *  Pragmatic, reliable, atomic message size across many protocols.
+ *  Pragmatic, reliable, atomic message size across many protocols, such as
+ *  udp4 and pipe buffers.
  *
  *  Note:
  *	should JMSCOTT_ATOMIC_WRITE_SIZE be renamed JMSCOTT_ATOMIC_SIZE?
@@ -39,7 +37,10 @@
  *
  *		https://starfivetech.com/uploads/tilelink_spec_1.8.1.pdf
  */
-#define JMSCOTT_ATOMIC_WRITE_SIZE	508	// max "reliable" udp4 packet
+#define JMSCOTT_ATOMIC_WRITE_SIZE	508
+
+//  YYYY-MM-DDThh:mm:ss.nsec[+-]HH:MM
+#define JMSCOTT_RFC3339NANO_SIZE	35
 
 extern int	jmscott_ecpg_error_code;
 extern int	jmscott_ecpg_warn_code;
