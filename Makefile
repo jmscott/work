@@ -141,8 +141,8 @@ tas-unlock-fs: tas-unlock-fs.c $(JMSLIB) $(JMSINC)
 pg_launchd: pg_launchd.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o pg_launchd pg_launchd.c $(CLINK)
 
-slice-file: slice-file.c $(JMSLIB) $(JMSINC)
-	$(CCOMPILE) -o slice-file slice-file.c $(CLINK)
+slice-file-seek: slice-file-seek.c $(JMSLIB) $(JMSINC)
+	$(CCOMPILE) -o slice-file-seek slice-file-seek.c $(CLINK)
 
 is-utf8wf: is-utf8wf.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o is-utf8wf is-utf8wf.c $(CLINK)

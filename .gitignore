@@ -13,6 +13,7 @@ jmscott
 local.mk
 pg_launchd
 slice-file
+slice-file-seek
 slice-stdin
 stale-mtime
 stat-mtime

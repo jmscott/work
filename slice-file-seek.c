@@ -1,21 +1,19 @@
 /*
  *  Synopsis:
- *	Exactly slice a portion of a file onto standard output.
+ *	Inclusively slice a chunk of a seekable file onto standard output.
  *  Usage:
- *	slice-file <file-path> <start-offset> <end-offset>
+ *	slice-file <start-offset> <end-offset> <file-path>
  *  Exit Status:
  *	0	ok, wrote <stop-offset> - <start-offset> bytes to stdout
  *	1	file length < stop-offset, no bytes written
  *	5	unexpected error.
  *  Note:
- *	lseek() not returning error on seek of empty file!
- *	must we stat the file first?
- *
  *	An empty stream exits 0.  Why?
  */
 #include <sys/errno.h>
 #include <string.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 
 #include "jmscott/libjmscott.h"
 
@@ -64,43 +62,34 @@ _lseek(int fd, off_t offset, int whence)
 
 int main(int argc, char **argv)
 {
+	size_t start, stop;
+	char *err;
+
 	argc--;
 	if (argc != 3)
 		die("wrong count of CLI args: expected 3");
-
-	char *err;
-
+	if ((err = jmscott_a2size_t(argv[1], &start)))
+		die2("a2size_t(start) failed", err);
+	if ((err = jmscott_a2size_t(argv[2], &stop)))
+		die2("a2size_t(stop) failed", err);
+	if (start > stop)
+		die("start > stop");
 	if (!argv[1][0])
 		die("empty file path");
-	int in = jmscott_open(argv[1], O_RDONLY, 0);
+
+	int in;
+	in = jmscott_open(argv[3], O_RDONLY, 0);
 	if (in < 0)
 		die2("open(input) failed", strerror(errno));
 
-	size_t start;
-	if ((err = jmscott_a2size_t(argv[2], &start)))
-		die2("a2size_t(start) failed", err);
-	if (jmscott_lseek(in, 0, SEEK_SET) < 0)
-		die2("lseek(input, start offset) failed", strerror(errno));
-
-	size_t stop;
-	if ((err = jmscott_a2size_t(argv[3], &stop)))
-		die2("a2size_t(stop offset) failed", err);
-
-	if (stop < start)
-		die("stop < start");
-
-	if (stop == start)
-		_exit(0);
-
-	if (_lseek(in, 0, SEEK_END) < stop)
-		_exit(1);
-	if (_lseek(in, start, SEEK_SET) != start)
-		die("impossible: lseek(start) != start");
+	off_t pos = jmscott_lseek(in, start, SEEK_SET);
+	if (pos < 0)
+		die2("lseek(input) failed", strerror(errno));
 
 	//  write slice to standard output
-	unsigned char buf[JMSCOTT_ATOMIC_WRITE_SIZE];
+	unsigned char buf[4096];
 
-	int nwrite = stop - start;
+	int nwrite = stop - start + 1;		//  start==stop ==> 1 byte
 	while (nwrite > 0) {
 		int sz = sizeof buf;
 		if (nwrite < sz)
@@ -108,9 +97,11 @@ int main(int argc, char **argv)
 		int nb = 0;
 		nb += _read(in, buf, sz);
 		if (nb == 0)
-			_exit(2);		// at end of file
+			_exit(1);		// at end of file
 		_write(buf, nb);
 		nwrite -= nb;
 	}
+	if (jmscott_close(in) != 0)
+		die2("close(in) failed", strerror(errno));
 	_exit(0);
 }

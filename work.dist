@@ -29,7 +29,7 @@ COMPILEs="
 	is-dir-empty
 	is-utf8wf
 	pg_launchd
-	slice-file
+	slice-file-seek
 	stale-mtime
 	stat-mtime
 	tas-lock-fs
@@ -98,7 +98,7 @@ SRCs="
 	is-utf8wf.c
 	istext.c
 	pg_launchd.c
-	slice-file.c
+	slice-file-seek.c
 	stale-mtime.c
 	stat-mtime.c
 	tas-lock-fs.c
