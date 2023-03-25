@@ -22,5 +22,7 @@ INSTALL_PREFIX?=/usr/local
 
 GODIST=/usr/local/go
 
-PGHOME=/usr/local/pgsql
-PGINC=$(PGHOME)/include
+#  compile postgresql dependent code, set JMSCOTT_COMPILE_PG=1;
+#  otherwise, JMSCOTT_COMPILE_PG=0;  PG
+export JMSCOTT_COMPILE_PG=1
+PGINC=/usr/local/pgsql/include

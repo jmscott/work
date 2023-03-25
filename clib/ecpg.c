@@ -11,7 +11,9 @@
 #include <unistd.h>
 #include <string.h>
 
+#if JMSCOTT_COMPILE_PG
 #include "sqlca.h"
+#endif
 
 #include "jmscott/libjmscott.h"
 
@@ -30,6 +32,7 @@ jmscott_ecpg_fault(
 	char *what,
 	struct jmscott_ecpg_state_fault *fault
 ) {
+#if JMSCOTT_COMPILE_PG
 	char msg[4096];
 
 	msg[0] = 0;
@@ -86,6 +89,12 @@ jmscott_ecpg_fault(
 		jmscott_strcat(msg, sizeof msg, err);
 	}
 	jmscott_die(status, msg);
+#else
+	(void)status;
+	(void)what;
+	(void)fault;
+	jmscott_die(127, "jmscott_ecpg_fault: not compiled with postgresql");
+#endif
 }
 
 /*
@@ -97,6 +106,7 @@ jmscott_ecpg_error(struct jmscott_ecpg_state_fault *fault)
 {
 	jmscott_ecpg_fault(jmscott_ecpg_error_code, "ERROR", fault);
 }
+
 
 /*
 *  Synopsis:

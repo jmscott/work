@@ -87,7 +87,7 @@ net.o: net.c libjmscott.h
 	cc $(CFLAGS) -c net.c
 
 ecpg.o: ecpg.c libjmscott.h
-	cc $(CFLAGS) -I$(PGINC) -c ecpg.c
+	cc $(CFLAGS) -DJMSCOTT_COMPILE_PG=$(JMSCOTT_COMPILE_PG) -I$(PGINC) -c ecpg.c
 
 dist:
 	make-dist tar $(DIST)
