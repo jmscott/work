@@ -4,25 +4,47 @@
 #  Usage:
 #	cp local-linux.mk.example local.mk
 #	vi local.mk
+#
+#	#  Consider these variables
+#
+#	#  where dir jmscott/{bin,sbin,lib,include,libexec,src,www} installed
+#	INSTALL_PREFIX=/usr/local
+#	INSTALL_PREFIX=/home/jmscott/opt
+#
+#	#  go executable, required
+#	GOEXEC=/usr/local/go/bin/go	#  required
+#
+#	#  enable compilation of postgresql dependencies
+#	JMSCOTT_COMPILE_PG=1
+#
+#	#  enable install of various web tools in dir $JMSCOTT_ROOT/www/
+#	JMSCOTT_COMPILE_WWW=1
+#
 #	make world
-#  Note:
-#	Is GODIST relavent for modern golang?
 #
 
 #  Where to install directory jmscott/.  Default is /usr/local/jmscott
 #  Value may be overriden by -DINSTALL_PREFIX=...
 
-INSTALL_PREFIX?=/usr/local
+#INSTALL_PREFIX?=/usr/local
 
 #  Typical location for development
 
-#INSTALL_PREFIX?=$(HOME)/opt
+INSTALL_PREFIX?=$(HOME)/opt
 
-# location of go distribution.
+# location of go executable.
 
-GODIST=/usr/local/go
+GOEXE=/usr/local/go/bin/go
 
-#  compile postgresql dependent code, set JMSCOTT_COMPILE_PG=1;
-#  otherwise, JMSCOTT_COMPILE_PG=0;  PG
+#  conditional compilation of postgresql dependent code
+#  set JMSCOTT_COMPILE_PG=1; otherwise, JMSCOTT_COMPILE_PG=0
+#  disable all PG compilation.
+
 export JMSCOTT_COMPILE_PG=1
 PGINC=/usr/local/pgsql/include
+
+#  conditional build of various www tools.
+#  set JMSCOTT_COMPILE_WWW=1 to enable; JMSCOTT_COMPILE_WWW=0 to disable.
+#  depends on perl xml libraries.
+
+export JMSCOTT_COMPILE_WWW=1

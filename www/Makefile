@@ -1,6 +1,11 @@
 #
 #  Synopsis:
 #	Standalone install of $JMSCOTT_ROOT/www
+#  Note:
+#	the process env JMSCOTT_COMPILE_WWW=1 determines if various
+#	www tools are installed.  to disable build set JMSCOTT_COMPILE_WWW=0.
+#	note that even when disable the "clean" and "distclean" still remove
+#	files.
 #
 
 include ../local.mk
@@ -15,13 +20,21 @@ COMPILED=								\
 		env env.d/help.pl 					\
 		form form.d/help.pl
 
+ifeq ($(JMSCOTT_COMPILE_WWW),1)
 all: $(COMPILED)
+else
+all:
+	@echo 'all www: JMSCOTT_COMPILE_WWW !=1: skipping (ok)'
+	@exit 0
+endif
 
 distclean:
+	rm -rf $(WWW_PREFIX)/src
 	rm -rf $(WWW_PREFIX)/lib
 	rm -rf $(WWW_PREFIX)/bin
 	rm -rf $(WWW_PREFIX)/cgi-bin
 
+ifeq ($(JMSCOTT_COMPILE_WWW),1)
 install: all
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(JMSCOTT_PREFIX)
@@ -103,6 +116,11 @@ install: all
 		env							\
 		form							\
 		$(WWW_PREFIX)/cgi-bin
+else
+install:
+	@echo 'install www: JMSCOTT_COMPILE_WWW !=1: skipping (ok)'
+	@exit 0
+endif
 
 clean:
 	rm -f $(COMPILED)
@@ -128,4 +146,4 @@ dist-lib:
 world: clean all distclean install
 
 bust-http-rfc2388: bust-http-rfc2388.go
-	$(GODIST)/bin/go build bust-http-rfc2388.go
+	$(GOEXE) build bust-http-rfc2388.go
