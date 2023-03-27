@@ -39,7 +39,7 @@ func main() {
 	} else {
 		var err error
 
-		out, err = os.Open(out_path)
+		out, err = os.OpenFile(out_path, os.O_WRONLY|os.O_CREATE, 0755)
 		if err != nil {
 			die("os.File.Open(%s) failed: %s", out_path, err)
 		}
@@ -70,7 +70,7 @@ func main() {
 		}
 		_, err = out.Write(buf[:nb])
 		if err != nil {
-			die("out.Write(udp4) failed: %s", err)
+			die("out.Write(out) failed: %s", err)
 		}
 	}
 	os.Exit(0)
