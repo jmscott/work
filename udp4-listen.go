@@ -15,7 +15,7 @@ import (
 
 func die(format string, args ...interface{}) {
 	
-	fmt.Fprintf(os.Stderr, "ERROR: " + format, args...)
+	fmt.Fprintf(os.Stderr, "ERROR: " + format + "\n", args...)
 	os.Exit(1)
 }
 
