@@ -116,8 +116,8 @@ SRCs="
 #"
 
 #  Uncomment to create etc/ directory
-#ETC="
-#"
+ETC="
+"
 
 #  Uncomment to create spool/ directory
 #SPOOL="
