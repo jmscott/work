@@ -150,6 +150,9 @@ is-utf8wf: is-utf8wf.c $(JMSLIB) $(JMSINC)
 is-dir-empty: is-dir-empty.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o is-dir-empty is-dir-empty.c $(CLINK)
 
+udp4-listen: udp4-listen.go
+	$(GOEXE) build udp4-listen.go
+
 world:
 	$(_MAKE) clean
 	$(_MAKE) all

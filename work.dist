@@ -34,6 +34,7 @@ COMPILEs="
 	stat-mtime
 	tas-lock-fs
 	tas-unlock-fs
+	udp4-listen
 "
 
 LIBs="
@@ -103,6 +104,7 @@ SRCs="
 	stat-mtime.c
 	tas-lock-fs.c
 	tas-unlock-fs.c
+	udp4-listen.go
 "
 
 #  Uncomment to create attic/ directory
