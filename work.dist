@@ -23,7 +23,6 @@ COMPILEs="
 	duration-mtime
 	escape-json-string
 	file-stat-size
-	flatx
 	fork-me
 	idiff
 	is-dir-empty
@@ -92,7 +91,6 @@ SRCs="
 	duration-mtime.c
 	escape-json-string.c
 	file-stat-size.c
-	flatx.c
 	fork-me.c
 	idiff.c
 	is-dir-empty.c
