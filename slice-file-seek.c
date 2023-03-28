@@ -47,7 +47,7 @@ _read(int fd, unsigned char *buf, size_t buf_size)
 static void
 _write(unsigned char *buf, size_t buf_size)
 {
-	if (jmscott_write(1, buf, buf_size))
+	if (jmscott_write_all(1, buf, buf_size))
 		die2("write(stdout) failed", strerror(errno));
 }
 
