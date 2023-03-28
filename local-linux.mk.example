@@ -21,6 +21,8 @@
 #	JMSCOTT_COMPILE_WWW=1
 #
 #	make world
+#  Note:
+#	Replace JMSCOTT_COMPILE_PG with PG_CONFIG=/usr/local/pgsql/bin/pg_config
 #
 
 #  Where to install directory jmscott/.  Default is /usr/local/jmscott
