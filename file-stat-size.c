@@ -40,7 +40,7 @@ die3(char *msg1, char *msg2, char *msg3)
 static void
 _write(void *p, ssize_t nbytes)
 {
-	if (jmscott_write(1, p, nbytes) < 0)
+	if (jmscott_write_all(1, p, nbytes) < 0)
 		die2("write(stdout) failed", strerror(errno));
 }
 

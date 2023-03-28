@@ -32,6 +32,7 @@ OBJs="
 	json.o
 	net.o
 	posio.o
+	sendfile.o
 	string.o
 	time.o
 	udig.o
@@ -72,9 +73,9 @@ SRCs="
 	halloc.c
 	hexdump.c
 	json.c
-	libjmscott.h
 	net.c
 	posio.c
+	sendfile.c
 	string.c
 	time.c
 	udig.c

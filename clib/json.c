@@ -98,11 +98,11 @@ jmscott_json_trace(struct jmscott_json *jp, char *what, char *value)
 {
 	if (!jp->trace)
 		return;
-	jmscott_write(2, "TRACE: ", 7);
-	jmscott_write(2, what, strlen(what));
-	jmscott_write(2, ": ", 2);
-	jmscott_write(2, value, strlen(value));
-	jmscott_write(2, "\n", 1);
+	jmscott_write_all(2, "TRACE: ", 7);
+	jmscott_write_all(2, what, strlen(what));
+	jmscott_write_all(2, ": ", 2);
+	jmscott_write_all(2, value, strlen(value));
+	jmscott_write_all(2, "\n", 1);
 }
 
 void
@@ -151,7 +151,7 @@ jmscott_json_write(struct jmscott_json *jp, char *format, ...)
 
 #define WRITE(s)							\
 	{								\
-		if (jmscott_write(jp->out_fd, s, strlen(s)))		\
+		if (jmscott_write_all(jp->out_fd, s, strlen(s)))		\
 			RETURN(strerror(errno));			\
 	}
 
@@ -238,7 +238,7 @@ step:
 		WRITE("]\n");
 		break;
 	default:
-		if (jmscott_write(jp->out_fd, &c, 1))
+		if (jmscott_write_all(jp->out_fd, &c, 1))
 			RETURN(strerror(errno));
 	}
 	goto step;

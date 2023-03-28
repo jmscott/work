@@ -96,7 +96,7 @@ main(int argc, char **argv)
 		else
 			sprintf(answer, "%dd\n", day);
 	}
-	if (jmscott_write(1, answer, strlen(answer)))
+	if (jmscott_write_all(1, answer, strlen(answer)))
 		die2("write(stderr) failed", strerror(errno));
 	return 0;
 }

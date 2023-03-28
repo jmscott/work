@@ -174,7 +174,7 @@ extern int	jmscott_read_exact_timeout(
 			ssize_t size,
 			int millisec
 		);
-extern int	jmscott_write(int fd, void *p, ssize_t nbytes);
+extern int	jmscott_write_all(int fd, void *p, ssize_t nbytes);
 extern off_t	jmscott_lseek(int fd, off_t offset, int whence);
 extern int	jmscott_open(char *path, int oflag, mode_t mode);
 extern int	jmscott_close(int fd);
@@ -226,4 +226,11 @@ extern char			*jmscott_RFC3339Nano_now(
 				);
 extern char			*jmscott_net_32addr2text(u_long addr);
 extern int			jmscott_flock(int, int);
+extern char			*jmscott_sendfile(
+					int in,
+					int out,
+					off_t
+					offset,
+					off_t len
+				);
 #endif //  JMSCOTT_LIBJMSCOTT_H

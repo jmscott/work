@@ -55,7 +55,7 @@ main(int argc, char **argv)
 	now[len++] = '\n';
 	now[len] = 0;
 
-	if (jmscott_write(1, now, len))
+	if (jmscott_write_all(1, now, len))
 		die2("write(stdout) failed", strerror(errno));
 	_exit(0);
 }

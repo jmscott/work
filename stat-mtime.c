@@ -40,7 +40,7 @@ enoent(char *path)
 static void
 _write(void *p, ssize_t nbytes)
 {
-	if (jmscott_write(1, p, nbytes))
+	if (jmscott_write_all(1, p, nbytes))
 		die2("write(stdout) failed", strerror(errno));
 }
 

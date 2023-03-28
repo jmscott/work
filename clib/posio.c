@@ -222,11 +222,9 @@ AGAIN:
  *  Returns:
  *	0	wrote "nbytes" with no error.
  *	-1	error in write(), consult errno.
- *  Note:
- *	Need to rename to jmscott_write_all().
  */
 int
-jmscott_write(int fd, void *p, ssize_t nbytes)
+jmscott_write_all(int fd, void *p, ssize_t nbytes)
 {
 	int nb = 0;
 

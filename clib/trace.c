@@ -49,7 +49,7 @@ jmscott_trace(char *msg)
 	else
 		jmscott_strcat(buf, sizeof buf, "<NULL>");
 	jmscott_strcat(buf, sizeof buf, "\n");
-	jmscott_write(trace_fd, buf, strlen(buf));
+	jmscott_write_all(trace_fd, buf, strlen(buf));
 }
 
 void
@@ -133,7 +133,7 @@ trace5(char *msg1, char *msg2, char *msg3, char *msg4)
 static void
 _write(char *buf)
 {
-	jmscott_write(trace_fd, buf, strlen(buf));
+	jmscott_write_all(trace_fd, buf, strlen(buf));
 }
 
 static short
