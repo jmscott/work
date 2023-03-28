@@ -12,6 +12,7 @@ is-utf8wf
 jmscott
 local.mk
 pg_launchd
+send-file-slice
 slice-file
 slice-file-seek
 slice-stdin

@@ -19,7 +19,7 @@
 
 extern int	errno;
 
-char *jmscott_progname = "slice-file";
+char *jmscott_progname = "send-file-slice";
 
 static void
 die(char *msg)
@@ -31,33 +31,6 @@ static void
 die2(char *msg1, char *msg2)
 {
 	jmscott_die2(5, msg1, msg2);
-}
-
-static ssize_t
-_read(int fd, unsigned char *buf, size_t buf_size)
-{
-	ssize_t nr;
-
-	nr = jmscott_read(fd, buf, buf_size);
-	if (nr < 0)
-		die2("read(input) failed", strerror(errno));
-	return nr;
-}
-
-static void
-_write(unsigned char *buf, size_t buf_size)
-{
-	if (jmscott_write_all(1, buf, buf_size))
-		die2("write(stdout) failed", strerror(errno));
-}
-
-size_t
-_lseek(int fd, off_t offset, int whence)
-{
-	off_t pos = jmscott_lseek(fd, offset, whence);
-	if (pos < 0)
-		die2("lseek() failed", strerror(errno));
-	return (size_t)pos;
 }
 
 int main(int argc, char **argv)
@@ -82,25 +55,9 @@ int main(int argc, char **argv)
 	if (in < 0)
 		die2("open(input) failed", strerror(errno));
 
-	off_t pos = jmscott_lseek(in, start, SEEK_SET);
-	if (pos < 0)
-		die2("lseek(input) failed", strerror(errno));
-
-	//  write slice to standard output
-	unsigned char buf[4096];
-
-	int nwrite = stop - start + 1;		//  start==stop ==> 1 byte
-	while (nwrite > 0) {
-		int sz = sizeof buf;
-		if (nwrite < sz)
-			sz = nwrite;
-		int nb = 0;
-		nb += _read(in, buf, sz);
-		if (nb == 0)
-			_exit(1);		// at end of file
-		_write(buf, nb);
-		nwrite -= nb;
-	}
+	char *status = jmscott_sendfile(in, 1, start, stop - start + 1);
+	if (status)
+		die2("sendfile() failed", status);
 	if (jmscott_close(in) != 0)
 		die2("close(in) failed", strerror(errno));
 	_exit(0);
