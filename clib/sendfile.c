@@ -10,9 +10,13 @@
 
 extern int	errno;
 
+#if defined(__APPLE__)
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
+#else
+#include <sys/sendfile.h>
+#endif
 
 //  mac os (<ventura) can not sendfile on non socket, so brute force
 
@@ -45,8 +49,13 @@ jmscott_sendfile(int in, int out, off_t offset, off_t len)
 	int total = len;
 	int status;
 AGAIN:
+#if defined(__APPLE__)
 	status = sendfile(in, out, offset, &len, (struct sf_hdtr *)0, 0);
-	if (status != 0) {
+#else
+	status = sendfile(out, in, &offset, len);
+	len = status;
+#endif
+	if (status < 0) {
 		if (errno == ENOTSOCK)
 			return send_not_socket(in, out, offset, len);
 		if (errno == EAGAIN)
