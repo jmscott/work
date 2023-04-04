@@ -68,14 +68,13 @@ _prepend_PATH()
 #  Add various directories to PATH
 #
 _prepend_PATH 								\
+	$HOME/bin							\
 	/opt/local/libexec/gnubin					\
 	/opt/local/bin							\
 	$JMSCOTT_ROOT/bin						\
 	$PGHOME/bin							\
 	/usr/sbin							\
 	/sbin
-
-_prepend_PATH . $HOME/bin
 
 [ "$USER" = root ] && _prepend_PATH /opt/local/sbin $JMSCOTT_ROOT/sbin
 
