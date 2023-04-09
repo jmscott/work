@@ -42,11 +42,11 @@ GOEXE=/usr/local/go/bin/go
 #  set JMSCOTT_COMPILE_PG=1; otherwise, JMSCOTT_COMPILE_PG=0
 #  disable all PG compilation.
 
-export JMSCOTT_COMPILE_PG=1
+export JMSCOTT_COMPILE_PG?=1
 PGINC=/usr/local/pgsql/include
 
 #  conditional build of various www tools.
 #  set JMSCOTT_COMPILE_WWW=1 to enable; JMSCOTT_COMPILE_WWW=0 to disable.
 #  depends on perl xml libraries.
 
-export JMSCOTT_COMPILE_WWW=1
+export JMSCOTT_COMPILE_WWW?=1
