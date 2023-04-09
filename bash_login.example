@@ -68,6 +68,7 @@ _prepend_PATH()
 #  Add various directories to PATH
 #
 _prepend_PATH 								\
+	.								\
 	$HOME/bin							\
 	/opt/local/libexec/gnubin					\
 	/opt/local/bin							\
