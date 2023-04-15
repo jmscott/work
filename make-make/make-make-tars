@@ -1,0 +1,212 @@
+#!/usr/bin/env bash
+#
+#  Synopsis:
+#	Libexecs script to merge multiple tar files into a single tar file.
+#  Description:
+#	Merge the files from several different *.mkmk files into a single
+#	tar file suitable for deployment.  The merged tar file can be unpacked
+#	in the root/start_dir target directory.
+#
+#	The cool symbol ꛷ for a question comes from the Banum people of
+#	west africa.
+#  Usage:
+#	cd ~/src/github.com/jmscott/setspace
+#	git pull
+#
+#	MKMK1=setspace.mkmk
+#	MKMK2=schema/setcore/setspace-schema-setcore.mkmk
+#	MKMK3=schema/pdfbox/setspace-schema-pdfbox.mkmk
+#	TAG=setspace-$(git rev-parse --short HEAD)
+#	
+#	make-make tars $TAG $MKMK1 $MKMK2 $MKMK3		|| exit 1
+#	TAR=$(echo $TAG-[0-9]*.tar.bz)
+#	cp $TAR ~/opt/setspace/dist/
+#	cd ~/opt/setspace
+#	#  stop processes for setcore and pdfbox
+#	tar xvf dist/$TAR
+#	#  start processes for setcore and pdfbox
+#  Requires:
+#	gnu realpath find bash tar date
+#	jmscott elapsed-english
+#	
+#  Exit Status:
+#	0	tars merged into single tar <tag>-YYYYMMDD_hhmm.tar.bz2
+#	1	failure
+#  Note:
+#	Consider moving the individual tar files into the respective dirs/dist.
+#
+
+PROG=make-make-tars
+START_EPOCH=$(date +%s)
+TAG=
+WORK_TMP=
+START_DIR=$(pwd)
+
+#  match file names *-YYYYMMDD_hhmm.tar.bz2
+TAR_BZ2_REGEX='-[123][0-9]{7}_[0-5][0-9]{3}[.]tar[.]bz2$'
+
+#  map dir dist/ base to realpath of containing directory
+declare -A tarbz2dir_path
+
+WARN()
+{
+	PREAMBLE=$PROG
+	test -n "$TAG" && PREAMBLE="$PREAMBLE-$TAG"
+	echo "$PREAMBLE: WARN: $@" >&2
+}
+
+zap_work_tmp()
+{
+	test -n "$WORK_DIR" -a -d $WORK_DIR || return
+	cd "$START_DIR"
+	"-$WORK_TMP"
+	rm -rf $WORK_TMP || WARN "rm tmp/work/ failed: exit status=$?"
+	WORK_TMP=
+}
+
+leave()
+{
+	zap_work_tmp
+	echo "#  $PROG: good bye, cruel world: $(elapsed-english $START_EPOCH)"
+}
+
+die()
+{
+	PREAMBLE="$PROG"
+	test -n "$TAG" && PREAMBLE="$PREAMBLE-$TAG"
+	echo "$PREAMBLE: ERROR: $@" >&2
+	exit 1
+}
+
+#
+#  Find previous tar files <start_dir>/dist/<product>-YYYYMMDD_HHMM.tar.bz2.
+#
+#  Note:
+#	what about escaping regex metachars in $MKMK?
+#
+find_dist_tar()
+{
+	MKMK_PATH="$1"
+	MKMK=$(basename "$MKMK_PATH" .mkmk)
+	MKMK_DIR=$(dirname "$MKMK_PATH")
+
+	find "$MKMK_DIR"						\
+		-maxdepth 1						\
+		-type f							\
+		-regextype posix-extended				\
+		-regex '.*/'"$MKMK$TAR_BZ2_REGEX"
+}
+
+#  remove stale <product>-YYYYMMDD_HHMM.bz2 files of previous dist pulls.
+
+purge_tar()
+{
+	find_dist_tar $1						|
+	  while read TAR;  do
+	  	echo "-$TAR"
+		rm -f $TAR || die "rm old tar.bz failed: exit status=$?"
+	  done
+}
+
+make_tar()
+{
+	local MKMK=$1
+
+	cd "$START_DIR" || die "cd start dir failed: exit status=$?"
+
+	MKMK_DIR=$(dirname $MKMK)
+	echo "->$MKMK_DIR"
+	MKMK_DIR=$(realpath $MKMK_DIR --relative-to "$START_DIR")
+	cd $MKMK_DIR || die "cd dist dir failed: exit status=$?"
+	BASE_MKMK=$(basename $MKMK)
+	echo "<$BASE_MKMK"
+	make-make tar $BASE_MKMK || die "make-make tar failed: exit status=$?"
+
+	for TAR in $(find_dist_tar $BASE_MKMK);  do
+		mv $TAR $WORK_TMP/dist				||
+			die "mv tar to tmp/work/dist failed: exit status=#?"
+
+		local _TAR
+		_TAR=$(basename $TAR)
+		#  Note: need to verify no duplicates!
+		tarbz2dir_path["$_TAR"]=$MKMK_DIR
+	done
+}
+
+unpack_dist_tar()
+{
+	local TAR_NAME
+	local TAR_PATH
+	local MKMK_PATH
+
+	cd $WORK_TMP || die "cd work/tmp start unpack failed: exit status=$?"
+	TAR_PATH=$1
+	TAR_NAME=$(basename $TAR_PATH)
+	echo "꛷$TAR_PATH"
+
+	MKMK_PATH="${tarbz2dir_path[$TAR_NAME]}"
+	test -n "$MKMK_PATH" || die "can not find dist path: $TAR_NAME"
+	echo "+>$MKMK_PATH"
+	mkdir -p $MKMK_PATH || die "mkdir unpack dist failed: exit status=$?"
+
+	TAR_PATH=$(realpath --relative-to $MKMK_PATH $TAR_PATH)
+	cd $MKMK_PATH || die "cd unpack dist path failed: exit status=$?"
+	tar xvf $TAR_PATH || die "tar x unpack failed: exit status=$?"
+}
+
+#  verify paths to dist files
+
+trap leave EXIT
+echo
+echo "#  $PROG: hello, world"
+
+TAG="$1";  shift
+
+#  verify the dist files exist
+
+for MKMK in $*;  do
+	case $MKMK in
+	*' '*)
+		die "space not allowed in dist path: $MKMK"
+		;;
+	*.mkmk)
+		echo "✓$MKMK"
+		test -r $MKMK || die "can not read mkmk file: $MKMK"
+		purge_tar $MKMK || exit
+		;;
+	*)
+		die "mkmk file must has .mkmk suffix: $MKMK"
+		;;
+	esac
+done
+
+#  assemble the temp work dir in which to unpack the indvidually built tar.bz2
+#  files.
+WORK_TMP=${TMPDIR:=/tmp}/$PROG-$$.d
+echo "+>$WORK_TMP/dist"
+mkdir -p $WORK_TMP/dist || die "mkdir -p tmp/work/dist failed: exit status=$?"
+
+WORK_TMP=$(realpath $WORK_TMP)
+
+#  build a tar file for each dist file by executing "make tar" in the
+#  containing directory.
+
+for MKMK in $*;  do
+	make_tar $MKMK || exit
+done
+
+echo "->$WORK_TMP"
+cd $WORK_TMP || die "cd work tmp failed: exit status=$?"
+
+for TAR in dist/*.tar.bz2;  do
+	unpack_dist_tar $TAR || exit
+done
+
+cd $WORK_TMP || die "cd work/tmp post unpack failed: exit status=$?"
+
+#  bundle the temp directory into single tar in $START_DIR
+
+tar cvf $START_DIR/$TAG-$(date +'%Y%m%d_%H%M').tar.bz2 . --bzip2	||
+	die "tar tmp/work failed: exit status=$?"
+
+exit 0

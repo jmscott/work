@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+#
+#  Synopsis:
+#	exec "make-make help" command by pulling preamble from make-make script.
+#
+die()
+{
+	echo "make-make: ERROR: $@" 2>&1
+	exit 1
+}
+
+MAKE_MAKE_PATH=$(which make-make)
+STATUS=$?
+test $STATUS = 0 || die "which make-make failed: exit status=$STATUS"
+
+#  filter the comments from the preamble in the bash script
+
+#  macos awk has issue with / in char class, hence filter out #!/bin/bash
+
+sed -n '/^#/,/^$/{/^$/q; p}' $MAKE_MAKE_PATH | grep -v '^#!' | more

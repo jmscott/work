@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#
+#  Synopsis:
+#	Write a template file for starting a new mkmk file
+#  Usage:
+#	make-mkmk template
+#
+exec cat $JMSCOTT_ROOT/lib/make-make.mkmk.example

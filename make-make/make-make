@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+#
+#  Synopsis:
+#	Build a tar or populate makefile recipies from configuration file.
+#  Usage:
+#	make-make help
+#	make-make template >foobar.mkmk
+#	make-make tar foobar.mkmk
+#	make-make tars <tag> foobar.mkmk bar.mkmk
+#  See:
+#	https://github.com/jmscott/work/blob/master/make-make
+#	https://en.wikipedia.org/wiki/Unix_filesystem
+#  Note:
+#	Need rsync in addition to tar, to preserve timestamps on target.
+#
+#	Add startup test for GNU sed!
+#
+#	VAR->dir remaps only for a single directory.  for example,
+#
+#		LIBs->lib/schema
+#
+#	The tar version insures that dynamic directories in foobar.conf
+#	exist but does NOT ever overwrite, lest precious data be lost.
+#	However, the Makefile version, does not insure, so make recipes
+#	must be hand coded.  Adding an option to generate the install
+#	recipes would be nice:
+#
+#		make-make dynamic-dirs
+#
+#	Which could be manually spliced back into the Makefile.
+#
+#	Add command "env" or "fs" to document environment variables in config
+#	file that describe directories.
+#
+#	Add "unpack" action, which properly removes and unpacks *.tar.bz2
+#	directories.  Will need to make no assumptions about the root directory
+#	files.  In other words, if, say, dir sbin/ is not in the tar file,
+#	then "unpack" would NOT remove an existing /sbin/ on the target.
+#	This algorithm implies knowing the difference between static dirs
+#	like /sbin/, /lib/, etc versus dynatic dirs like /run/, /spool/.
+#	Perhaps if the directory is empty in the tar file, then we can
+#	safely assume the directory is dynamic and NOT to be removed on the
+#	target.
+#
+
+die()
+{
+	echo "ERROR: $@" >&2
+	exit 1
+}
+
+can_read_mkmk()
+{
+	MKMK="$1"
+	test -r "$MKMK" || die "mkmk file not readable: $MKMK"
+}
+
+[ "${BASH_VERSINFO:-0}" -ge 4 ] 					||
+	die "bash version must be >= 4: ver ${BASH_VERSINFO:-0}" 
+
+test $# = 0 && die 'no command line arguments'
+test -n "$JMSCOTT_ROOT" || die 'env not defined: JMSCOTT_ROOT'
+test -d $JMSCOTT_ROOT || die "dir does not exist: $JMSCOTT_ROOT"
+
+ACTION="$1";  shift
+case "$ACTION" in
+help)
+	test $# = 0							||
+		die "help: wrong number of arguments: got $#, expected 0"
+	exec $JMSCOTT_ROOT/libexec/make-make-help
+	;;
+
+template)
+	#  generate template file
+	test $# = 0							||
+		die "template: wrong number of arguments: got $#, expected 0"
+	exec $JMSCOTT_ROOT/libexec/make-make-template
+	;;
+tar)
+	#  make-make tar foobar.mkmk
+	test $# = 1							||
+		die "tar: wrong number of arguments: got $#, expected 1"
+	can_read_mkmk "$1"
+	exec $JMSCOTT_ROOT/libexec/make-make-tar "$1"
+	;;
+tars)
+	#  make-make tars <tag> foo.mkmk bar.mkmk ... 
+
+	test $# -lt 2 && die 						\
+		"tars: wrong number of arguments: got $#, expected at least 2"
+	for MKMK in $@;  do
+		can_read_mkmk $MKMK
+	done
+	exec $JMSCOTT_ROOT/libexec/make-make-tars "$@"
+	;;
+*)
+	die "unknown action: $ACTION"
+	;;
+esac
