@@ -7,6 +7,8 @@
  *  Note:
  *	Consider replacing the default out put of msg+"\n" to a pipe to
  *	long running background process to further masage the udp4 message.
+ *	By the way, this piping trick may actually be possible using socats
+ *	ability to fork subprocesses.  not sure.
  *
  *	This program only exists since socat can not terminate udp4 packets
  *	with a newline.  various piping to a script were more cumbersone than
