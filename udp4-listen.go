@@ -5,6 +5,9 @@
  *	udp4-listen <listen-ip4> <port> <output-path>
  *	udp4-listen 192.168.1.175 10514 raspberry-pi.log
  *  Note:
+ *	Consider replacing the default out put of msg+"\n" to a pipe to
+ *	long running background process to further masage the udp4 message.
+ *
  *	This program only exists since socat can not terminate udp4 packets
  *	with a newline.  various piping to a script were more cumbersone than
  *	than just writing this program.
@@ -87,6 +90,7 @@ func main() {
 	if err != nil {
 		die("net.ListenUDP(%s) failed: %s", addr, err)
 	}
+
 	go slurp(in, out)
 
 	sigc := make(chan os.Signal, 1)
