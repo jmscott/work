@@ -23,37 +23,8 @@ func die(format string, args ...interface{}) {
 	os.Exit(1)
 }
 
-func main() {
+func slurp(in *net.UDPConn, out *os.File) {
 
-	argc := len(os.Args) - 1
-	if argc != 3 {
-		die("wrong number of cli args: got %d, expected 3", argc)
-	}
-
-	var out *os.File
-	out_path := os.Args[3]
-	if out_path == "stdout" {
-		out = os.Stdout
-	} else if out_path == "stderr" {
-		out = os.Stderr
-	} else {
-		var err error
-
-		out, err = os.OpenFile(out_path, os.O_WRONLY|os.O_CREATE, 0755)
-		if err != nil {
-			die("os.File.Open(%s) failed: %s", out_path, err)
-		}
-	}
-
-	service := fmt.Sprintf("%s:%s", os.Args[1], os.Args[2])
-	addr, err := net.ResolveUDPAddr("udp4", service)
-	if err != nil {
-		die("net.ResolveUDPAddr(%s) failed: %s", service, err)
-	}
-	in, err := net.ListenUDP("udp4", addr)
-	if err != nil {
-		die("net.ListenUDP(%s) failed: %s", addr, err)
-	}
 	for {
 	       var buf [2048]byte	//  larger than udp packet
 
@@ -73,5 +44,43 @@ func main() {
 			die("out.Write(out) failed: %s", err)
 		}
 	}
+}
+
+func main() {
+
+	argc := len(os.Args) - 1
+	if argc != 3 {
+		die("wrong number of cli args: got %d, expected 3", argc)
+	}
+
+	var out *os.File
+	out_path := os.Args[3]
+	if out_path == "stdout" {
+		out = os.Stdout
+	} else if out_path == "stderr" {
+		out = os.Stderr
+	} else {
+		var err error
+
+		out, err = os.OpenFile(
+				out_path,
+				os.O_APPEND|os.O_WRONLY|os.O_CREATE,
+				0755,
+		)
+		if err != nil {
+			die("os.File.Open(%s) failed: %s", out_path, err)
+		}
+	}
+
+	service := fmt.Sprintf("%s:%s", os.Args[1], os.Args[2])
+	addr, err := net.ResolveUDPAddr("udp4", service)
+	if err != nil {
+		die("net.ResolveUDPAddr(%s) failed: %s", service, err)
+	}
+	in, err := net.ListenUDP("udp4", addr)
+	if err != nil {
+		die("net.ListenUDP(%s) failed: %s", addr, err)
+	}
+	slurp(in, out)
 	os.Exit(0)
 }
