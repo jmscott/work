@@ -15,6 +15,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func die(format string, args ...interface{}) {
@@ -53,6 +55,8 @@ func main() {
 		die("wrong number of cli args: got %d, expected 3", argc)
 	}
 
+	//  open output
+
 	var out *os.File
 	out_path := os.Args[3]
 	if out_path == "stdout" {
@@ -72,6 +76,8 @@ func main() {
 		}
 	}
 
+	//  open udp4 listener
+
 	service := fmt.Sprintf("%s:%s", os.Args[1], os.Args[2])
 	addr, err := net.ResolveUDPAddr("udp4", service)
 	if err != nil {
@@ -81,6 +87,12 @@ func main() {
 	if err != nil {
 		die("net.ListenUDP(%s) failed: %s", addr, err)
 	}
-	slurp(in, out)
+	go slurp(in, out)
+
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc, syscall.SIGINT, syscall.SIGTERM)
+
+	sig := <-sigc
+	fmt.Println("\nudp4-listen: caught signal:", sig)
 	os.Exit(0)
 }
