@@ -17,15 +17,11 @@ import (
 	"fmt"
 	"mime/multipart"
 	"os"
-	"syscall"
 	"time"
 )
 
 var (
 	prog = "bust-http-rfc2388"
-	stderr = os.NewFile(uintptr(syscall.Stderr), "/dev/stderr")
-	stdin = os.NewFile(uintptr(syscall.Stdin), "/dev/stdin")
-	stdout = os.NewFile(uintptr(syscall.Stdout), "/dev/stdout")
 )
 
 type ProcessSignature struct {
@@ -51,12 +47,12 @@ type json_response struct {
 func die(format string, args ...interface{}) {
 
 	fmt.Fprintf(
-		stderr,
+		os.Stderr,
 		"%s: ERROR: %s\n",
 		prog,
 		fmt.Sprintf(format, args...),
 	)
-	fmt.Fprintf(stderr, "usage: %s <boundary-string>\n", prog)
+	fmt.Fprintf(os.Stderr, "usage: %s <boundary-string>\n", prog)
 	os.Exit(1)
 }
 
@@ -90,7 +86,7 @@ func main() {
 		res.Signature.Hostname = host
 	}
 
-	mr := multipart.NewReader(stdin, res.BoundaryString)
+	mr := multipart.NewReader(os.Stdin, res.BoundaryString)
 	form, err := mr.ReadForm(int64(0))
 	if err != nil {
 		die("multipart.ReadForm(stdin) failed: %s", err)
