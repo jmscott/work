@@ -12,6 +12,10 @@
 #	jmscott elapsed-english
 #	gnu date
 #  Note:
+#	Make *_local versions of ALL variables that can be remapped in *.mkmk
+#	file.  Currently only VAR2dir_local() can be remapped.  Need to also
+#	remap dir2perm{} and file2perm{}.
+#
 #	Need option to keep temp work directory!
 #
 #	- VAR->dir remaps only for a single directory.  for example,
