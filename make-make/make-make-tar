@@ -421,10 +421,6 @@ TAR_FILE=$TAR_FILE-$(date +'%Y%m%d_%H%M').tar.bz2
 echo ">>$TAR_FILE"
 (
 	cd $WORK_TMP || die "cd $WORK_TMP failed"
-	#
-	#  Tar up files in scratch directory.
-	#  Need to check tar error status with ${PIPSTATUS[]}.
-	#
 	tar cf - . || die "tar cf failed: exit status=$?"
 ) | bzip2 --best >$TAR_FILE
 STATUS=${PIPESTATUS[*]}
