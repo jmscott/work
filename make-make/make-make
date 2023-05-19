@@ -3,6 +3,7 @@
 #  Synopsis:
 #	Build a tar or populate makefile recipies from configuration file.
 #  Usage:
+#	export JMSCOTT_ROOT=/usr/local/jmscott
 #	make-make help
 #	make-make template >foobar.mkmk
 #	make-make tar foobar.mkmk
