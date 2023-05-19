@@ -45,6 +45,10 @@ dev-links:
 	test -e log || ln -s . log
 	test -e etc || ln -s . etc
 	test -e run || ln -s . run
+	test -e libexec || ln -s . libexec
+	test -e lib || ln -s . lib
 	test -e spool || ln -s . spool
+clean-dev-links:
+	rm -f log etc run spool libexec lib
 tar:
 	make-make tar $(MKMK)
