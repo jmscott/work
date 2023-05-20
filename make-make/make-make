@@ -12,6 +12,11 @@
 #	https://github.com/jmscott/work/blob/master/make-make
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
+#	Consider adding the commit hash to the tar file name:
+#
+#		GIT_SIG=$(git rev-parse --short=4 HEAD)
+#		work-<YYYYMMDD_hhmm>-$GIT_SIG.tar.bz2
+#
 #	Need rsync in addition to tar, to preserve timestamps on target.
 #
 #	Add startup test for GNU sed!
