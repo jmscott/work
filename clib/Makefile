@@ -11,12 +11,12 @@ include ../jmscott.mk
 
 _MAKE=$(MAKE) $(MFLAGS)
 
-DIST=work-clang.dist
-COMPILEs := $(shell  (. ./$(DIST) && echo $$COMPILEs))
-OBJs := $(shell  (. ./$(DIST) && echo $$OBJs))
-LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
-SRCs := $(shell  (. ./$(DIST) && echo $$SRCs))
-INCLUDEs := $(shell  (. ./$(DIST) && echo $$INCLUDEs))
+MKMK=work-clang.mkmk
+COMPILEs := $(shell  (. ./$(MKMK) && echo $$COMPILEs))
+OBJs := $(shell  (. ./$(MKMK) && echo $$OBJs))
+LIBs := $(shell  (. ./$(MKMK) && echo $$LIBs))
+SRCs := $(shell  (. ./$(MKMK) && echo $$SRCs))
+INCLUDEs := $(shell  (. ./$(MKMK) && echo $$INCLUDEs))
 
 all: $(COMPILEs)
 
@@ -89,8 +89,8 @@ net.o: net.c libjmscott.h
 ecpg.o: ecpg.c libjmscott.h
 	cc $(CFLAGS) -DJMSCOTT_COMPILE_PG=$(JMSCOTT_COMPILE_PG) -I$(PGINC) -c ecpg.c
 
-dist:
-	make-dist tar $(DIST)
+tar:
+	make-make tar $(MKMK)
 
 libjmscott.a: $(OBJs) libjmscott.h
 	ar crs libjmscott.a $(OBJs)

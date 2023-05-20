@@ -1,0 +1,16 @@
+#
+#  Synopsis:
+#	Configuration file for make-make script
+#  See:
+#	./Makefile
+#	https://github.com/jmscott/work/tree/master/make-make
+#
+BINs="
+	furl
+"
+LIBs="
+	crontab.conf.example
+	profile.example
+	work-furl.mkmk
+	write-out.curl.example
+"

@@ -21,5 +21,5 @@ clean-dev-links:
 	test ! -e run || rm run
 	test ! -e tmp || rm tmp
 
-dist:
-	make-dist dist-root.conf
+tar:
+	make-make tar work-furl.mkmk

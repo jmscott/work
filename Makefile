@@ -10,9 +10,6 @@
 #
 #	Probably time to retire flatx.
 #
-#	Add warning when running ./make-dist instead of previously installed
-#	version in $JMSCOTT_ROOT/bin.
-#
 #	Install README in /usr/local/jmscott/README, describing github location
 #	and digest of installed code (typically trunk).
 #
@@ -27,12 +24,12 @@ include jmscott.mk
 
 _MAKE=$(MAKE) $(MFLAGS)
 
-DIST=work.dist
-COMPILEs := $(shell  (. ./$(DIST) && echo $$COMPILEs))
-SBINs := $(shell  (. ./$(DIST) && echo $$SBINs))
-LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
-BINs := $(shell  (. ./$(DIST) && echo $$BINs))
-SRCs := $(shell  (. ./$(DIST) && echo $$SRCs))
+MKMK=work.mkmk
+COMPILEs := $(shell  (. ./$(MKMK) && echo $$COMPILEs))
+SBINs := $(shell  (. ./$(MKMK) && echo $$SBINs))
+LIBs := $(shell  (. ./$(MKMK) && echo $$LIBs))
+BINs := $(shell  (. ./$(MKMK) && echo $$BINs))
+SRCs := $(shell  (. ./$(MKMK) && echo $$SRCs))
 
 JMSLIB=clib/libjmscott.a
 JMSINC=clib/libjmscott.h
@@ -77,7 +74,7 @@ install: all
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r		\
 		$(SRCs)							\
 		$(JMSCOTT_PREFIX)/src
-	cd make-dist && $(_MAKE) install
+	cd make-make && $(_MAKE) install
 	cd clib && $(_MAKE) install
 	cd pgsnap && $(_MAKE) install
 	cd www && $(_MAKE) install
@@ -90,7 +87,7 @@ distclean:
 	cd clib && $(_MAKE) $(MFLAGS) distclean
 	cd www && $(_MAKE) distclean
 	cd pgsnap && $(_MAKE) distclean
-	cd make-dist && $(_MAKE) distclean
+	cd make-make && $(_MAKE) distclean
 	rm -rf $(JMSCOTT_PREFIX)/bin
 	rm -rf $(JMSCOTT_PREFIX)/sbin
 	rm -rf $(JMSCOTT_PREFIX)/src
@@ -158,9 +155,9 @@ world:
 	$(_MAKE) all
 	$(_MAKE) distclean
 	$(_MAKE) install
-	cd make-dist && $(_MAKE) world
+	cd make-make && $(_MAKE) world
 	cd clib && $(_MAKE) world
 	cd pgsnap && $(_MAKE) pgsnap
 	cd www && $(_MAKE) world
-dist:
-	make-dist tar $(DIST)
+tar:
+	make-make tar $(MKMK)

@@ -5,9 +5,9 @@
 #	https://github.com/jmscott/work/blob/master/make-dist
 #  Note:
 #	Makefile variables can be extracted and defined from the the
-#	root.dist file with these recipes.  Example make code follows:
+#	root.mkmk file with these recipes.  Example make code follows:
 #
-#		DIST=product.dist
+#		DIST=product.mkmk
 #
 #		COMPILEs := $(shell  (. ./$(DIST) && echo $$COMPILEs))
 #		SBINs := $(shell  (. ./$(DIST) && echo $$SBINs))
@@ -21,35 +21,27 @@
 
 #  Uncomment to override default mappings of VARs to target directory
 VAR2dir_local=(
-	[INCLUDEs]='include/jmscott'
+	[LIBs]='lib/pgsnap'
 )
 
-OBJs="
-	die.o
-	ecpg.o
-	halloc.o
-	hexdump.o
-	json.o
-	net.o
-	posio.o
-	sendfile.o
-	string.o
-	time.o
-	udig.o
-"
-
-COMPILEs="
-	$OBJs
-	libjmscott.a
-"
+#
+#  Uncomment for compiled programs to be installed in bin/ or sbin/ and
+#  removed in "clean" recipes.
+#
+#COMPILEs="
+#"
 
 LIBs="
-	libjmscott.a
+	crontab.example
+	profile.example
+	work-pgsnap.mkmk
 "
 
 #  Uncoment to create bin/ directory
-#BINs="
-#"
+BINs="
+	pgsnap
+	pgsnap-janitor
+"
 
 #SBINs="
 #"
@@ -67,19 +59,8 @@ LIBs="
 #"
 
 #  Uncomment to create src/ directory
-SRCs="
-	die.c
-	ecpg.c
-	halloc.c
-	hexdump.c
-	json.c
-	net.c
-	posio.c
-	sendfile.c
-	string.c
-	time.c
-	udig.c
-"
+#SRCs="
+#"
 
 #  Uncomment to create attic/ directory
 #ATTIC="
@@ -116,7 +97,3 @@ SRCs="
 #  Uncomment to create directory libexec/
 #LIBEXECs="
 #"
-
-INCLUDEs="
-	libjmscott.h
-"

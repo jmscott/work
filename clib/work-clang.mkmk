@@ -21,27 +21,36 @@
 
 #  Uncomment to override default mappings of VARs to target directory
 VAR2dir_local=(
-	[LIBs]='lib/pgsnap'
+	[INCLUDEs]='include/jmscott'
 )
 
-#
-#  Uncomment for compiled programs to be installed in bin/ or sbin/ and
-#  removed in "clean" recipes.
-#
-#COMPILEs="
-#"
+OBJs="
+	die.o
+	ecpg.o
+	halloc.o
+	hexdump.o
+	json.o
+	net.o
+	posio.o
+	sendfile.o
+	string.o
+	time.o
+	udig.o
+"
+
+COMPILEs="
+	$OBJs
+	libjmscott.a
+"
 
 LIBs="
-	crontab.example
-	profile.example
-	work-pgsnap.dist
+	libjmscott.a
+	work-clang.mkmk
 "
 
 #  Uncoment to create bin/ directory
-BINs="
-	pgsnap
-	pgsnap-janitor
-"
+#BINs="
+#"
 
 #SBINs="
 #"
@@ -59,8 +68,19 @@ BINs="
 #"
 
 #  Uncomment to create src/ directory
-#SRCs="
-#"
+SRCs="
+	die.c
+	ecpg.c
+	halloc.c
+	hexdump.c
+	json.c
+	net.c
+	posio.c
+	sendfile.c
+	string.c
+	time.c
+	udig.c
+"
 
 #  Uncomment to create attic/ directory
 #ATTIC="
@@ -97,3 +117,7 @@ BINs="
 #  Uncomment to create directory libexec/
 #LIBEXECs="
 #"
+
+INCLUDEs="
+	libjmscott.h
+"

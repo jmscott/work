@@ -3,9 +3,9 @@
 #	Bash sourceable conf file for make-make to build files in $JMSCOTT_ROOT.
 #  See:
 #	./Makefile
-#	https://github.com/jmscott/work/blob/master/make-make
+#	https://github.com/jmscott/work/tree/master/make-make
 #  Note:
-#	Rename this file to jmscott-work.dist?
+#	Rename this file to jmscott-work.mkmk?
 #
 
 #  Uncomment to override default mappings of VARs to target directory
@@ -38,7 +38,7 @@ COMPILEs="
 
 LIBs="
 	bash_login.example
-	work.dist
+	work.mkmk
 "
 
 BINs="

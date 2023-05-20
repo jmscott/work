@@ -10,9 +10,9 @@ include ../jmscott.mk
 
 _MAKE=$(MAKE) $(MFLAGS)
 
-DIST=work-pgsnap.dist
-BINs := $(shell  (. ./$(DIST) && echo $$BINs))
-LIBs := $(shell  (. ./$(DIST) && echo $$LIBs))
+MKMK=work-pgsnap.mkmk
+BINs := $(shell  (. ./$(MKMK) && echo $$BINs))
+LIBs := $(shell  (. ./$(MKMK) && echo $$LIBs))
 
 install-dirs:
 	cd .. && $(_MAKE) install-dirs
@@ -41,5 +41,5 @@ dev-links:
 	test -e etc || ln -s . etc
 	test -e run || ln -s . run
 	test -e spool || ln -s . spool
-dist:
-	make-dist tar $(DIST)
+tar:
+	make-make tar $(MKMK)
