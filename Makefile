@@ -74,6 +74,7 @@ install: all
 	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m ugo=r		\
 		$(SRCs)							\
 		$(JMSCOTT_PREFIX)/src
+	cd make-dist && $(_MAKE) install
 	cd make-make && $(_MAKE) install
 	cd clib && $(_MAKE) install
 	cd pgsnap && $(_MAKE) install
@@ -87,6 +88,7 @@ distclean:
 	cd clib && $(_MAKE) $(MFLAGS) distclean
 	cd www && $(_MAKE) distclean
 	cd pgsnap && $(_MAKE) distclean
+	cd make-dist && $(_MAKE) distclean
 	cd make-make && $(_MAKE) distclean
 	rm -rf $(JMSCOTT_PREFIX)/bin
 	rm -rf $(JMSCOTT_PREFIX)/sbin
@@ -155,6 +157,7 @@ world:
 	$(_MAKE) all
 	$(_MAKE) distclean
 	$(_MAKE) install
+	cd make-dist && $(_MAKE) world
 	cd make-make && $(_MAKE) world
 	cd clib && $(_MAKE) world
 	cd pgsnap && $(_MAKE) pgsnap
