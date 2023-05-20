@@ -15,7 +15,10 @@
 #	Consider adding the commit hash to the tar file name:
 #
 #		GIT_SIG=$(git rev-parse --short=4 HEAD)
+#		GIT_SIG=$(git log -1 --pretty=format:%h)
 #		work-<YYYYMMDD_hhmm>-$GIT_SIG.tar.bz2
+#
+#	Also, git-log has a number of formatting options.
 #
 #	Need rsync in addition to tar, to preserve timestamps on target.
 #
