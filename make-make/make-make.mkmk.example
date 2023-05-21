@@ -27,7 +27,7 @@
 #		BINs := $(shell (. ./$(MKMK) && echo $$BINs))
 #		HTDOCSs := $(shell (. ./$(MKMK) && echo $$HTDOCSs))
 #		CGIBINs := $(shell (. ./$(MKMK) && echo $$CGIBINs))
-#		LIBEXEC := $(shell (. ./$(MKMK) && echo $$LIBEXECs))
+#		LIBEXECs := $(shell (. ./$(MKMK) && echo $$LIBEXECs))
 #
 
 #  Uncomment to override default mappings of VARs to target directory
