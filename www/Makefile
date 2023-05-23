@@ -142,9 +142,6 @@ env env.d/help.pl: env.cgi
 form form.d/help.pl: form.cgi
 	./cgi2perl5 --source-path form.cgi
 
-dist-lib:
-	make-dist dist-lib.conf
-
 world: clean all distclean install
 
 rfc2388_2json: rfc2388_2json.go
