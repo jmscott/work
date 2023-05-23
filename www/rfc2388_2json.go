@@ -1,12 +1,6 @@
 /*
  *  Synopsis
- *	Parse stdin as multipart mime message according to RFC2388 to json.
- *  Usage:
- *	WORK_DIR=/tmp/bust-http-rfc2388-$$.d
- *	mkdir $WORK_DIR
- *	cd $WORK_DIR
- *	bust-http-rfc2388 <boundary> >request.json
- *	curl -F 'data=@path/to/local/file' UPLOAD_ADDRESS
+ *	Convert stdin multipart mime message to json, according to RFC2388
  *  See:
  *	https://medium.com/@petehouston/upload-files-with-curl-93064dcccc76
  */
@@ -21,7 +15,7 @@ import (
 )
 
 var (
-	prog = "bust-http-rfc2388"
+	prog = "rfc2388_2json"
 )
 
 type ProcessSignature struct {

@@ -2,6 +2,8 @@
 #  Synopsis:
 #	Standalone install of $JMSCOTT_ROOT/www
 #  Note:
+#	Convert configs to to make-make.
+#
 #	the process env JMSCOTT_COMPILE_WWW=1 determines if various
 #	www tools are installed.  to disable build set JMSCOTT_COMPILE_WWW=0.
 #	note that even when disable the "clean" and "distclean" still remove
@@ -16,7 +18,7 @@ WWW_USER?=$(INSTALL_USER)
 WWW_GROUP?=$(INSTALL_GROUP)
 
 COMPILED=								\
-		bust-http-rfc2388					\
+		rfc2388_2json						\
 		env env.d/help.pl 					\
 		form form.d/help.pl
 
@@ -145,5 +147,5 @@ dist-lib:
 
 world: clean all distclean install
 
-bust-http-rfc2388: bust-http-rfc2388.go
-	$(GOEXE) build bust-http-rfc2388.go
+rfc2388_2json: rfc2388_2json.go
+	$(GOEXE) build rfc2388_2json.go
