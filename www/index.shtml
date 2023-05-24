@@ -15,8 +15,5 @@
   that transform XML documents into cgi perl scripts and manual pages.
   </p>
   <!--#include virtual="/footer.shtml" -->
-  <p class="svn">
-   Subversion Id: $Id$
-  </p>
  </body>
 </html>
