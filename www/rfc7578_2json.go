@@ -1,6 +1,6 @@
 /*
  *  Synopsis
- *	Convert stdin multipart mime message to json, according to RFC2388
+ *	Convert stdin multipart mime message to json, according to RFC7578
  *  See:
  *	https://medium.com/@petehouston/upload-files-with-curl-93064dcccc76
  */
@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	prog = "rfc2388_2json"
+	prog = "rfc7578_2json"
 )
 
 type ProcessSignature struct {

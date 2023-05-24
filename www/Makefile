@@ -18,7 +18,7 @@ WWW_USER?=$(INSTALL_USER)
 WWW_GROUP?=$(INSTALL_GROUP)
 
 COMPILED=								\
-		rfc2388_2json						\
+		rfc7578_2json						\
 		env env.d/help.pl 					\
 		form form.d/help.pl
 
@@ -53,18 +53,11 @@ install: all
 		-d $(WWW_PREFIX)/src
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)/lib
+	install -g $(WWW_GROUP) -o $(WWW_USER)				\
+		-d $(WWW_PREFIX)/bin
+	install -g $(WWW_GROUP) -o $(WWW_USER)				\
+		-d $(WWW_PREFIX)/htdocs
 
-	#
-	#  create the symlink, so in apache
-	#
-	#	PERL5LIB=$(WWW_PREFIX)/lib:$PERL5LIB
-	#
-	#  and in perl code, namespace jmscott code via
-	#
-	#	require jmscott/dbi-pg.pl
-	#
-	test -h $(WWW_PREFIX)/lib/jmscott				||\
-		ln -s $(WWW_PREFIX)/lib $(WWW_PREFIX)/lib/jmscott
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
 		-d $(WWW_PREFIX)/lib/env.d
 	install -g $(WWW_GROUP) -o $(WWW_USER)				\
@@ -82,6 +75,15 @@ install: all
 		local-macosx.mk.example					\
 		property.pl						\
 		$(WWW_PREFIX)/lib
+	install -g $(WWW_GROUP) -o $(WWW_USER) -m ugo=rx		\
+		rfc7578_2json						\
+		$(WWW_PREFIX)/bin
+	install -g $(WWW_GROUP) -o $(WWW_USER) -m ugo=rx		\
+		env.shtml						\
+		footer.shtml						\
+		header.shtml						\
+		index.shtml						\
+		$(WWW_PREFIX)/htdocs
 
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m ugo=r			\
 		httpd2.d/GET.pl						\
@@ -128,8 +130,9 @@ clean:
 	rm -f $(COMPILED)
 
 dev-links:
-	test ! -s lib && ln -s . lib;		true
-
+	test -s lib || ln -s . lib
+	test -s htdocs || ln -s . htdocs
+	test -s cgi-bin || ln -s . cgi-bin
 #
 #  Dump the process environment for debugging.
 #
@@ -144,5 +147,5 @@ form form.d/help.pl: form.cgi
 
 world: clean all distclean install
 
-rfc2388_2json: rfc2388_2json.go
-	$(GOEXE) build rfc2388_2json.go
+rfc7578_2json: rfc7578_2json.go
+	$(GOEXE) build rfc7578_2json.go
