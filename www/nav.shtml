@@ -1,0 +1,8 @@
+<div id="navigation">
+ <ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/schema">SQL Schemas</a></li>
+  <li><a href="/gw">Internet Gateways</a></li>
+  <li><a href="/extra.shtml">Etc</a></li>
+ </ul>
+</div>

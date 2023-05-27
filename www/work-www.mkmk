@@ -9,45 +9,62 @@
 #  Blame:
 #	jmscott@setspace.com
 #
+CGIBINs="
+	env
+	form
+"
+
+COMPILEs="
+	$CGIBINs
+
+	rfc7578_2json
+	env.d/help.pl
+	form.d/help.pl
+"
+
 LIBs="
+	common-json.pl
+	dbi-pg.pl
+
 	env.cgi
-	env.d/div.pl
 	env.d/dl.pl
 	env.d/help.pl
 	env.d/input.pl
 	env.d/text.pl
-
-	file
-	file.cgi
-	file.d/help.pl
-	file.d/pre.pl
-	file.d/text.full-path.pl
 
 	form.cgi
 	form.d/help.pl
 	form.d/post.dump.pl
 	form.d/religion.pl
 
-	httpd2.d/common.pl
+	httpd2.cgi
 	httpd2.d/GET.pl
+	httpd2.d/POST.pl
+	httpd2.d/common.pl
 	httpd2.d/make-work-dir.pl
 	httpd2.d/multipart-form-data.pl
-	httpd2.d/POST.pl
 	httpd2.d/system.pl
 	httpd2.d/www-form-urlencoded.pl
 
-	Makefile
+	local-linux.mk.example
+	local-macosx.mk.example
 
 	property.pl
 "
+
 BINs="
-	cgi2perl5
 	cgi-template
+	cgi2perl5
 "
-CGIBINs="
-	env
-	form
-	manifest
+SBINs="
+	rfc7578_2json
 "
-HTDOCs="
+HTDOCSs="
+	env.shtml
+	footer.shtml
+	form.shtml
+	header.shtml
+	index.shtml
+	screen.css
+	template.shtml
 "
