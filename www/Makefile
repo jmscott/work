@@ -23,8 +23,26 @@
 #		CGIBINs := $(shell (. ./$(MKMK) && echo $$CGIBINs))
 #		LIBEXEC := $(shell (. ./$(MKMK) && echo $$LIBEXECs))
 #
+include ../local.mk
+include ../jmscott.mk
 
 MKMK=work-www.mkmk
+
+#  Use "rsync" instead of "install" to mirror directory paths on target
+define RSYNC
+	rsync 								\
+		--relative						\
+		--archive						\
+		--chown=$(WWW_USER):$(WWW_GROUP)			\
+		--executability						\
+		--chmod u=rwx,go=					\
+		$(value $(1))						\
+		$(WWW_PREFIX)/$(2)
+endef
+
+define CLEARX
+	find $(WWW_PREFIX)/$(1) -type f | xargs chmod a-x
+endef
 
 COMPILEs := $(shell (. ./$(MKMK) && echo $$COMPILEs))
 LIBs := $(shell (. ./$(MKMK) && echo $$LIBs))
@@ -33,9 +51,6 @@ BINs := $(shell (. ./$(MKMK) && echo $$BINs))
 SBINs := $(shell (. ./$(MKMK) && echo $$SBINs))
 HTDOCSs := $(shell (. ./$(MKMK) && echo $$HTDOCSs))
 CGIBINs := $(shell (. ./$(MKMK) && echo $$CGIBINs))
-
-include ../local.mk
-include ../jmscott.mk
 
 WWW_PREFIX?=$(JMSCOTT_PREFIX)/www
 WWW_USER?=$(INSTALL_USER)
@@ -51,6 +66,7 @@ endif
 
 distclean:
 	rm -rf $(WWW_PREFIX)/src
+	rm -rf $(WWW_PREFIX)/htdocs
 	rm -rf $(WWW_PREFIX)/lib
 	rm -rf $(WWW_PREFIX)/bin
 	rm -rf $(WWW_PREFIX)/sbin
@@ -78,11 +94,11 @@ install: all
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=wrx,g=rx,o=		\
 		-d $(WWW_PREFIX)/htdocs
 
-	rsync --relative $(LIBs) $(WWW_PREFIX)/lib
-	rsync --relative $(BINs) $(WWW_PREFIX)/bin
-	rsync --relative $(HTDOCs) $(WWW_PREFIX)/htdocs
-	rsync --relative $(SBINs) $(WWW_PREFIX)/sbin
-	rsync --relative $(CGIBINs) $(WWW_PREFIX)/cgi-bin
+	$(call RSYNC,LIBs,lib);  $(call CLEARX,lib)
+	$(call RSYNC,CGIBINs,cgi-bin)
+	$(call RSYNC,BINs,bin)
+	$(call RSYNC,HTDOCSs,htdocs);  $(call CLEARX,htdocs)
+	$(call RSYNC,SBINs,sbin)
 else
 install:
 	@echo 'install www: JMSCOTT_COMPILE_WWW !=1: skipping (ok)'
