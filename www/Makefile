@@ -28,7 +28,12 @@ include ../jmscott.mk
 
 MKMK=work-www.mkmk
 
+#
 #  Use "rsync" instead of "install" to mirror directory paths on target
+#
+#  Note:
+#	Need to pull perms from <product>.mkmk!
+#
 define RSYNC
 	rsync 								\
 		--relative						\
