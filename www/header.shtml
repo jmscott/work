@@ -4,12 +4,6 @@
     <code>
       <!--#include
         virtual="/cgi-bin/jmscott/env?out=text&name=SERVER_NAME&src=env"
-      --></code> queries <code><!--#include
-        virtual="/cgi-bin/jmscott/env?out=text&name=PGDATABASE&src=env"
-      -->@<!--#include
-        virtual="/cgi-bin/jmscott/env?out=text&name=PGHOST&src=env"
-      -->:<!--#include
-        virtual="/cgi-bin/jmscott/env?out=text&name=PGPORT&src=env"
       -->
     </code>
 
