@@ -24,17 +24,23 @@ Define JMSCOTT_WORK_APACHE2_SERVER_NAME work.jmscott.rj2imac
 Define JMSCOTT_WORK_VHOST_ROOT /Users/jmscott/opt/vhost/work.jmscott.rj2imac
 Define JMSCOTT_WORK_JMSCOTT_ROOT /Users/jmscott/opt/jmscott
 Define JMSCOTT_WORK_PERL5LIB /Users/jmscott/opt/jmscott/www/lib
-Define JMSCOTT_WORK_PATH /Users/jmscott/opt/jmscott/www/bin
+Define JMSCOTT_WORK_PATH /Users/jmscott/opt/jmscott/www/bin:/opt/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/jmscott/bin
 
 <VirtualHost ${JMSCOTT_WORK_APACHE2_SERVER_NAME}:80>
 	SetEnv JMSCOTT_ROOT ${JMSCOTT_WORK_JMSCOTT_ROOT}
 	SetEnv PATH ${JMSCOTT_WORK_PATH}
 	SetEnv SERVER_ROOT ${JMSCOTT_WORK_VHOST_ROOT}
+	SetEnv PERL5LIB ${JMSCOTT_WORK_PERL5LIB}
 
 	DocumentRoot "${JMSCOTT_WORK_VHOST_ROOT}/htdocs"
 	ServerName ${JMSCOTT_WORK_APACHE2_SERVER_NAME}
 	ErrorLog "var/log/apache2/${JMSCOTT_WORK_APACHE2_SERVER_NAME}.log"
 	CustomLog "var/log/apache2/${JMSCOTT_WORK_APACHE2_SERVER_NAME}.log" common
+
+	<Directory />
+            AllowOverride all
+            Require all granted
+        </Directory>
 
         <Directory "${JMSCOTT_WORK_VHOST_ROOT}">
                 Options Indexes FollowSymLinks
@@ -45,11 +51,11 @@ Define JMSCOTT_WORK_PATH /Users/jmscott/opt/jmscott/www/bin
 	<Directory "${JMSCOTT_WORK_VHOST_ROOT}/htdocs">
 		Options +ExecCGI +Includes +FollowSymLinks
 
-		AddType text/html .shtml
-		AddOutputFilter INCLUDES .shtml
+                AddType text/html .shtml
+                AddOutputFilter INCLUDES .shtml
 	</Directory>
-	ScriptAlias /cgi-bin/jmscott/ "${JMSCOTT_WORK_JMSCOTT_ROOT}/www/cgi-gin"
-	ScriptAlias /cgi-bin/ "${JMSCOTT_WORK_VHOST_ROOT}/cgi-bin/"
+	ScriptAlias /cgi-bin/jmscott/ "${JMSCOTT_WORK_JMSCOTT_ROOT}/www/cgi-bin/"
+        ScriptAlias /cgi-bin/ "${JMSCOTT_WORK_VHOST_ROOT}/cgi-bin/"
 
 	<Directory "${JMSCOTT_WORK_VHOST_ROOT}/cgi-bin">
                 AllowOverride all
@@ -59,11 +65,5 @@ Define JMSCOTT_WORK_PATH /Users/jmscott/opt/jmscott/www/bin
 
         </Directory>
 
-	<Directory "${JMSCOTT_WORK_JMSCOTT_ROOT}/www/cgi-bin">
-                AllowOverride all
-                Allow from all
-
-                Options None +ExecCGI +Includes +FollowSymLinks
-        </Directory>
 	DirectoryIndex index.shtml
 </VirtualHost>

@@ -1,15 +1,22 @@
 <html>
  <head>
-  <title>Apache HTTP Daemon Tools</title>
+  <title>Tools from ~jmscott/work@github.com</title>
   <link
     	rel="stylesheet"
         type="text/css"
-        href="/common.css" />
+        href="/screen.css"
+  ></link>
  </head>
 
  <body>
   <!--#include virtual="/header.shtml" -->
-  <h1>Apache HTTP Daemon Tools</h1>
+  <!--#include virtual="/nav.shtml" -->
+  <h1>JMScott Work WWW Tools</h1>
+  <h2>
+   <a href="https://github.com/jmscott/work/tree/master/www">
+     Github JMScott/work/www
+   </a>
+  </h2>
   <p>
   The <code>httpd2</code> repository contains a collection of programs
   that transform XML documents into cgi perl scripts and manual pages.
