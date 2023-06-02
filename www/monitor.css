@@ -1,0 +1,387 @@
+/*
+ *  Synopsis:
+ *	Cascading style sheet for typical, largish computer monitor (circa 2023)
+ *  See:
+ *	https://github.com/jmscott/work/tree/master/www
+ */
+
+span.title
+{
+	font-weight:	bold;
+	padding-right:	1em;
+}
+
+#container
+{
+	margin:		0 1em;
+	background:	poink;
+}
+
+#container > header:first-child
+{
+	foreground:	black;
+	background:	lightgrey;
+	width:		100%;
+}
+
+#container > header:first-child > h1,
+  #container > header:first-child > h2
+{
+	width:		100%;
+	text-width:	90%;
+	text-align:	center;
+}
+
+#container > nav:first-child
+{
+	float:		left;
+	width:		100%;
+	background:	#333;
+}
+
+#nav ul
+{
+	list-style:	none;
+	margin:		0;
+	padding:	0;
+}
+
+#nav ul li
+{
+	list-style-type: none;
+	display:	inline;
+}
+
+#nav li a
+{
+	display:		block;
+	float:			left;
+	padding:		0.25em 0.5em;
+	color:			white;
+	background-color:	black;
+	text-decoration:	none;
+	border-right:		.125em solid #fff;
+}
+
+#nav li a:hover
+{
+	color:		black;
+	background:	lightgrey;
+}
+
+#content
+{
+	float:		left;
+	width:		100%;
+}
+
+#content > h1:first-child
+{
+	width:		100%;
+	text-align:	center;
+}
+
+h2
+{
+	color:			black;
+	background-color:	white;
+	font-size:		160%;
+	margin:			0 0 .5em;
+	text-align:		center;
+}
+
+h3
+{
+	color:			black;
+	background-color:	white;
+	font-size:		120%;
+	margin:			0 0 .5em;
+	text-align:		center;
+}
+
+h4
+{
+	color:			black;
+	background-color:	white;
+	margin:			0 0 .5em;
+	text-align:		center;
+}
+
+#container > footer
+{
+	float:          left;
+	width:		100%;
+	text-align:	center;
+	background:	lightgrey;
+	margin-top:	1em;
+}
+
+#container > footer > p,
+  #container > footer > h1
+{
+	font-size:	smaller;
+	margin:		1em;
+}
+
+table.query caption
+{
+	font-size:		150%;
+	font-weight:		bold;
+	font-variant:		small-caps;
+	border-top:		0.1em solid black;
+	border-left:		0.1em solid black;
+	border-right:		0.1em solid black;
+	padding-bottom:		0.75em;
+}
+
+table.query caption h1
+{
+	font-size:		140%;
+	font-weight:		bold;
+	background-color:	white;
+	color:			black;
+}
+
+table.query caption h2
+{
+	font-size:		80%;
+	background-color:	white;
+	color:			black;
+}
+
+table.query caption h3
+{
+	font-size:		60%;
+	background-color:	white;
+	color:			black;
+}
+
+table.query
+{
+	border-spacing:		0.25em 0.25em;
+	width:			100%;
+	text-align:		left;
+	margin-top:		3em;
+}
+
+table.query th
+{
+	background:		white;
+	color:			black;
+	font-size:		120%;
+	font-variant:		small-caps;
+	font-weight:		bold;
+}
+
+table.query thead th
+{
+	padding-bottom:		1em;
+	text-align:		left;
+}
+
+table.query tfoot th
+{
+	padding-top:		1em;
+	text-align:		center;
+}
+
+dl > dt
+{
+	font-weight:		bold;
+}
+
+dl.raw dt
+{
+	flex-basis:		20%;
+	padding:		0.1em 0.2em;
+	background:		#000;
+	color:			#0f0;
+	text-align:		right;
+}
+
+dl.raw dd
+{
+	flex-basis:		70%;
+	flex-grow:		1;
+	margin:			0;
+	padding:		0.1em 0.2em;
+	border-bottom:		1px solid #000;
+}
+
+table.query td.fault, span.fault
+{
+	background-color:       black;
+	color:			white;
+	border:			2px solid red;
+}
+
+table.query td.err, dl.raw dd.err, dl.raw dd.fault
+{
+	background-color:	pink;
+	color:			black;
+}
+
+table.query td.warn, dl.raw dd.warn
+{
+	background-color:	yellow;
+	color:			black;
+}
+
+table.query td.ok, dl.raw dd.ok
+{
+	background-color:	lightgreen;
+	color:			black;
+}
+
+table.query td.action
+{
+	font-size:		75%;
+	background:		#fff;
+}
+
+table.query tr:hover td
+{
+	background:		lightgrey;
+	color:			#000;
+}
+
+table.query tr.footer td
+{
+	text-align:		center;
+	background-color:	white;
+	color:			black;
+	border-bottom:		2px solid black;
+	border-left:		2px solid black;
+	border-right:		2px solid black;
+	padding:		1em;
+}
+
+span.warn
+{
+	background-color:	yellow;
+	color:			black;
+}
+
+span.err
+{
+	background-color:	pink;
+	color:			black;
+}
+
+span.ok
+{
+	background-color:	lightgreen;
+	color:			black;
+}
+
+dl.raw
+{
+	display:		flex;
+	flex-flow:		row wrap;
+	border:			solid #000;
+	border-width:		1px 1px 0 0;
+}
+
+input.submit
+{
+	font-weight:	bold;
+	background-color: darkgreen;
+	color:	white;
+}
+
+pre.dbi-raw span.title
+{
+	margin-right:		0px;
+	padding-right:		0em;
+	color:			white;
+	font-weight:		bold;
+}
+
+pre.chat span.timestamp
+{
+	color:			#090;
+	font-size:		smaller;
+}
+
+td.comments
+{
+	font-size:	75%;
+	font-style:	italic;
+}
+
+tr.umod0
+{
+	color:	black;
+	background-color:	#ccc;
+}
+
+td.last_name
+{
+	font-weight:	bold;
+}
+
+code
+{
+	font:			fixed;
+}
+
+@-webkit-keyframes blinker { from {opacity:1.0;} to {opacity:0.0;} }
+        @keyframes blinker { from {opacity:1.0;} to {opacity:0.0;} }
+
+tr.footer h1
+{
+	font-size:	100%;
+}
+
+dt.no-title
+{
+	font-style:		italic;
+	font-weight:		normal;
+	text-decoration:	line-through;
+}
+
+#q
+{
+	font-size:		larger;
+	width:			66%;
+	background-color:	black;
+	color:			lightgreen;
+	font:			monospace;
+}
+
+span.snippet
+{
+	background-color:	#fff;
+	font-style:		italic;
+	color:			#111;
+}
+
+span.snippet b
+{
+	color:		green;
+	font-weight:	bold;
+}
+
+dl.query span.detail
+{
+	margin-left:	3em;
+	font-size:	smaller;
+	display:	block;
+}
+
+.udig
+{
+	font-family:	monospace;
+}
+
+span.note
+{
+	font-size:	x-small;
+}
+
+span.empty
+{
+	foreground:		lightred;
+	background:		white;
+	width:			1em;
+}
