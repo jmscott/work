@@ -47,7 +47,7 @@ LIBs="
 	httpd2.d/www-form-urlencoded.pl
 
 	local-linux.mk.example
-	local-macosx.mk.example
+	local-darwin.mk.example
 
 	property.pl
 "
@@ -65,6 +65,6 @@ HTDOCSs="
 	form.shtml
 	header.shtml
 	index.shtml
-	screen.css
+	monitor.css
 	template.shtml
 "

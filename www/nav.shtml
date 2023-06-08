@@ -1,6 +1,5 @@
-<div id="navigation">
- <ul>
-  <li><a href="/">Home</a></li>
-  <li><a href="/env.shtml">Apache Process Environment</a></li>
- </ul>
-</div>
+<nav>
+ <a href="/">Home</a>
+ <a href="/env.shtml">Apache Process Environment</a>
+ <a href="/template.shtml">Page Template</a>
+</nav>

@@ -4,23 +4,21 @@
   <title>Template - EDIT ME</title>
   <meta charset="UTF-8" />
   <link
-    href="/screen.css"
+    href="/monitor.css"
     rel="stylesheet"
     type="text/css"
   />
  </head>
 
  <body>
-  <div id="container">
-   <!--#include virtual="/header.shtml" -->
-   <!--#include virtual="/nav.shtml" -->
-   <div id="content">
-    <h2>Secondary Header - EDIT ME</h2>
-    <p>
-     Content goes here.
-    </p>
-   </div>
-   <!--#include virtual="/footer.shtml" -->
-  </div>
+  <!--#include virtual="/header.shtml" -->
+  <!--#include virtual="/nav.shtml" -->
+  <main>
+   <h1>Header - EDIT ME</h1>
+   <p>
+    Content goes here.
+   </p>
+  </main>
+  <!--#include virtual="/footer.shtml" -->
  </body>
 </html>

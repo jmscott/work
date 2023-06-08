@@ -1,11 +1,10 @@
 <header>
-  <h1>Tools from ~jmscott/work@github.com</h1>
-  <h2>
-    <code>
-      <!--#include
+ <h1>Tools from ~jmscott/work@github.com</h1>
+ <h2>
+  <code>
+   <!--#include
         virtual="/cgi-bin/jmscott/env?out=text&name=SERVER_NAME&src=env"
-      -->
-    </code>
-
-  </h2>
+   -->
+  </code>
+ </h2>
 </header>

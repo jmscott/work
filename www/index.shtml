@@ -1,26 +1,20 @@
+<!DOCTYPE html>
 <html>
  <head>
-  <title>Tools from ~jmscott/work@github.com</title>
+  <title>JMScott/Work/WWW @github.com</title>
+  <meta charset="UTF-8" />
   <link
-    	rel="stylesheet"
-        type="text/css"
-        href="/screen.css"
-  ></link>
+    href="/monitor.css"
+    rel="stylesheet"
+    type="text/css" />
  </head>
 
  <body>
   <!--#include virtual="/header.shtml" -->
   <!--#include virtual="/nav.shtml" -->
-  <h1>JMScott Work WWW Tools</h1>
-  <h2>
-   <a href="https://github.com/jmscott/work/tree/master/www">
-     Github JMScott/work/www
-   </a>
-  </h2>
-  <p>
-  The <code>httpd2</code> repository contains a collection of programs
-  that transform XML documents into cgi perl scripts and manual pages.
-  </p>
+  <main>
+   <h1>JMScott Work/WWW Tools</h1>
+  </main>
   <!--#include virtual="/footer.shtml" -->
  </body>
 </html>

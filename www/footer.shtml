@@ -1,9 +1,10 @@
-<div id="footer">
- <ul>
-  <li>
-   <a
-   	class="active"
-   	href="/">Home</a>
-  </li>
- </ul>
-</div>
+<footer>
+ <p>
+   This is a private computer facility protected by a security system.
+   Unauthorized access may violate Federal and state laws of the United States
+   of America and may result in criminal or civil liability, or both.
+   Anyone using it is subject to monitoring and recording of all operations.
+   This record may be provided as evidence to law enforcement officials.
+ </p>
+ <h1>Copyright &#169; John the Scott, 2023+</h1>
+</footer>

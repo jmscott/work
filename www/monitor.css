@@ -11,71 +11,77 @@ span.title
 	padding-right:	1em;
 }
 
-#container
+main
 {
-	margin:		0 1em;
-	background:	poink;
+	margin-left:	1em;
+	margin-right:	1em;
 }
 
-#container > header:first-child
+body
+{
+	foreground:     black;
+	background:	white;
+	margin:		0.5em;
+	width:		100%;
+}
+
+
+body > header:first-child
 {
 	foreground:	black;
 	background:	lightgrey;
 	width:		100%;
 }
 
-#container > header:first-child > h1,
-  #container > header:first-child > h2
+body > header:first-child > h1,
+  body > header:first-child > h2,
+  body > header:first-child > h3
 {
 	width:		100%;
-	text-width:	90%;
 	text-align:	center;
+	margin:		0em;
 }
 
-#container > nav:first-child
+body > nav:first-child
 {
 	float:		left;
-	width:		100%;
+	width:		95%;
 	background:	#333;
 }
 
-#nav ul
+nav
 {
-	list-style:	none;
-	margin:		0;
-	padding:	0;
+	width:			100%;
+	background-color:	#bbb;
+	color:			black;
+	display:		flex;
+	flex-wrap:		wrap;
 }
 
-#nav ul li
+nav > a
 {
-	list-style-type: none;
-	display:	inline;
+	text-decoration: none;
+	display: block;
+	padding: 1em 1em;
+	text-align: center;
+	margin: 0;
+	font-family: sans-serif;
 }
 
-#nav li a
+nav > a:hover
 {
-	display:		block;
-	float:			left;
-	padding:		0.25em 0.5em;
-	color:			white;
-	background-color:	black;
-	text-decoration:	none;
-	border-right:		.125em solid #fff;
+	background-color:	#777;
+	color:			#ffffff;
+	text-decoration:	underline;
 }
 
-#nav li a:hover
-{
-	color:		black;
-	background:	lightgrey;
-}
-
-#content
+main
 {
 	float:		left;
 	width:		100%;
 }
 
-#content > h1:first-child
+main > h1:first-child
 {
 	width:		100%;
 	text-align:	center;
@@ -85,7 +91,6 @@ h2
 {
 	color:			black;
 	background-color:	white;
-	font-size:		160%;
 	margin:			0 0 .5em;
 	text-align:		center;
 }
@@ -107,7 +112,7 @@ h4
 	text-align:		center;
 }
 
-#container > footer
+footer
 {
 	float:          left;
 	width:		100%;
@@ -116,8 +121,8 @@ h4
 	margin-top:	1em;
 }
 
-#container > footer > p,
-  #container > footer > h1
+footer > p,
+  body > footer > h1
 {
 	font-size:	smaller;
 	margin:		1em;
