@@ -15,9 +15,6 @@
   <!--#include virtual="/nav.shtml" -->
   <main>
    <h1>Header - EDIT ME</h1>
-   <p>
-    Content goes here.
-   </p>
   </main>
   <!--#include virtual="/footer.shtml" -->
  </body>
