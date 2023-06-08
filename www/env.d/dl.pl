@@ -7,9 +7,9 @@
 #	/cgi-bin/env?out=help
 #  Depends:
 #	&encode_html_entities()
-#  SVN Id:
-#	$Id$
 #
+
+our %QUERY_ARG;
 
 #
 #  Open <dl>
@@ -23,10 +23,16 @@ END
 #
 for (sort keys %ENV) {
 	my $dt_text = &encode_html_entities($_);
-	my $dd_text = &encode_html_entities($ENV{$_});
+	my ($dd_text, $dd_span_class);
+	if ($ENV{$_}) {
+		$dd_text = &encode_html_entities($ENV{$_});
+	} else {
+		$dd_text = '&#10240;';
+		$dd_span_class = ' class="empty"';
+	}
 	print <<END;
  <dt><span>$dt_text</span></dt>
- <dd><span>$dd_text</span></dd>
+ <dd><span$dd_span_class>$dd_text</span></dd>
 END
 }
 
