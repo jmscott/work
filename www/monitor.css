@@ -11,20 +11,12 @@ span.title
 	padding-right:	1em;
 }
 
-main
-{
-	margin-left:	1em;
-	margin-right:	1em;
-}
-
 body
 {
+	margin:		0.5em;
 	foreground:     black;
 	background:	white;
-	margin:		0.5em;
-	width:		100%;
 }
-
 
 body > header:first-child
 {
@@ -61,11 +53,11 @@ nav
 nav > a
 {
 	text-decoration: none;
-	display: block;
-	padding: 1em 1em;
-	text-align: center;
-	margin: 0;
-	font-family: sans-serif;
+	display:	block;
+	padding:	1em 1em;
+	text-align:	center;
+	margin:		0;
+	font-family:	sans-serif;
 }
 
 nav > a:hover
