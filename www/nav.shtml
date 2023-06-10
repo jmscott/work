@@ -1,5 +1,4 @@
 <nav>
  <a href="/">Home</a>
- <a href="/env.shtml">Apache Process Environment</a>
- <a href="/template.shtml">Page Template</a>
+ <a href="/etc.shtml">Et Cetera</a>
 </nav>

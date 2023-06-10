@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Et Cetera</title>
+  <meta charset="UTF-8" />
+  <link
+    href="/monitor.css"
+    rel="stylesheet"
+    type="text/css"
+  />
+ </head>
+
+ <body>
+  <!--#include virtual="/header.shtml" -->
+  <!--#include virtual="/nav.shtml" -->
+  <main>
+   <h1>Et Cetera</h1>
+   <ul>
+    <li><a href="/env.shtml">Apache Process Environment</a></li>
+    <li><a href="/template.shtml">HTML Template</a></li>
+  </main>
+  <!--#include virtual="/footer.shtml" -->
+ </body>
+</html>

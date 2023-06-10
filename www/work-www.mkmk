@@ -61,6 +61,7 @@ SBINs="
 "
 HTDOCSs="
 	env.shtml
+	etc.shtml
 	footer.shtml
 	form.shtml
 	header.shtml
