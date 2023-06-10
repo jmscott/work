@@ -66,5 +66,6 @@ HTDOCSs="
 	header.shtml
 	index.shtml
 	monitor.css
+	nav.shtml
 	template.shtml
 "
