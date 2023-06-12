@@ -131,3 +131,5 @@ rfc7578_2json: rfc7578_2json.go
 	$(GOEXE) build rfc7578_2json.go
 tar: all
 	make-make tar $(MKMK)
+dev-clean:
+	rm -fv cgi-bin htdocs lib
