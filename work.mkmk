@@ -43,6 +43,12 @@ LIBs="
 
 BINs="
 	$COMPILEs
+
+	cgi-inherit
+	cgi-inherit-merge
+	cgi-manifest
+	cgi-template
+	cgi2perl5
 	elapsed-english
 	exec-logoff
 	isjson

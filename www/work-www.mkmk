@@ -52,10 +52,6 @@ LIBs="
 	property.pl
 "
 
-BINs="
-	cgi-template
-	cgi2perl5
-"
 SBINs="
 	rfc7578_2json
 "
