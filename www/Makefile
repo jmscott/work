@@ -79,10 +79,11 @@ distclean:
 
 ifeq ($(JMSCOTT_COMPILE_WWW),1)
 install: all
-	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=wrx,go=rx		\
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=wrx,go=rx	\
 		-d $(JMSCOTT_PREFIX)
-	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=wrx,go=rx		\
+	install -g $(INSTALL_GROUP) -o $(INSTALL_USER) -m u=wrx,go=rx	\
 		-d $(JMSCOTT_PREFIX)/bin
+
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=wrx,g=rx,o=		\
 		-d $(WWW_PREFIX)
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=wrx,g=rx,o=		\

@@ -50,3 +50,14 @@ PGINC=/usr/local/pgsql/include
 #  depends on perl xml libraries.
 
 export JMSCOTT_COMPILE_WWW?=1
+#
+#  For fedora set to apache, debian set to www-data, mac ports root
+#  Defaults to INSTALL_{USER,GROUP}.
+#
+#  Note:
+#	NOT set correctly in recipe "make tar"!
+#
+#	Ought to detect OS and default to appropriate USER/GROUP.
+# 
+#WWW_USER=apache
+#WWW_GROUP=apache
