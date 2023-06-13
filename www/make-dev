@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	Push site code to $HOME/opt/lct, called in Makefile recipe 'dev'.
+#  See:
+#	Makefile file recipe 'dev'
+#
+
+set -xe
+
+export JMSCOTT_ROOT=$HOME/opt/jmscott
+export JMSCOTT_WWW_ROOT=$JMSCOTT_ROOT/www
+
+DIST=$JMSCOTT_ROOT/dist
+mkdir -p $DIST
+echo "dist: $DIST"
+
+rm -f work-www-*.tar.bz2
+make tar
+TAR=$(ls work-www-*.tar.bz2)
+echo "tar: $TAR"
+mv -v $TAR $DIST
+cd $JMSCOTT_WWW_ROOT
+pwd
+tar pxvf $JMSCOTT_ROOT/dist/$TAR
