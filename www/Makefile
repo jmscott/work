@@ -133,3 +133,5 @@ tar: all
 	make-make tar $(MKMK)
 dev-clean:
 	rm -fv cgi-bin htdocs lib
+dev:
+	./make-dev
