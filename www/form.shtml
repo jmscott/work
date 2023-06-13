@@ -14,6 +14,9 @@
   >
    <h1>Demonstration/Test of POST to a Form</h1>
    <h2>Pick a Religion - Demonstrates<code>/cgi-bin/form?in=religion</code></h2>
+   <h3 style="text-decoration: underline;">
+     Selecting 'Atheist' Purposely Generates an Invalid POST
+   </h3>
    <div
      style="
        width:		80%;
@@ -21,10 +24,6 @@
        margin-right:	10%;
      "
    >
-    <p>
-      Selecting 'Atheist' will purposely generate an invalid post
-      variable value.
-    </p>
     <form
       name="form1"
       action="/cgi-bin/form"
