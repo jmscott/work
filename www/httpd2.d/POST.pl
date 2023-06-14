@@ -60,10 +60,11 @@ if ($CL > 0) {
 
 if ($CT eq 'application/x-www-form-urlencoded') {
 	require 'httpd2.d/www-form-urlencoded.pl';
-} elsif ($CT eq 'application/multipart-form-data') {
+} elsif ($CT =~ m/application\/multipart-form-data/ or
+         $CT =~ m/multipart\/form-data/) {
 	require 'httpd2.d/multipart-form-data.pl';
 } else {
-	die "POST: unknown CONTENT_TYPE: $CT";
+	die "XPOST: unknown CONTENT_TYPE: $CT";
 }
 
 #
