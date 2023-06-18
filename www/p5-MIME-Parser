@@ -5,10 +5,12 @@
 #  Usage:
 #	TMPDIR=/tmp/p5-mime-parser.$$
 #	mkdir $TMPDIR && cd $TMPDIR
-#	$SERVER_ROOT/sbin/p5-mime-parser </tmp/catPOST.12345	
+#	$SERVER_ROOT/sbin/p5-mime-parser </tmp/cat-http-POST.12345
 #	#  process extracted mime segments
 #  Depends:
 #	perl module MIME::Parser
+#  Note:
+#	Move from cgi-bin/ to sbin/ !
 #
 
 use MIME::Parser;
