@@ -28,14 +28,6 @@ $CGI{name} = 'form';
 #  BEGIN: /cgi/POST/in/putter[@name='post.dump']
 #
 $CGI{POST}->{in}->{putter}->{'post.dump'}->{name} = 'post.dump';
-$CGI{POST}->{in}->{putter}->{'post.dump'}->{vars}->{var}->{raw_post_dir} = {
-	perl5_re	=>	'[[:graph:]]{1,63}',
-	required	=>	'no',
-};
-#
-#  END: /cgi/POST/in/putter[@name=post.dump]/vars
-#
-
 #
 #  END: /cgi/POST/in/putter[@name='post.dump']
 #
