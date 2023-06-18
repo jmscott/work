@@ -10,12 +10,14 @@
 #	jmscott@setspace.com
 #
 CGIBINs="
+	cat-http-POST
 	env
 	form
 "
 
 COMPILEs="
-	$CGIBINs
+	env
+	form
 
 	rfc7578_2json
 	env.d/help.pl
@@ -23,8 +25,10 @@ COMPILEs="
 "
 
 LIBs="
+	cat-http-POST.out.example
 	common-json.pl
 	dbi-pg.pl
+	dublin-pupster.jpg
 
 	env.cgi
 	env.d/dl.pl
@@ -53,6 +57,7 @@ LIBs="
 "
 
 SBINs="
+	p5-mime-parser
 	rfc7578_2json
 "
 HTDOCSs="

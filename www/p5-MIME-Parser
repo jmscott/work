@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+#
+#  Synopsis:
+#	Perl5 MIME::Parser extractor of attachments from stdin into current dir.
+#  Usage:
+#	TMPDIR=/tmp/p5-mime-parser.$$
+#	mkdir $TMPDIR && cd $TMPDIR
+#	$SERVER_ROOT/sbin/p5-mime-parser </tmp/catPOST.12345	
+#	#  process extracted mime segments
+#  Depends:
+#	perl module MIME::Parser
+#
+
+use MIME::Parser;
+
+my $argc = scalar(@ARGV);
+die "wrong cli args: got $argc, need 0" unless $argc == 0; 
+
+my $parser = new MIME::Parser;
+$parser->output_prefix('p5-mime-parser-wtf');
+$parser->output_dir('.');
+
+$parser->parse(\*STDIN) || die "mime-parse(stdin) failed: $!";

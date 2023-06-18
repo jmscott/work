@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+#  Synopsis:
+#	Assemble a POST
+
+RAW_PATH=${TMPDIR:=/tmp}/$(basename $0).$$
+
+cat >$RAW_PATH <<END
+Content Length: $CONTENT_LENGTH
+Content-Type: $CONTENT_TYPE
+
+END
+cat >>$RAW_PATH
+
+cat <<END
+Status: 201
+
+END

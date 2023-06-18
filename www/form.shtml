@@ -25,7 +25,7 @@
      "
    >
     <form
-      name="form1"
+      name="religon"
       action="/cgi-bin/form"
       method="POST"
     >
@@ -45,7 +45,33 @@
      </select>
      <input
        type="submit"
-       value="Post Form"
+       value="Post Religion"
+     />
+    </form>
+
+    <form
+      name="upload"
+      action="/cgi-bin/catPOST"
+      enctype="multipart/form-data"
+      method="POST"
+    >
+     <input
+       type="hidden"
+       name="in"
+       value="post.dump"
+     />
+     <input
+       type="hidden"
+       name="raw_post_data_path"
+       value="/tmp/raw_post_data_path"
+     />
+     <input
+       name="upfile"
+       type="file"
+     />
+     <input
+       type="submit"
+       value="Upload File"
      />
     </form>
    </div>

@@ -26,6 +26,8 @@
 include ../local.mk
 include ../jmscott.mk
 
+.PHONY: catPOST
+
 MKMK=work-www.mkmk
 
 #
