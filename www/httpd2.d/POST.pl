@@ -9,7 +9,6 @@
 #
 #		https://metacpan.org/release/MIME-tools
 #
-
 our (
 	%CGI,
 	%POST_VAR,
@@ -20,7 +19,6 @@ binmode STDIN;
 
 #  should we parse the body of the POST or passthough to the script.
 
-
 my $CL = $ENV{CONTENT_LENGTH};
 my $CT = $ENV{CONTENT_TYPE};
 
@@ -30,7 +28,7 @@ my $MAX_CONTENT_LENGTH = 100 * 1024 * 1024;	#  100meg
 #  Specifc encodings may enforce stricter limits.
 
 die "Content-Length too big: $CL > $MAX_CONTENT_LENGTH"
-				if $CL > $MAX_CONTENT_LENGTH
+	if $CL > $MAX_CONTENT_LENGTH
 ;
 if ($CL > 0) {
 	#
@@ -57,14 +55,13 @@ if ($CL > 0) {
 #  Call the appropriate parser to map build the POST_* variables.
 #
 
-
 if ($CT eq 'application/x-www-form-urlencoded') {
 	require 'httpd2.d/www-form-urlencoded.pl';
 } elsif ($CT =~ m/application\/multipart-form-data/ or
          $CT =~ m/multipart\/form-data/) {
 	require 'httpd2.d/multipart-form-data.pl';
 } else {
-	die "XPOST: unknown CONTENT_TYPE: $CT";
+	die "POST: unknown CONTENT_TYPE: $CT";
 }
 
 #
