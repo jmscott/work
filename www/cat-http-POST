@@ -2,6 +2,9 @@
 #
 #  Synopsis:
 #	Assemble a POST
+#  Note:
+#	Added mime header Date:
+#
 
 RAW_PATH=${TMPDIR:=/tmp}/$(basename $0).$$
 
