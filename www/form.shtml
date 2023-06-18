@@ -51,7 +51,7 @@
 
     <form
       name="upload"
-      action="/cgi-bin/catPOST"
+      action="/cgi-bin/cat-http-POST"
       enctype="multipart/form-data"
       method="POST"
     >
