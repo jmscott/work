@@ -28,6 +28,14 @@ $CGI{name} = 'form';
 #  BEGIN: /cgi/POST/in/putter[@name='post.dump']
 #
 $CGI{POST}->{in}->{putter}->{'post.dump'}->{name} = 'post.dump';
+$CGI{POST}->{in}->{putter}->{'post.dump'}->{vars}->{var}->{raw_post_dir} = {
+	perl5_re	=>	'[[:graph:]]{1,63}',
+	required	=>	'no',
+};
+#
+#  END: /cgi/POST/in/putter[@name=post.dump]/vars
+#
+
 #
 #  END: /cgi/POST/in/putter[@name='post.dump']
 #
@@ -38,7 +46,7 @@ $CGI{POST}->{in}->{putter}->{'post.dump'}->{name} = 'post.dump';
 #
 $CGI{POST}->{in}->{putter}->{'religion'}->{name} = 'religion';
 $CGI{POST}->{in}->{putter}->{'religion'}->{vars}->{var}->{religion} = {
-	perl5_re	=>	'jewish|christian|muslim|hindu|buddhist|agnostic|atheist',
+	perl5_re	=>	'jewish|christian|muslim|hindu|buddhist|jain|agnostic|atheist',
 	required	=>	'yes',
 };
 #
