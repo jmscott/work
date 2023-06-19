@@ -31,4 +31,5 @@ cat >>$RAW_PATH
 cat <<END
 Status: 201
 
+Path to Raw POST File: $SERVER_NAME:$RAW_PATH 
 END

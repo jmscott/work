@@ -1,6 +1,6 @@
 <html>
  <head>
-  <title>Domonstation of Form</title>
+  <title>Form POST Test</title>
   <link
     	rel="stylesheet"
         type="text/css"
@@ -12,7 +12,7 @@
   <!--#include virtual="/nav.shtml" -->
   <main
   >
-   <h1>Demonstration/Test of POST to a Form</h1>
+   <h1>Form POST Test</h1>
    <h2>Pick a Religion - Demonstrates<code>/cgi-bin/form?in=religion</code></h2>
    <div
      style="
@@ -81,7 +81,7 @@
      />
      <input
        type="submit"
-       value="Upload File"
+       value="Capture Upload POST"
      />
     </form>
    </div>
