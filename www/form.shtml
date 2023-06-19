@@ -14,9 +14,6 @@
   >
    <h1>Demonstration/Test of POST to a Form</h1>
    <h2>Pick a Religion - Demonstrates<code>/cgi-bin/form?in=religion</code></h2>
-   <h3 style="text-decoration: underline;">
-     Selecting 'Atheist' Purposely Generates an Invalid POST
-   </h3>
    <div
      style="
        width:		80%;
@@ -24,6 +21,9 @@
        margin-right:	10%;
      "
    >
+    <h3 style="text-decoration: underline;">
+      Selecting 'Atheist' Purposely Generates an Invalid POST
+    </h3>
     <form
       name="religon"
       action="/cgi-bin/form"
@@ -49,6 +49,16 @@
      />
     </form>
 
+    <h3 style="text-decoration: underline;">
+      Capture HTTP Post Into Remote File 
+      <h4>
+       <code>
+        <!--#include virtual=
+		"/cgi-bin/jmscott/env?out=text&name=SERVER_NAME&src=env"
+        -->
+       </code>:$TMPDIR/cat-http-POST.$$
+      </h4>
+    </h3>
     <form
       name="upload"
       action="/cgi-bin/cat-http-POST"
