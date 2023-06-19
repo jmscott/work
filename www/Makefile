@@ -121,9 +121,6 @@ clean:
 env env.d/help.pl: env.cgi
 	../cgi2perl5 --source-path env.cgi
 
-#
-#  Dump contents of a POSTED form during debuging.
-#
 form form.d/help.pl: form.cgi
 	../cgi2perl5 --source-path form.cgi
 
