@@ -57,7 +57,7 @@ LIBs="
 "
 
 SBINs="
-	p5-mime-parser
+	p5-MIME-Parser
 	rfc7578_2json
 "
 HTDOCSs="
