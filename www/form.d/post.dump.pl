@@ -4,7 +4,7 @@
 #  Usage:
 #	<form action="/cgi-bin/env?out=post.dump" ...>
 #  Description:
-#	Generate a <div> html delement that dumps the contents of an http 
+#	Generate a <div> html element that dumps the contents of an http 
 #	POST command.  The output is suitable for debugging forms and not
 #	good for much else.
 #  HTML Outline:
