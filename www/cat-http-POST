@@ -1,9 +1,18 @@
 #!/bin/bash
 #
 #  Synopsis:
-#	Assemble a POST
-#  Note:
-#	Added mime header Date:
+#	Assemble a raw apache2 POST suitable for debugging or mime decoding
+#  Usage:
+#	In client html page:
+#		<form
+#	  	  action="/cgi-bin/cat-http-POST"
+#
+#	On apache2 web server, to see raw post
+#
+#		cat /tmp/cat-http-POST.12345
+#  See:
+#	lib/cat-http-POST.out.example
+#	sbin/p5-MIME-Parser
 #
 
 RAW_PATH=${TMPDIR:=/tmp}/$(basename $0).$$
@@ -11,6 +20,10 @@ RAW_PATH=${TMPDIR:=/tmp}/$(basename $0).$$
 cat >$RAW_PATH <<END
 Content Length: $CONTENT_LENGTH
 Content-Type: $CONTENT_TYPE
+Content-Language: $CONTENT_LANGUAGE
+Content-Disposition: $CONTENT_DISPOSITION
+Content-Security-Policy: $CONTENT_SECURITY_POLICY
+Cookie: $HTTP_COOKIE
 
 END
 cat >>$RAW_PATH
