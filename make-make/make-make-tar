@@ -333,8 +333,14 @@ for V in "${!VAR2dir_local[@]}"; do
 
 	PERMD="${dir2perm[$ORIG_D]}"
 	test -n "$PERMD" || die "no perms for original dir: $ORIG_D"
-	PERMF="${file2perm[$ORIG_D]}"
-	test -n "$PERMF" || die "no perms for original dir/file: $ORIG_D"
+
+	if [ -n "${file2perm[$ORIG_D]}" ];  then
+		PERMF="${file2perm[$ORIG_D]}"
+		test -n "$PERMF"					||
+			die "no perms for original dir/file: $ORIG_D"
+	else
+		PERMF='u=rw,g=r,o='
+	fi
 
 	NEW_D="${VAR2dir_local[$V]}"
 	VAR2dir[$V]="$NEW_D"
