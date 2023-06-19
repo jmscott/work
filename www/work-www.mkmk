@@ -27,6 +27,7 @@ COMPILEs="
 LIBs="
 	cat-http-POST.out.example
 	common-json.pl
+	common-time.pl
 	dbi-pg.pl
 	dublin-pupster.jpg
 
