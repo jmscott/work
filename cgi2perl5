@@ -12,7 +12,14 @@
 #  Depends:
 #	Perl modules XML::Parser
 #  Note:
-#	Consider adding a CLI option "--namespace <prefix>" for simplifying
+#	- Change to
+#
+#		require 'jmscott/httpd2.d/common.pl'
+#
+#	otherwise, apache var PERL5LIB must add $JMSCOTT_ROOT/www/lib,
+#	instead of using a symlink to $JMSCOTT_ROOT/www/lib
+#
+#	- Consider adding a CLI option "--namespace <prefix>" for simplifying
 #	the various directory prefixes added to cgi-bin/ and lib/ when the
 #	package lives in subdirectories of $SERVER_ROOT/{cgi-bin,lib}.
 #	Currently, various separate args server this purpose.  Also, the
@@ -20,9 +27,9 @@
 #
 #		ENV{SERVER_JMSCOTT_NAMESPACE}
 #	
-#	Zap SHA1 code
+#	-  Zap SHA1 code
 #
-#	the name of the required SERVER_ROOT environment variable ought to be
+#	-  The name of the required SERVER_ROOT environment variable ought to be
 #	overridden in the xml file or the apache environment.
 #
 
@@ -673,6 +680,7 @@ unshift \@INC, ${INC_alias_path}"\$ENV{SERVER_ROOT}/lib";
 
 our \%CGI;
 
+#  Note:  ought to be "require jmscott/httpd2.d/common.pl" !
 require 'httpd2.d/common.pl';
 END
 print MAIN <<END if defined $tree->[1]->[0]->{perl5_require};
