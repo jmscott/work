@@ -21,6 +21,7 @@ unshift @INC, "$ENV{SERVER_ROOT}/lib";
 
 our %CGI;
 
+#  Note:  ought to be "require jmscott/httpd2.d/common.pl" !
 require 'httpd2.d/common.pl';
 $CGI{name} = 'form';
 
