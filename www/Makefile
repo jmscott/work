@@ -42,13 +42,13 @@ define RSYNC
 		--archive						\
 		--chown=$(WWW_USER):$(WWW_GROUP)			\
 		--executability						\
-		--chmod u=rwx,go=					\
+		--chmod u=rwx,g=rx,o=					\
 		$(value $(1))						\
 		$(WWW_PREFIX)/$(2)
 endef
 
 define CLEARX
-	find $(WWW_PREFIX)/$(1) -type f | xargs chmod a-x
+	find $(WWW_PREFIX)/$(1) -type f | xargs chmod o-x
 endef
 
 COMPILEs := $(shell (. ./$(MKMK) && echo $$COMPILEs))
