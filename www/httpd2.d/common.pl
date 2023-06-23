@@ -25,15 +25,19 @@ END
 #	If the first part of the message matches ^([45]\d\d)\s*,
 #	then the matching http status code is extracted and sent
 #	to the client instead of a 500 error.
-#  Note:
-#	If the mime headers have already been written, which is
-#	pretty common,  then, nothing is sent to the client,
-#	which is bogus.  Surely needs improvement.  How about
-#	content-type specific handlers invoked from an eval?
 #  Usage:
 #	die "good bye, cruel world";
 #	die "404", "not sure what you mean";
 #	die "404 not sure what you mean";
+#  Note:
+#	Consider testing for stdin being a tty before issuing http status
+#	codes in __DIE__.  EMitting http status codes gets confusing when
+#	testing scripts from command line that do "require 'httpd2.d/common.pl'.
+#
+#	If the mime headers have already been written, which is
+#	pretty common,  then, nothing is sent to the client,
+#	which is bogus.  Surely needs improvement.  How about
+#	content-type specific handlers invoked from an eval?
 #
 $SIG{__DIE__} = sub
 {
@@ -53,7 +57,7 @@ $SIG{__DIE__} = sub
 		$status = $1;
 		$error_text = $2;
 	}
-	print STDERR 'status: ', $status, "\n";
+	print STDERR 'Status: ', $status, "\n";
 	print STDERR $error_text, "\n";
 	#
 	#  If nothing has been written to STDOUT, then
