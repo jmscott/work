@@ -155,6 +155,9 @@ udp4-listen: udp4-listen.go
 stdin2go-byte: stdin2go-byte.go
 	$(GOEXE) build stdin2go-byte.go
 
+stdin2go-literal: stdin2go-literal.go
+	$(GOEXE) build stdin2go-literal.go
+
 world:
 	$(_MAKE) clean
 	$(_MAKE) all
