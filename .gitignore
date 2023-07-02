@@ -18,6 +18,7 @@ slice-file-seek
 slice-stdin
 stale-mtime
 stat-mtime
+stdin2go-byte
 tas-lock-fs
 tas-unlock-fs
 udp4-listen

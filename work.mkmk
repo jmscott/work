@@ -31,6 +31,7 @@ COMPILEs="
 	send-file-slice
 	stale-mtime
 	stat-mtime
+	stdin2go-byte
 	tas-lock-fs
 	tas-unlock-fs
 	udp4-listen
@@ -106,6 +107,7 @@ SRCs="
 	send-file-slice.c
 	stale-mtime.c
 	stat-mtime.c
+	stdin2go-byte.go
 	tas-lock-fs.c
 	tas-unlock-fs.c
 	udp4-listen.go

@@ -152,6 +152,9 @@ is-dir-empty: is-dir-empty.c $(JMSLIB) $(JMSINC)
 udp4-listen: udp4-listen.go
 	$(GOEXE) build udp4-listen.go
 
+stdin2go-byte: stdin2go-byte.go
+	$(GOEXE) build stdin2go-byte.go
+
 world:
 	$(_MAKE) clean
 	$(_MAKE) all
