@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"unicode/utf8"
 )
 
@@ -34,6 +35,11 @@ func main() {
 		if !utf8.ValidString(line) {
 			panic(fmt.Sprintf(
 				"invalid utf8: line number %d", lineno,
+			))
+		}
+		if strings.Contains("`", line) {
+			panic(fmt.Sprintf(
+				"backtick exists: line number %d", lineno,
 			))
 		}
 		out.Write([]byte(line))
