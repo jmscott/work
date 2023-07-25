@@ -73,7 +73,7 @@ $SIG{__DIE__} = sub
 	if (tell(STDOUT) == 0) {
 		print <<END;
 Status: $status\r
-Content-Type: text/plain;  charset=iso-8859-1\r
+Content-Type: text/plain;  charset=utf-8\r
 
 $error_text
 END
