@@ -12,6 +12,12 @@
 #	https://github.com/jmscott/work/blob/master/make-make
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
+#	Create action "unpack" that removes various statis directories
+#	before unpack tar archive.  An automatic method for detecting static
+#	directories must exist and be smarter enough to detect dir alias/remaps.
+#	Currently shell vars ending in "s", like LIBs, indicate static
+#	directories.
+#
 #	Consider adding the commit hash to the tar file name:
 #
 #		GIT_SIG=$(git rev-parse --short=4 HEAD)
