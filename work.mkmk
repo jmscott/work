@@ -21,6 +21,7 @@ COMPILEs="
 	RFC3339Nano
 	duration-english
 	duration-mtime
+	env2json
 	escape-json-string
 	file-stat-size
 	fork-me
@@ -97,6 +98,7 @@ SRCs="
 	RFC3339Nano.c
 	duration-english.c
 	duration-mtime.c
+	env2json.go
 	escape-json-string.c
 	file-stat-size.c
 	fork-me.c
