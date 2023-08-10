@@ -4,7 +4,7 @@
  *
  *  Note:
  *	Need to replace static buf rotator code with hypothetical
- *	jmscott_bufstatcat() family!
+ *	jmscott_str*() family!
  *
  *	Derived from code written by https://github.com/akfullfo.
  */
