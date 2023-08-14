@@ -26,6 +26,7 @@ VAR2dir_local=(
 
 OBJs="
 	die.o
+	dir.o
 	ecpg.o
 	halloc.o
 	hexdump.o
@@ -70,6 +71,7 @@ LIBs="
 #  Uncomment to create src/ directory
 SRCs="
 	die.c
+	dir.c
 	ecpg.c
 	halloc.c
 	hexdump.c

@@ -263,7 +263,7 @@ AGAIN:
 
 /*
  *  Synopsis:
- *	open a file, restarting on interrupt.
+ *	posix open() a file, restarting on interrupt.
  *  Returns:
  *	0	opened file, returned file descriptor
  *	-1	error in open(), consult errno.
@@ -323,6 +323,10 @@ AGAIN:
 
 /*
  *  Make a directory path.
+ *
+ *  Note:
+ *	can mkdir() may interupted?
+ *	if not then no need for jmscott_mkdir()
  */
 int
 jmscott_mkdir(const char *path, mode_t mode)
@@ -344,13 +348,13 @@ AGAIN:
  *	-1	error occured, consult errno
  *
  *  Note:
- *	so, mmkdir -p recuses theough the path list, wheres mkdir_EEXIST()
+ *	so, mkdir -p recuses theough the path list, wheres mkdir_EEXIST()
  *	does not.  only the $(dirname <path>) is created. so, "flat" means
  *	not recursive and i (jmscott) can not find a constructuve term for
  *	"nor recusive".  "flat" is my attemtp.
  *
  *	When dir exists, the mode is not rechecked, which is inconsistent
- *	with the command "mkdir -p <path>".  This is a bug. the prems should be
+ *	with the command "mkdir -p <path>".  This is a bug. the perms should be
  *	changed.
  */
 int
@@ -434,4 +438,15 @@ AGAIN:
 	if (errno == EINTR)
 		goto AGAIN;
 	return -1;
+}
+
+int
+jmscott_mkdirat_EEXIST(int fd, const char *path, mode_t mode)
+{
+write(2, "WTF: ", 5);
+write(2, path, strlen(path));
+write(2, "\n", 1);
+	if (mkdirat(fd, path, mode) < 0 && errno != EEXIST)
+		return -1;
+	return 0;
 }

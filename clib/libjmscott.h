@@ -12,13 +12,13 @@
  *
  *	Rename dir clib/ to libjmscott/
  *
- *	Need to abstract maximum file path length (PATH_MAX) in clib.
- *
  *	should struct jmscott_ecpg_state_fault containt the	
  */
 
 #ifndef JMSCOTT_LIBJMSCOTT_H
 #define JMSCOTT_LIBJMSCOTT_H
+
+#define JMSCOTT_PATH_MAX	255		//  cause someone must be god
 
 #include <sys/time.h>		//  is needed?
 #include <sys/stat.h>
@@ -183,6 +183,7 @@ extern int	jmscott_stat(char *path, struct stat *buf);
 extern int	jmscott_mkdir(const char *path, mode_t mode);
 extern char	*jmscott_mkdir_p(const char *path);
 extern int	jmscott_mkdir_EEXIST(const char *path, mode_t mode);
+extern int 	jmscott_mkdirat_EEXIST(int fd, const char *path, mode_t mode);
 extern int	jmscott_link(const char *old_path, const char *new_path);
 extern int	jmscott_unlink(const char *path);
 extern int	jmscott_access(const char *path, int mode);
@@ -232,5 +233,10 @@ extern char			*jmscott_sendfile(
 					off_t
 					offset,
 					off_t len
+				);
+char *				jmscott_mkdir_path(
+					char *parent_path,
+					char *path,
+					mode_t mode
 				);
 #endif //  JMSCOTT_LIBJMSCOTT_H
