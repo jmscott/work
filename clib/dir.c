@@ -8,6 +8,8 @@
 
 #include "jmscott/libjmscott.h"
 
+#define DEFER {err = strerror(errno); goto BYE;}
+
 /*
  *  Make all directories in a full path, relative to parent dir.
  *  Return (char *) if full path created;  otherwise, return string
@@ -19,6 +21,8 @@
 char *
 jmscott_mkdir_path(char *parent_path, char *child_path, mode_t mode)
 {
+	char *err = (char *)0;
+
 	if (!*child_path)
 		return (char *)0;
 	if (!*parent_path)
@@ -58,13 +62,17 @@ jmscott_mkdir_path(char *parent_path, char *child_path, mode_t mode)
 		*slash = 0;
 
 		if (jmscott_mkdirat_EEXIST(parent_fd, path, mode) < 0)
-			return strerror(errno);
+			DEFER;
 		*slash = '/';
 		p = slash + 1;
 	}
 	if (jmscott_mkdirat_EEXIST(parent_fd, path, mode) < 0)
-		return strerror(errno);
-	if (jmscott_close(parent_fd) < 0)
-		return strerror(errno);
-	return (char *)0;
+		DEFER;
+
+BYE:
+	if (parent_fd >= 0) {
+		if (jmscott_close(parent_fd) != 0 && !err)
+			err = strerror(errno);
+	}
+	return err;
 }
