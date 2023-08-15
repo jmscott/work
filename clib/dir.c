@@ -8,6 +8,11 @@
 
 #include "jmscott/libjmscott.h"
 
+/*
+ *  Note:
+ *	May be able to do a real defer in clang/gcc/
+ *	https://fdiv.net/2015/10/08/emulating-defer-c-clang-or-gccblocks
+ */
 #define DEFER {err = strerror(errno); goto BYE;}
 
 /*
