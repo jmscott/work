@@ -24,32 +24,17 @@
  *	Escaped forward slashes cause an error~
  */
 char *
-jmscott_mkdir_path(char *parent_path, char *child_path, mode_t mode)
+jmscott_mkdir_path(int parent_fd, char *child_path, mode_t mode)
 {
 	char *err = (char *)0;
 
 	if (!*child_path)
 		return (char *)0;
-	if (!*parent_path)
-		return "parent path is empty";
-
-	if (strstr(parent_path, "\\/"))
-		return "parent path can not contain escaped /";
-	if (strstr(parent_path, "//"))
-		return "parent path contains contiguous //";
 
 	if (strstr(child_path, "\\/"))
 		return "child path can not contain escaped /";
 	if (strstr(child_path, "//"))
 		return "child path contains contiguous //";
-
-	int parent_fd = jmscott_open(
-			parent_path,
-			O_DIRECTORY,
-			mode
-	);
-	if (parent_fd < 0)
-		return strerror(errno);
 
 	char path[JMSCOTT_PATH_MAX + 1];
 	path[0] = 0;

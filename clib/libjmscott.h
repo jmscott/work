@@ -235,7 +235,7 @@ extern char			*jmscott_sendfile(
 					off_t len
 				);
 char *				jmscott_mkdir_path(
-					char *parent_path,
+					int parent_fd,
 					char *path,
 					mode_t mode
 				);
