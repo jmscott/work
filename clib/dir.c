@@ -36,7 +36,7 @@ jmscott_mkdir_path(char *parent_path, char *child_path, mode_t mode)
 
 	int parent_fd = jmscott_open(
 			parent_path,
-			O_SYMLINK | O_SEARCH | O_DIRECTORY,
+			O_DIRECTORY,
 			mode
 	);
 	if (parent_fd < 0)
