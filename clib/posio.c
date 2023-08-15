@@ -443,9 +443,6 @@ AGAIN:
 int
 jmscott_mkdirat_EEXIST(int fd, const char *path, mode_t mode)
 {
-write(2, "WTF: ", 5);
-write(2, path, strlen(path));
-write(2, "\n", 1);
 	if (mkdirat(fd, path, mode) < 0 && errno != EEXIST)
 		return -1;
 	return 0;
