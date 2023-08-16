@@ -16,15 +16,19 @@
 #define DEFER {err = strerror(errno); goto BYE;}
 
 /*
- *  Make all directories in a full path, relative to parent dir.
- *  Return (char *) if full path created;  otherwise, return string
- *  describing the error in english.  Existing directories are not changed.
+ *  Synopsis:
+ *	Make all directories in a full path, relative to parent dir.
+ *  Description:
+ *	Make all directories in a full path, relative to parent dir.
+ *	Return (char *)0 if full path created;  otherwise, return string
+ *	describing the error in english.  Modes/ownership of existing
+ *	directories are not changed.
  *
  *  Note:
- *	Escaped forward slashes cause an error~
+ *	Escaped forward and contiguous slashes cause an error, which is a bug.
  */
 char *
-jmscott_mkdir_path(int parent_fd, char *child_path, mode_t mode)
+jmscott_mkdirat_path(int at_fd, char *child_path, mode_t mode)
 {
 	char *err = (char *)0;
 
@@ -51,18 +55,16 @@ jmscott_mkdir_path(int parent_fd, char *child_path, mode_t mode)
 	while ((slash = strchr(p, '/'))) {
 		*slash = 0;
 
-		if (jmscott_mkdirat_EEXIST(parent_fd, path, mode) < 0)
+		if (jmscott_mkdirat_EEXIST(at_fd, path, mode) < 0)
 			DEFER;
 		*slash = '/';
 		p = slash + 1;
 	}
-	if (jmscott_mkdirat_EEXIST(parent_fd, path, mode) < 0)
+	if (jmscott_mkdirat_EEXIST(at_fd, path, mode) < 0)
 		DEFER;
 
 BYE:
-	if (parent_fd >= 0) {
-		if (jmscott_close(parent_fd) != 0 && !err)
-			err = strerror(errno);
-	}
+	if (at_fd >= 0 && jmscott_close(at_fd) != 0 && !err)
+		err = strerror(errno);
 	return err;
 }
