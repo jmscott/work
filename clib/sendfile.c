@@ -58,7 +58,7 @@ AGAIN:
 	if (status < 0) {
 		if (errno == ENOTSOCK)
 			return send_not_socket(in, out, offset, len);
-		if (errno == EAGAIN)
+		if (errno == EINTR || errno == EAGAIN)
 			goto AGAIN;
 		return strerror(errno);
 	}
