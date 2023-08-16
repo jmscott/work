@@ -283,6 +283,26 @@ AGAIN:
 
 /*
  *  Synopsis:
+ *	openat() a file, restarting on interrupt.
+ *  Returns:
+ *	0	opened file, returned file descriptor
+ *	-1	error in open(), consult errno.
+ */
+int
+jmscott_openat(int at_fd, char *path, int oflag, mode_t mode)
+{
+	int fd;
+AGAIN:
+	fd = openat(at_fd, path, oflag, mode);
+	if (fd >= 0)
+		return fd;
+	if (errno == EINTR || errno == EAGAIN)
+		goto AGAIN;
+	return -1;
+}
+
+/*
+ *  Synopsis:
  *	close a file, restarting on interrupt.
  *  Returns:
  *	0	closed file

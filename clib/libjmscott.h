@@ -177,6 +177,7 @@ extern int	jmscott_read_exact_timeout(
 extern int	jmscott_write_all(int fd, void *p, ssize_t nbytes);
 extern off_t	jmscott_lseek(int fd, off_t offset, int whence);
 extern int	jmscott_open(char *path, int oflag, mode_t mode);
+extern int	jmscott_openat(int at_fd, char *path, int oflag, mode_t mode);
 extern int	jmscott_close(int fd);
 extern int	jmscott_fstat(int fd, struct stat *buf);
 extern int	jmscott_stat(char *path, struct stat *buf);
