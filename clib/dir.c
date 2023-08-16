@@ -13,7 +13,7 @@
  *	May be able to do a real defer in clang/gcc/
  *	https://fdiv.net/2015/10/08/emulating-defer-c-clang-or-gccblocks
  */
-#define DEFER {err = strerror(errno); goto BYE;}
+#define DEFER {if (!err) err = strerror(errno); goto BYE;}
 
 /*
  *  Synopsis:
@@ -62,9 +62,6 @@ jmscott_mkdirat_path(int at_fd, char *child_path, mode_t mode)
 	}
 	if (jmscott_mkdirat_EEXIST(at_fd, path, mode) < 0)
 		DEFER;
-
 BYE:
-	if (at_fd >= 0 && jmscott_close(at_fd) != 0 && !err)
-		err = strerror(errno);
 	return err;
 }
