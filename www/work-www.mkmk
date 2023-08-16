@@ -1,13 +1,9 @@
 #
 #  Synopsis:
-#	make-dist configuration file for typical web install
+#	make-make configuration file for typical web install
 #  Note:
 #	Be sure do a 'make all' before building a distribution.
 #	Otherwise, the automatically generated cgi scripts will be missing.
-#  See:
-#	make-dist script in jmscott subversions repo
-#  Blame:
-#	jmscott@setspace.com
 #
 CGIBINs="
 	cat-http-POST
