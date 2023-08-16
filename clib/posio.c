@@ -38,7 +38,7 @@ AGAIN:
 	nb = read(fd, p, nbytes);
 	if (nb >= 0)
 		return nb;
-	if (errno == EINTR)
+	if (errno == EINTR || errno == EAGAIN)
 		goto AGAIN;
 	return -1;
 }
@@ -231,7 +231,7 @@ jmscott_write_all(int fd, void *p, ssize_t nbytes)
 AGAIN:
 	nb = write(fd, p + nb, nbytes);
 	if (nb < 0) {
-		if (errno == EINTR)
+		if (errno == EINTR || errno == EAGAIN)
 			goto AGAIN;
 		return -1;
 	}
@@ -256,7 +256,7 @@ AGAIN:
 	where = lseek(fd, offset, whence);
 	if (where >= 0)
 		return where;
-	if (errno == EINTR)
+	if (errno == EINTR || errno == EAGAIN)
 		goto AGAIN;
 	return -1;
 }
@@ -276,7 +276,7 @@ AGAIN:
 	fd = open(path, oflag, mode);
 	if (fd >= 0)
 		return fd;
-	if (errno == EINTR)
+	if (errno == EINTR || errno == EAGAIN)
 		goto AGAIN;
 	return -1;
 }
@@ -294,7 +294,7 @@ jmscott_close(int fd)
 AGAIN:
 	if (close(fd) == 0)
 		return 0;
-	if (errno == EINTR)
+	if (errno == EINTR || errno == EAGAIN)
 		goto AGAIN;
 	return -1;
 }
@@ -305,7 +305,7 @@ jmscott_fstat(int fd, struct stat *buf)
 AGAIN:
 	if (fstat(fd, buf) == 0)
 		return 0;
-	if (errno == EINTR)
+	if (errno == EINTR || errno == EAGAIN)
 		goto AGAIN;
 	return -1;
 }
@@ -316,7 +316,7 @@ jmscott_stat(char *path, struct stat *buf)
 AGAIN:
 	if (stat(path, buf) == 0)
 		return 0;
-	if (errno == EINTR)
+	if (errno == EINTR || errno == EAGAIN)
 		goto AGAIN;
 	return -1;
 }
@@ -333,7 +333,7 @@ jmscott_mkdir(const char *path, mode_t mode)
 {
 AGAIN:
         if (mkdir(path, mode)) {
-                if (errno == EINTR)
+                if (errno == EINTR || errno == EAGAIN)
                         goto AGAIN;
                 return -1;
         }
@@ -363,7 +363,7 @@ jmscott_mkdir_EEXIST(const char *path, mode_t mode)
 AGAIN:
 	if (jmscott_mkdir(path, mode) == 0 || errno == EEXIST)
 		return 0;
-	if (errno == EINTR)
+	if (errno == EINTR || errno == EAGAIN)
 		goto AGAIN;
 	return -1;
 }
@@ -399,7 +399,7 @@ AGAIN:
         errno = 0;
         if (link(old_path, new_path) == 0)
                 return 0;
-        if (errno == EINTR)
+        if (errno == EINTR || errno == EAGAIN)
                 goto AGAIN;
         return -1;
 }
@@ -411,7 +411,7 @@ AGAIN:
         errno = 0;
         if (unlink(path) == 0)
                 return 0;
-        if (errno == EINTR)
+        if (errno == EINTR || errno == EAGAIN)
                 goto AGAIN;
         return -1;
 }
@@ -423,7 +423,7 @@ AGAIN:
         errno = 0;
         if (access(path, mode) == 0)
                 return 0;
-        if (errno == EINTR)
+        if (errno == EINTR || errno == EAGAIN)
                 goto AGAIN;
         return -1;
 }
@@ -435,7 +435,7 @@ AGAIN:
 	errno = 0;
 	if (flock(fd, op) == 0)
 		return 0;
-	if (errno == EINTR)
+	if (errno == EINTR || errno == EAGAIN)
 		goto AGAIN;
 	return -1;
 }
