@@ -64,7 +64,7 @@ BINs="
 #TMP="
 #"
 
-#  Uncomment to create cgibin/ directory
+#  Uncomment to create cgi-bin/ directory
 #CGIBINs="
 #"
 
