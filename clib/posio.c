@@ -416,9 +416,32 @@ int
 jmscott_link(const char *old_path, const char *new_path)
 {
 AGAIN:
-        errno = 0;
         if (link(old_path, new_path) == 0)
                 return 0;
+        if (errno == EINTR || errno == EAGAIN)
+                goto AGAIN;
+        return -1;
+}
+
+int
+jmscott_linkat(
+	int at_fd_old,
+	const char *old_path,
+	int at_fd_new,
+	const char *new_path,
+	int flags
+) {
+	int status;
+AGAIN:
+	status = linkat(
+			at_fd_old,
+			old_path,
+			at_fd_new,
+			new_path,
+			flags
+	);
+	if (status == 0)
+		return 0;
         if (errno == EINTR || errno == EAGAIN)
                 goto AGAIN;
         return -1;
@@ -428,7 +451,6 @@ int
 jmscott_unlink(const char *path)
 {
 AGAIN:
-        errno = 0;
         if (unlink(path) == 0)
                 return 0;
         if (errno == EINTR || errno == EAGAIN)
@@ -440,7 +462,6 @@ int
 jmscott_access(const char *path, int mode)
 {
 AGAIN:
-        errno = 0;
         if (access(path, mode) == 0)
                 return 0;
         if (errno == EINTR || errno == EAGAIN)
@@ -452,7 +473,6 @@ int
 jmscott_flock(int fd, int op)
 {
 AGAIN:
-	errno = 0;
 	if (flock(fd, op) == 0)
 		return 0;
 	if (errno == EINTR || errno == EAGAIN)
