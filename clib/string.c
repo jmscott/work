@@ -120,9 +120,12 @@ jmscott_strcat6(
 /*
  *  Convert unsigned long long to decimal ascii string.
  *  Return the pointer to byte after final digit:
- *  The caller must be sure to null terminate the string:
+ *
+ *  !!  The caller must be sure to null terminate the return end string:
  *
  *	*jmscott_ulltoa(...) = 0;
+ *
+ *  !!  Not terminating can cause typical, wierd clang behavior!
  */
 char *
 jmscott_ulltoa(unsigned long long ull, char *tgt)
