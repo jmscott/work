@@ -459,10 +459,32 @@ AGAIN:
 }
 
 int
+jmscott_unlinkat(int at_fd, const char *path, int flags)
+{
+AGAIN:
+        if (unlinkat(at_fd, path, flags) == 0)
+                return 0;
+        if (errno == EINTR || errno == EAGAIN)
+                goto AGAIN;
+        return -1;
+}
+
+int
 jmscott_access(const char *path, int mode)
 {
 AGAIN:
         if (access(path, mode) == 0)
+                return 0;
+        if (errno == EINTR || errno == EAGAIN)
+                goto AGAIN;
+        return -1;
+}
+
+int
+jmscott_faccessat(int at_fd, const char *path, int mode, int flag)
+{
+AGAIN:
+        if (faccessat(at_fd, path, mode, flag) == 0)
                 return 0;
         if (errno == EINTR || errno == EAGAIN)
                 goto AGAIN;
@@ -487,3 +509,21 @@ jmscott_mkdirat_EEXIST(int fd, const char *path, mode_t mode)
 		return -1;
 	return 0;
 }
+
+int
+jmscott_renameat(
+	int at_fd_old,
+	const char *old_path,
+	int at_fd_new,
+	const char *new_path)
+{
+	int status;
+AGAIN:
+	status = renameat(at_fd_old, old_path, at_fd_new, new_path);
+	if (status == 0)
+		return 0;
+	if (errno == EINTR || errno == EAGAIN)
+		goto AGAIN;
+	return -1;
+}
+
