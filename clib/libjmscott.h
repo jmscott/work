@@ -186,8 +186,22 @@ extern char	*jmscott_mkdir_p(const char *path);
 extern int	jmscott_mkdir_EEXIST(const char *path, mode_t mode);
 extern int 	jmscott_mkdirat_EEXIST(int fd, const char *path, mode_t mode);
 extern int	jmscott_link(const char *old_path, const char *new_path);
+extern int	jmscott_linkat(
+			int at_fd_old,
+			const char *old_path,
+			int at_fd_new,
+			const char *new_path,
+			int flag
+		);
 extern int	jmscott_unlink(const char *path);
+extern int	jmscott_unlinkat(int at_fd, const char *path, int flags);
 extern int	jmscott_access(const char *path, int mode);
+extern int	jmscott_faccessat(
+			int at_fd,
+			const char *path,
+			int mode,
+			int flag
+		);
 
 struct jmscott_json
 {
@@ -227,17 +241,22 @@ extern char			*jmscott_RFC3339Nano_now(
 					int buf_size
 				);
 extern char			*jmscott_net_32addr2text(u_long addr);
-extern int			jmscott_flock(int, int);
-extern char			*jmscott_sendfile(
-					int in,
-					int out,
-					off_t
-					offset,
-					off_t len
+extern int			jmscott_flock(int fd, int op);
+extern char			*jmscott_send_file(
+					int in_fd,
+					int out_fd,
+					long long *send_size
 				);
 char *				jmscott_mkdirat_path(
 					int at_fd,
 					char *path,
 					mode_t mode
 				);
+int				jmscott_renameat(
+					int at_fd_old,
+					const char *old_path,
+					int at_fd_new,
+					const char *new_path
+				);
+
 #endif //  JMSCOTT_LIBJMSCOTT_H
