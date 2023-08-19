@@ -55,10 +55,10 @@ int main(int argc, char **argv)
 	if (in < 0)
 		die2("open(input) failed", strerror(errno));
 
-	char *status = jmscott_sendfile(in, 1, start, stop - start + 1);
-	if (status)
-		die2("sendfile() failed", status);
-	if (jmscott_close(in) != 0)
+	err = jmscott_send_file(in, 1, (long long *)0);
+	if (err)
+		die2("sendfile() failed", err);
+	if (jmscott_close(in))
 		die2("close(in) failed", strerror(errno));
 	_exit(0);
 }
