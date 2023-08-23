@@ -93,7 +93,8 @@ jmscott_send_file(int in_fd, int out_fd, long long *send_size)
 
 	//  probably linux sendfile() semantics.
 
-	size_t len = sz, nw;
+	size_t len = sz;
+	int nw;
 AGAIN:
 	nw = sendfile(out_fd, in_fd, (off_t *)0, len);
 	if (nw < 0 {
@@ -106,7 +107,7 @@ AGAIN:
 		goto AGAIN;
 	if (send_size)
 		*send_size = sz;
-	return (char *
+	return (char *)0;
 	goto AGAIN;
 #endif
 }
