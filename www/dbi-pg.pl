@@ -131,12 +131,35 @@ sub dbi_PGDUMP
 
 		my ($TMPDIR, $sql_path) = ($ENV{TMPDIR});
 
+		#  compare $tag to value of $PGDUMP for dumping a specific
+		#  script only.
+
+		if ($PGDUMP =~ m/^[a-z]/ && $PGDUMP ne $tag) {
+			print STDERR
+				'dbi_PGDUMP: off (ok): ',
+				"$tag != $PGDUMP\n";
+			return;
+		}
+
 		$TMPDIR = '/tmp' unless $TMPDIR;
 		$sql_path = ">$TMPDIR/$tag.$$.sql";
 		print STDERR "dbi_PGDUMP: sql path: $sql_path\n";
 
 		my $T;
 		open($T, $sql_path) or die "$tag: open($sql_path) failed: $!";
+
+		print $T <<END;
+/*
+ *  Tag:
+ *	$tag
+ *  PGDUMP:
+ *	$PGDUMP
+ *  Argv:
+END
+		#  print the args in argv in a comment header
+		print $T " *  $_\n" foreach (@$argv);
+		print $T " */\n";
+
 		print $T $sql, ";\n";
 		close $T or die "close($sql_path) failed: $!";
 	}
