@@ -1,6 +1,8 @@
 #
 #  Synopsis:
 #	Implement the GET method executed from a cgi script.
+#  Note:
+#	Move define of $PGDUMP_re to dbi-pg.pl!
 #
 
 our (
@@ -10,7 +12,9 @@ our (
 	$right_RE,
 );
 
-our $PGDUMP_re = qr/^(STDOUT|STDERR|1|on|yes|y|t|true)$/i;
+our $PGDUMP_re =
+	qr/^(STDOUT|STDERR|1|(?:[a-z][a-z_-]{1,32}))$/i
+;
 
 #
 #  Synopsis:
