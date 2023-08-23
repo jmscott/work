@@ -20,6 +20,7 @@ extern int	errno;
 #include <sys/sendfile.h>
 #endif
 
+#if defined(__APPLE__)
 static char *
 copyio(int in, int out, long long *send_size)
 {
@@ -38,7 +39,6 @@ copyio(int in, int out, long long *send_size)
 	return (char *)0;
 }
 
-#if defined(__APPLE__)
 static char *
 apple_sendfile(int in_fd, int out_fd, long long *send_size)
 {
