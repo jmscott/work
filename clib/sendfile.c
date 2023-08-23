@@ -97,7 +97,7 @@ jmscott_send_file(int in_fd, int out_fd, long long *send_size)
 	int nw;
 AGAIN:
 	nw = sendfile(out_fd, in_fd, (off_t *)0, len);
-	if (nw < 0 {
+	if (nw < 0) {
 		if (errno == EINTR || errno == EAGAIN)
 			goto AGAIN;
 		return strerror(errno);
