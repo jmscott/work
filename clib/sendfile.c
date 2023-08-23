@@ -38,6 +38,7 @@ copyio(int in, int out, long long *send_size)
 	return (char *)0;
 }
 
+#if defined(__APPLE__)
 static char *
 apple_sendfile(int in_fd, int out_fd, long long *send_size)
 {
@@ -67,6 +68,7 @@ AGAIN:
 		*send_size = (long long)sz;
 	return (char *)0;
 }
+#endif
 
 /*
  *  send whole file, using sendfile() when appropriate or falling
