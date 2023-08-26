@@ -1,6 +1,6 @@
 /*
  *  Synopsis:
- *	Portable interface to non-posix sendfile().
+ *	Helpful, common file manipulation functions.
  *  Note:
  *	Move sendfile.c to file.c, so other helper file funcs can be added.
  */
@@ -110,4 +110,16 @@ AGAIN:
 	return (char *)0;
 	goto AGAIN;
 #endif
+
+}
+
+char *
+jmscott_fsizeat(int at_fd, const char *path, off_t *size)
+{
+	struct stat st;
+
+	if (jmscott_fstatat(at_fd, path, &st, 0))
+		return strerror(errno);
+	*size = st.st_size;
+	return (char *)0;
 }

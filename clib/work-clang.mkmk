@@ -24,20 +24,23 @@ VAR2dir_local=(
 	[INCLUDEs]='include/jmscott'
 )
 
-OBJs="
-	die.o
-	dir.o
-	ecpg.o
-	halloc.o
-	hexdump.o
-	json.o
-	net.o
-	posio.o
-	sendfile.o
-	string.o
-	time.o
-	udig.o
+#  Uncomment to create src/ directory
+SRCs="
+	die.c
+	dir.c
+	ecpg.c
+	file.c
+	halloc.c
+	hexdump.c
+	json.c
+	net.c
+	posio.c
+	string.c
+	time.c
+	udig.c
 "
+
+OBJs=$(echo $SRCs | sed 's/[.]c/.o/g')
 
 COMPILEs="
 	$OBJs
@@ -67,22 +70,6 @@ LIBs="
 #  Uncomment to create htdocs/ directory
 #HTDOCSs="
 #"
-
-#  Uncomment to create src/ directory
-SRCs="
-	die.c
-	dir.c
-	ecpg.c
-	halloc.c
-	hexdump.c
-	json.c
-	net.c
-	posio.c
-	sendfile.c
-	string.c
-	time.c
-	udig.c
-"
 
 #  Uncomment to create attic/ directory
 #ATTIC="

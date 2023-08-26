@@ -503,14 +503,6 @@ AGAIN:
 }
 
 int
-jmscott_mkdirat_EEXIST(int fd, const char *path, mode_t mode)
-{
-	if (mkdirat(fd, path, mode) < 0 && errno != EEXIST)
-		return -1;
-	return 0;
-}
-
-int
 jmscott_renameat(
 	int at_fd_old,
 	const char *old_path,
@@ -527,3 +519,28 @@ AGAIN:
 	return -1;
 }
 
+int
+jmscott_mkdirat(int fd, const char *path, mode_t mode)
+{
+AGAIN:
+	if (mkdirat(fd, path, mode)) {
+		if (errno == EINTR || errno == EAGAIN)
+			goto AGAIN;
+               return -1;
+	}
+	return 0;
+}
+
+int
+jmscott_fstatat(int at_fd, const char *path, struct stat *buf, int flag)
+{
+	int status;
+AGAIN:
+	status = fstatat(at_fd, path, buf, flag);
+	if (status) {
+		if (errno == EINTR || errno == EAGAIN)
+			goto AGAIN;
+               return -1;
+	}
+	return 0;
+}

@@ -65,3 +65,11 @@ jmscott_mkdirat_path(int at_fd, char *child_path, mode_t mode)
 BYE:
 	return err;
 }
+
+int
+jmscott_mkdirat_EEXIST(int at_fd, const char *path, mode_t mode)
+{
+	if (jmscott_mkdirat(at_fd, path, mode) < 0 && errno != EEXIST)
+		return -1;
+	return 0;
+}

@@ -180,11 +180,18 @@ extern int	jmscott_open(char *path, int oflag, mode_t mode);
 extern int	jmscott_openat(int at_fd, char *path, int oflag, mode_t mode);
 extern int	jmscott_close(int fd);
 extern int	jmscott_fstat(int fd, struct stat *buf);
+extern int	jmscott_fstatat(
+			int at_fd,
+			const char *path,
+			struct stat *buf,
+			int flag
+		);
 extern int	jmscott_stat(char *path, struct stat *buf);
 extern int	jmscott_mkdir(const char *path, mode_t mode);
 extern char	*jmscott_mkdir_p(const char *path);
 extern int	jmscott_mkdir_EEXIST(const char *path, mode_t mode);
-extern int 	jmscott_mkdirat_EEXIST(int fd, const char *path, mode_t mode);
+extern int 	jmscott_mkdirat(int fd, const char *path, mode_t mode);
+extern int	jmscott_mkdirat_EEXIST(int at_fd, const char *path,mode_t mode);
 extern int	jmscott_link(const char *old_path, const char *new_path);
 extern int	jmscott_linkat(
 			int at_fd_old,
@@ -202,6 +209,7 @@ extern int	jmscott_faccessat(
 			int mode,
 			int flag
 		);
+extern char	*jmscott_fsizeat(int at_fd, const char *path, off_t *size);
 
 struct jmscott_json
 {
