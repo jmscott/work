@@ -1,12 +1,12 @@
 die.o
 ecpg.o
+file.o
 halloc.o
 hexdump.o
 json.o
 libjmscott.a
 net.o
 posio.o
-sendfile.o
 string.o
 time.o
 udig.o
