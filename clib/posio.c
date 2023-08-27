@@ -503,14 +503,13 @@ jmscott_renameat(
 	int tgt_fd,
 	const char *tgt_path)
 {
-	int status;
 AGAIN:
-	status = renameat(src_fd, src_path, tgt_fd, tgt_path);
-	if (status == 0)
-		return 0;
-	if (errno == EINTR || errno == EAGAIN)
-		goto AGAIN;
-	return -1;
+	if (renameat(src_fd, src_path, tgt_fd, tgt_path)) {
+		if (errno == EINTR || errno == EAGAIN)
+			goto AGAIN;
+		return -1;
+	}
+	return 0;
 }
 
 int
@@ -528,10 +527,8 @@ AGAIN:
 int
 jmscott_fstatat(int fd, const char *path, struct stat *st, int flag)
 {
-	int status;
 AGAIN:
-	status = fstatat(fd, path, st, flag);
-	if (status) {
+	if (fstatat(fd, path, st, flag)) {
 		if (errno == EINTR || errno == EAGAIN)
 			goto AGAIN;
                return -1;
