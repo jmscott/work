@@ -320,10 +320,10 @@ AGAIN:
 }
 
 int
-jmscott_fstat(int fd, struct stat *buf)
+jmscott_fstat(int fd, struct stat *st)
 {
 AGAIN:
-	if (fstat(fd, buf) == 0)
+	if (fstat(fd, st) == 0)
 		return 0;
 	if (errno == EINTR || errno == EAGAIN)
 		goto AGAIN;
@@ -331,10 +331,10 @@ AGAIN:
 }
 
 int
-jmscott_stat(char *path, struct stat *buf)
+jmscott_stat(char *path, struct stat *st)
 {
 AGAIN:
-	if (stat(path, buf) == 0)
+	if (stat(path, st) == 0)
 		return 0;
 	if (errno == EINTR || errno == EAGAIN)
 		goto AGAIN;
@@ -413,10 +413,10 @@ jmscott_mkdir_p(const char *path)
 }
 
 int
-jmscott_link(const char *old_path, const char *new_path)
+jmscott_link(const char *src_path, const char *tgt_path)
 {
 AGAIN:
-        if (link(old_path, new_path) == 0)
+        if (link(src_path, tgt_path) == 0)
                 return 0;
         if (errno == EINTR || errno == EAGAIN)
                 goto AGAIN;
@@ -425,21 +425,15 @@ AGAIN:
 
 int
 jmscott_linkat(
-	int at_fd_old,
-	const char *old_path,
-	int at_fd_new,
-	const char *new_path,
+	int src_fd,
+	const char *src_path,
+	int tgt_fd,
+	const char *tgt_path,
 	int flags
 ) {
 	int status;
 AGAIN:
-	status = linkat(
-			at_fd_old,
-			old_path,
-			at_fd_new,
-			new_path,
-			flags
-	);
+	status = linkat(src_fd, src_path, tgt_fd, tgt_path, flags);
 	if (status == 0)
 		return 0;
         if (errno == EINTR || errno == EAGAIN)
@@ -459,10 +453,10 @@ AGAIN:
 }
 
 int
-jmscott_unlinkat(int at_fd, const char *path, int flags)
+jmscott_unlinkat(int fd, const char *path, int flags)
 {
 AGAIN:
-        if (unlinkat(at_fd, path, flags) == 0)
+        if (unlinkat(fd, path, flags) == 0)
                 return 0;
         if (errno == EINTR || errno == EAGAIN)
                 goto AGAIN;
@@ -481,10 +475,10 @@ AGAIN:
 }
 
 int
-jmscott_faccessat(int at_fd, const char *path, int mode, int flag)
+jmscott_faccessat(int fd, const char *path, int mode, int flag)
 {
 AGAIN:
-        if (faccessat(at_fd, path, mode, flag) == 0)
+        if (faccessat(fd, path, mode, flag) == 0)
                 return 0;
         if (errno == EINTR || errno == EAGAIN)
                 goto AGAIN;
@@ -504,14 +498,14 @@ AGAIN:
 
 int
 jmscott_renameat(
-	int at_fd_old,
-	const char *old_path,
-	int at_fd_new,
-	const char *new_path)
+	int src_fd,
+	const char *src_path,
+	int tgt_fd,
+	const char *tgt_path)
 {
 	int status;
 AGAIN:
-	status = renameat(at_fd_old, old_path, at_fd_new, new_path);
+	status = renameat(src_fd, src_path, tgt_fd, tgt_path);
 	if (status == 0)
 		return 0;
 	if (errno == EINTR || errno == EAGAIN)
@@ -532,11 +526,11 @@ AGAIN:
 }
 
 int
-jmscott_fstatat(int at_fd, const char *path, struct stat *buf, int flag)
+jmscott_fstatat(int fd, const char *path, struct stat *st, int flag)
 {
 	int status;
 AGAIN:
-	status = fstatat(at_fd, path, buf, flag);
+	status = fstatat(fd, path, st, flag);
 	if (status) {
 		if (errno == EINTR || errno == EAGAIN)
 			goto AGAIN;
