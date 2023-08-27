@@ -388,30 +388,6 @@ AGAIN:
 	return -1;
 }
 
-/*
- *  C version of cli command "mkdir -p <path>".
- *
- *  Note:
- *	we just do system("mkdir -p <path>") until i can find (or write)
- *	a posix	equivalent.
- */
-char *
-jmscott_mkdir_p(const char *path)
-{
-	char cmd[4096];
-
-	cmd[0] = 0;
-	jmscott_strcat3(cmd, sizeof cmd,
-		"mkdir -p '",
-		path,
-		"'"
-	);
-	int status = system(cmd);
-	if (status != 0)
-		return strerror(errno);		//  not correct!
-	return (char *)0;
-}
-
 int
 jmscott_link(const char *src_path, const char *tgt_path)
 {
