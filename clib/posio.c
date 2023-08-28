@@ -218,31 +218,6 @@ AGAIN:
 
 /*
  *  Synopsis:
- *	write() exactly nbytes, restarting on interrupt.
- *  Returns:
- *	0	wrote "nbytes" with no error.
- *	-1	error in write(), consult errno.
- */
-int
-jmscott_write_all(int fd, void *p, ssize_t nbytes)
-{
-	int nb = 0;
-
-AGAIN:
-	nb = write(fd, p + nb, nbytes);
-	if (nb < 0) {
-		if (errno == EINTR || errno == EAGAIN)
-			goto AGAIN;
-		return -1;
-	}
-	nbytes -= nb;
-	if (nbytes > 0)
-		goto AGAIN;
-	return 0;
-}
-
-/*
- *  Synopsis:
  *	lseek() to a file position, restarting on intearrupt.
  *  Returns:
  *	0	seek ok
@@ -510,4 +485,17 @@ AGAIN:
                return -1;
 	}
 	return 0;
+}
+
+int
+jmscott_write(int fd, void *p, ssize_t nbytes)
+{
+	int nb;
+AGAIN:
+	nb = write(fd, p, nbytes);
+	if (nb >= 0)
+		return nb;
+	if (errno == EINTR || errno == EAGAIN)
+		goto AGAIN;
+	return -1;
 }

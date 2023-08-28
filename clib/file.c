@@ -20,22 +20,43 @@ extern int	errno;
 #include <sys/sendfile.h>
 #endif
 
+/*
+ *  Synopsis:
+ *	write() exactly nbytes, restarting on interrupt.
+ *  Returns:
+ *	0	wrote "nbytes" with no error.
+ *	-1	error in write(), consult errno.
+ */
+int
+jmscott_write_all(int fd, void *p, ssize_t nbytes)
+{
+	int nb = 0;
+
+	while (nbytes > 0) {
+		nb = jmscott_write(fd, p + nb, nbytes);
+		if (nb < 0)
+			return -1;
+		nbytes -= nb;
+	}
+	return 0;
+}
+
 #if defined(__APPLE__)
 static char *
 copyio(int in, int out, long long *send_size)
 {
-	int nr, nw, total = 0;
+	ssize_t nr, total = 0;
 
 	char buf[4096];
 	while ((nr = jmscott_read(in, buf, sizeof buf)) > 0) {
-		if ((nw = jmscott_write_all(out, buf, nr)) < 0)
+		if (jmscott_write_all(out, buf, nr) < 0)
 			return strerror(errno);
-		total += nw;
-		if (total == *send_size)
-			return (char *)0;
+		total += nr;
 	}
 	if (nr < 0)
 		return strerror(errno);
+	if (send_size)
+		*send_size = total;
 	return (char *)0;
 }
 
