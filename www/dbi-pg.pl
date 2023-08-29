@@ -4,6 +4,9 @@
 #  Return:
 #	Always implies success, die otherwise
 #  Note:
+#	Rewrite require statements to reference jmscott/httpd2.d/...'
+#	This confines env var PERL5 to $SERVER_ROOT/lib.
+#
 #	existence of "tag" not tested in dbi_pg_connect!.
 #
 #	Added example of query called from cgi-bin, similar to env.cgi and
@@ -14,13 +17,24 @@
 #		Subroutine version::declare redefined at ...
 #
 
+require 'httpd2.d/common.pl';
+
 #
 #  Manually set LD_LIBRARY_PATH.  Redhat 6.2 apache has problem setting
 #  LD_LIBRARY_PATH.  Not sure why.
 #
 
-our $PGDUMP_re;
 our %QUERY_ARG;
+our ($left_RE, $right_RE);
+
+our $PGDUMP_re = qr/^(STDOUT|STDERR|1|(?:[a-z][a-z_-]{1,32}))$/i;
+
+if ($ENV{QUERY_STRING} =~ /${left_RE}PGDUMP$right_RE/) {
+	my $v = $1;
+	die "query arg: PGDUMP: unexpected value: $v" unless $v =~ $PGDUMP_re;
+	print STDERR "query arg: PGDUMP=$v\n";
+	$ENV{PGDUMP} = $v;
+}
 
 $ENV{LD_LIBRARY_PATH} = "$ENV{PGHOME}:$ENV{LD_LIBRARY_PATH}" if $ENV{PGHOME};
 

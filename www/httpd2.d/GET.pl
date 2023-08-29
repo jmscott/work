@@ -1,8 +1,6 @@
 #
 #  Synopsis:
 #	Implement the GET method executed from a cgi script.
-#  Note:
-#	Move define of $PGDUMP_re to dbi-pg.pl!
 #
 
 our (
@@ -12,9 +10,6 @@ our (
 	$right_RE,
 );
 
-our $PGDUMP_re =
-	qr/^(STDOUT|STDERR|1|(?:[a-z][a-z_-]{1,32}))$/i
-;
 
 #
 #  Synopsis:
@@ -194,12 +189,4 @@ $QUERY_ARG{id_att} = " id=\"$QUERY_ARG{id}\"" if defined $QUERY_ARG{id};
 $QUERY_ARG{class_att} = " class=\"$QUERY_ARG{class}\""
 						if defined $QUERY_ARG{class};
 
-#  move the query arg trigger for an sql dump (locally) to $ENV{PGDUMP}.
-
-if ($ENV{QUERY_STRING} =~ /${left_RE}PGDUMP$right_RE/) {
-	my $v = $1;
-	die "query arg: PGDUMP: unexpected value: $v" unless $v =~ $PGDUMP_re;
-	print STDERR "query arg: PGDUMP=$v\n";
-	$ENV{PGDUMP} = $v;
-}
 return require "$CGI{name}.d/$QUERY_ARG{out}.pl";
