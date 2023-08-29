@@ -171,7 +171,7 @@ sub dbi_PGDUMP
  *  Argv:
 END
 		#  print the args in argv in a comment header
-		print $T " *  $_\n" foreach (@$argv);
+		print $T " *	$_\n" foreach (@$argv);
 		print $T " */\n";
 
 		print $T $sql, ";\n";
