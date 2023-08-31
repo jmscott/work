@@ -37,6 +37,7 @@ COMPILEs="
 	tas-lock-fs
 	tas-unlock-fs
 	udp4-listen
+	udp4-reflect
 "
 
 LIBs="
@@ -115,6 +116,7 @@ SRCs="
 	tas-lock-fs.c
 	tas-unlock-fs.c
 	udp4-listen.go
+	udp4-reflect.go
 "
 
 #  Uncomment to create attic/ directory
