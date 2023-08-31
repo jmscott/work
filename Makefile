@@ -152,6 +152,9 @@ is-dir-empty: is-dir-empty.c $(JMSLIB) $(JMSINC)
 udp4-listen: udp4-listen.go
 	$(GOEXE) build udp4-listen.go
 
+udp4-reflect: udp4-reflect.go
+	$(GOEXE) build udp4-reflect.go
+
 env2json: env2json.go
 	$(GOEXE) build env2json.go
 
