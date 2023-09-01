@@ -113,9 +113,12 @@ jmscott_scan_dir(
 			if (!entp)
 				return "realloc(entries) failed: out of memory";
 		}
-		entp[ec] = strdup(ep->d_name);
+
+		entp[ec] = (char *)malloc(ep->d_namlen+1);
 		if (!entp[ec])
 			return "strdup(entry) failed: out of memory";
+		memcpy(entp[ec], ep->d_name, ep->d_namlen);
+		entp[ec][ep->d_namlen] = 0;
 	}
 	if (errno > 0)
 		return strerror(errno);
