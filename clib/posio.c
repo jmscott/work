@@ -8,16 +8,8 @@
  */
 
 #include <sys/errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/uio.h>
 #include <sys/file.h>
-
-#include <unistd.h>
-#include <fcntl.h>
 #include <poll.h>
-#include <string.h>
-#include <stdlib.h>
 #include <stdio.h>
 
 #include "jmscott/libjmscott.h"
@@ -498,4 +490,39 @@ AGAIN:
 	if (errno == EINTR || errno == EAGAIN)
 		goto AGAIN;
 	return -1;
+}
+
+DIR *
+jmscott_fdopendir(int dir_fd)
+{
+	DIR *dp;
+AGAIN:
+	dp = fdopendir(dir_fd);
+	if (!dp && (errno == EINTR || errno == EAGAIN))
+		goto AGAIN;
+	return dp;
+}
+
+struct dirent *
+jmscott_readdir(DIR *dp)
+{
+	struct dirent *dep;
+
+AGAIN:
+	dep = readdir(dp);
+	if (!dep && (errno == EINTR || errno == EAGAIN))
+		goto AGAIN;
+	return dep;
+}
+
+int
+jmscott_closedir(DIR *dp)
+{
+AGAIN:
+	if (closedir(dp)) {
+		if (errno == EINTR || errno == EAGAIN)
+			goto AGAIN;
+		return -1;
+	}
+	return 0;
 }

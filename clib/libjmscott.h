@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <arpa/inet.h>
+#include <dirent.h>
 
 /*
  *  Pragmatic, reliable, atomic message size across many protocols, such as
@@ -266,5 +267,8 @@ int				jmscott_renameat(
 					int at_fd_new,
 					const char *new_path
 				);
+DIR *				jmscott_fdopendir(int dir_fd);
+struct dirent *			jmscott_readdir(DIR *dp);
+int				jmscott_closedir(DIR *dp);
 
 #endif //  JMSCOTT_LIBJMSCOTT_H
