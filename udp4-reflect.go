@@ -47,7 +47,7 @@ func scatter(out []*net.UDPConn) (ref_c chan []byte) {
 				fmt.Fprintf(
 					os.Stderr, 
 					"Write(%s) failed: %s\n",
-					o,
+					o.RemoteAddr().String(),
 					err,
 				)
 				put_stats()
