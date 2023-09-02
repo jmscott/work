@@ -15,12 +15,18 @@ import (
 	"syscall"
 )
 
-var in_count uint64
+var in_count, out_count, err_count uint64
 
 func die(format string, args ...interface{}) {
 	
 	fmt.Fprintf(os.Stderr, "ERROR: " + format + "\n", args...)
 	os.Exit(1)
+}
+
+func put_stats() { 
+	fmt.Fprintf(os.Stdout, " in: %d pkts\n", in_count)
+	fmt.Fprintf(os.Stdout, "out: %d pkts\n", out_count)
+	fmt.Fprintf(os.Stdout, "err: %d pkts\n", err_count)
 }
 
 func scatter(out []*net.UDPConn) (ref_c chan []byte) {
@@ -32,7 +38,19 @@ func scatter(out []*net.UDPConn) (ref_c chan []byte) {
 		for {
 			pkt := <- ref_c
 			for _, o := range out {
-				o.Write(pkt)
+				_, err := o.Write(pkt)
+				if err == nil {
+					out_count++
+					continue
+				}
+				err_count++
+				fmt.Fprintf(
+					os.Stderr, 
+					"Write(%s) failed: %s\n",
+					o,
+					err,
+				)
+				put_stats()
 			}
 		}
 	}()
@@ -107,7 +125,7 @@ func main() {
 			)
 			os.Exit(1)
 		}
-		fmt.Fprintf(os.Stdout, "in: %d pkts\n", in_count)
+		put_stats()
 	}
 	os.Exit(0)
 }
