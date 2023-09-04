@@ -39,18 +39,18 @@ func scatter(out []*net.UDPConn) (ref_c chan []byte) {
 			pkt := <- ref_c
 			for _, o := range out {
 				_, err := o.Write(pkt)
-				if err == nil {
+				if err != nil {
+					err_count++
+					fmt.Fprintf(
+						os.Stderr, 
+						"Write(%s) failed: %s\n",
+						o.RemoteAddr().String(),
+						err,
+					)
+					put_stats()
+				} else {
 					out_count++
-					continue
 				}
-				err_count++
-				fmt.Fprintf(
-					os.Stderr, 
-					"Write(%s) failed: %s\n",
-					o.RemoteAddr().String(),
-					err,
-				)
-				put_stats()
 			}
 		}
 	}()
