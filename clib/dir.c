@@ -114,7 +114,6 @@ jmscott_scan_dir(
 				return "realloc(entries) failed: out of memory";
 		}
 
-		entp[ec] = (char *)malloc(ep->d_namlen+1);
 		if (!entp[ec])
 			return "strdup(entry) failed: out of memory";
 		entp[ec] = strdup(ep->d_name);
