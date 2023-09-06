@@ -144,3 +144,11 @@ jmscott_fsizeat(int at_fd, const char *path, off_t *size)
 	*size = st.st_size;
 	return (char *)0;
 }
+
+char *
+jmscott_rewind(int fd)
+{
+	if (jmscott_lseek(fd, (off_t)0, SEEK_SET))
+		return strerror(errno);
+	return (char *)0;
+}
