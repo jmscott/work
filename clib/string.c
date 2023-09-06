@@ -114,7 +114,40 @@ jmscott_strcat6(
 	const char *src6
 ){
 	char *p = jmscott_strcat(tgt, tgtsize, src1);
-	return jmscott_strcat5(p, tgtsize-(p-tgt), src2, src3, src4, src5, src6);
+	return jmscott_strcat5(
+				p,
+				tgtsize - (p - tgt),
+				src2,
+				src3,
+				src4,
+				src5,
+				src6
+	);
+}
+
+char *
+jmscott_strcat7(
+	char *tgt,
+	int tgtsize,
+	const char *src1,
+	const char *src2,
+	const char *src3,
+	const char *src4,
+	const char *src5,
+	const char *src6,
+	const char *src7
+){
+	char *p = jmscott_strcat(tgt, tgtsize, src1);
+	return jmscott_strcat6(
+				p,
+				tgtsize - (p - tgt),
+				src2,
+				src3,
+				src4,
+				src5,
+				src6,
+				src7
+	);
 }
 
 /*
