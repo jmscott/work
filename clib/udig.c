@@ -24,7 +24,7 @@ jmscott_frisk_udig(char *udig)
 	if (!udig)
 		return "udig is null";
 	if (!*udig)
-		return "udig is zero legnth";
+		return "udig is zero length";
 
 	//  scan the algorithm matching [a-z][a-z]{0,7}:
 
