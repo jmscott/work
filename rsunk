@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 #  Synopsis:
 #	Push /d1/d2/... to user@rsync.net:sunk/host/$(hostname -f)/root/d1/d2
 #  Description:
 #  	Rsync a precious, stable directory to an rsync.net server and send
 #  	status email.  Files that change during the sync will generate
-#  	an error, unless given te option --ignore-24.
+#  	an error, unless given the option --ignore-24.
 # 
 #  	Files are sunk in archive mode to user@rsync.net:sunk/host/$(hostname).
 #	Directories are	created as needed.  Stale files on the remote server
@@ -53,18 +53,28 @@ DU=
 #  ignore exit status 24 (some files changed)
 IGNORE_24=no
 
-RSYNC_ARGS='
+EXCLUDE='
+	--exclude tmp/
+	--exclude log/
+	--exclude run/
+	--exclude spool/
+	--exclude cache/
+	--exclude attic/
+'
+
+RSYNC_ARGS="
 	--numeric-ids
 	--verbose
-	--exclude tmp/
+	$EXCLUDE
 	--archive
 	--delete
 	--delete-excluded
 	--itemize-changes
 	--human-readable
 	--compress
-'
-TARGET_PATH=
+"
+
+TARGET_PATH=sunk/host/$(hostname -f)/root/
 RSYNC_OUT=
 RSYNC_TEE=cat
 ITEMIZE=no
@@ -215,6 +225,11 @@ while [ "$1" ];  do
 		RSYNC_OUT=${TMPDIR:=/tmp}/$PROG.$$
 		RSYNC_TEE="tee $RSYNC_OUT"
 		;;
+	--exclude)
+		test -n "$1" || die 'option --exclude: missing pattern'
+		RSYNC_ARGS="$RSYNC_ARGS --exclude $1"
+		shift
+		;;
 	--*)
 		die "unknown option: $ARG"
 		;;
@@ -238,7 +253,6 @@ test -n "$SOURCE_PATH" || die 'missing option: --source-path'
 log "source path: $SOURCE_PATH"
 log "itemize: $ITEMIZE"
 
-TARGET_PATH=sunk/host/condor.setspace.com/root$(dirname $SOURCE_PATH)
 log "target path: $TARGET_PATH"
 
 TARGET="$SSH_AUTH:$TARGET_PATH"
