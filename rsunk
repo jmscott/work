@@ -54,14 +54,14 @@ DU=
 #  ignore exit status 24 (some files changed)
 IGNORE_24=no
 
-EXCLUDE='
-	--exclude \\'tmp/*\\'
-	--exclude \\'log/*\\'
-	--exclude \\'run/*\\'
-	--exclude \\'spool/*\\'
-	--exclude \\'cache/*\\'
-	--exclude \\'attic/*\\'
-'
+EXCLUDE="
+	--exclude 'tmp/*'
+	--exclude 'log/*'
+	--exclude 'run/*'
+	--exclude 'spool/*'
+	--exclude 'cache/*'
+	--exclude 'attic/*'
+"
 
 RSYNC_ARGS="
 	--numeric-ids
