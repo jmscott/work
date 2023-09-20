@@ -193,8 +193,8 @@ while [ "$1" ];  do
 		shift
 		;;
 	--source-path)		#  file path
-		test -z "$SOURCE_PATH" || die
-				'option --source-path: given more than once'
+		test -z "$SOURCE_PATH" 					||
+				die 'option --source-path: given more than once'
 		case "$1" in
 		'')
 			die 'option --source-path: missing /d1/d2/...'
