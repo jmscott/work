@@ -54,15 +54,6 @@ DU=
 #  ignore exit status 24 (some files changed)
 IGNORE_24=no
 
-EXCLUDE="
-	--exclude 'tmp/*'
-	--exclude 'log/*'
-	--exclude 'run/*'
-	--exclude 'spool/*'
-	--exclude 'cache/*'
-	--exclude 'attic/*'
-"
-
 RSYNC_ARGS="
 	--numeric-ids
 	--verbose
@@ -280,7 +271,7 @@ ssh $SSH_AUTH "mkdir -p $TARGET_PATH" ||
 #	See gripe at top of file.
 #
 set -x
-time rsync --filter='dir-merge /.rsunk-filter' 				\
+time rsync --filter="dir-merge $SOURCE_PATH/.rsunk-filter"		\
 		$RSYNC_ARGS $SOURCE_PATH $TARGET 2>&1 | $RSYNC_TEE
 STATUS="${PIPESTATUS[*]}"
 set +x
