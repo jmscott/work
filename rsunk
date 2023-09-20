@@ -44,7 +44,7 @@
 #	https://rsync.net
 #
 
-START_EPOCH=$(date +%a)
+START_EPOCH=$(date +%s)
 PROG=$(basename $0)
 SOURCE_PATH=
 TARGET=
