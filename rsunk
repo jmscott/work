@@ -54,12 +54,12 @@ DU=
 IGNORE_24=no
 
 EXCLUDE='
-	--exclude tmp/
-	--exclude log/
-	--exclude run/
-	--exclude spool/
-	--exclude cache/
-	--exclude attic/
+	--exclude tmp/*
+	--exclude log/*
+	--exclude run/*
+	--exclude spool/*
+	--exclude cache/*
+	--exclude attic/*
 '
 
 RSYNC_ARGS="
