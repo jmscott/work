@@ -42,6 +42,13 @@
 #  See:
 #	https://github.com/jmscott/work/rsunk
 #	https://rsync.net
+#  Note:
+#	Add option --template to generate reasonable /.rsunk-filter file.
+#
+#	Add option --rsync-filter-path.  Not sure if global /.rsunk-filter
+#	makes too many assumptions about access to root.  In principle
+#	extra merge rules can be added to /.rsunk-filter, but not total
+#	how all that works.
 #
 
 START_EPOCH=$(date +%s)
@@ -191,10 +198,12 @@ while [ "$1" ];  do
 		'')
 			die 'option --source-path: missing /d1/d2/...'
 			;;
-		/*)
+		/)
 			;;
-		*/)
+		/*/)
 			die 'option --source-path: path can not end in /'
+			;;
+		/*)
 			;;
 		*)
 			die "option --source-path: not full path: $SOURCE_PATH"
@@ -271,7 +280,7 @@ ssh $SSH_AUTH "mkdir -p $TARGET_PATH" ||
 #	See gripe at top of file.
 #
 set -x
-time rsync --filter="dir-merge $SOURCE_PATH/.rsunk-filter"		\
+time rsync --filter='dir-merge /.rsunk-filter'				\
 		$RSYNC_ARGS $SOURCE_PATH $TARGET 2>&1 | $RSYNC_TEE
 STATUS="${PIPESTATUS[*]}"
 set +x
