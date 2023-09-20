@@ -47,7 +47,7 @@
 #
 #	Add option --rsync-filter-path.  Not sure if global /.rsunk-filter
 #	makes too many assumptions about access to root.  In principle
-#	extra merge rules can be added to /.rsunk-filter, but not total
+#	extra merge rules can be added to /.rsunk-filter, but not total sure
 #	how all that works.
 #
 
@@ -64,7 +64,6 @@ IGNORE_24=no
 RSYNC_ARGS="
 	--numeric-ids
 	--verbose
-	$EXCLUDE
 	--archive
 	--delete
 	--delete-excluded
