@@ -199,10 +199,10 @@ while [ "$1" ];  do
 		'')
 			die 'option --source-path: missing /d1/d2/...'
 			;;
+		/*)
+			;;
 		*/)
 			die 'option --source-path: path can not end in /'
-			;;
-		/*)
 			;;
 		*)
 			die "option --source-path: not full path: $SOURCE_PATH"
