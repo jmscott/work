@@ -34,14 +34,12 @@ jmscott_die(int status, char *msg1)
         static char colon[] = ": ";
         static char nl[] = "\n";
 
+write(2, "WTF6\n", 5);
         msg[0] = 0;
-	if (jmscott_progname) {
-		jmscott_strcat(msg, sizeof msg, jmscott_progname);
-		jmscott_strcat(msg, sizeof msg, colon);
-	}
-        jmscott_strcat(msg, sizeof msg, ERROR);
-        jmscott_strcat(msg, sizeof msg, msg1);
-        jmscott_strcat(msg, sizeof msg, nl);
+	if (jmscott_progname)
+		jmscott_strcat2(msg, sizeof msg, jmscott_progname, colon);
+write(2, "WTF7\n", 5);
+	jmscott_strcat3(msg, sizeof msg, ERROR, msg1, nl);
 
         write(2, msg, strlen(msg));
 
@@ -55,10 +53,7 @@ jmscott_die2(int status, char *msg1, char *msg2)
         char msg[JMSCOTT_ATOMIC_WRITE_SIZE];
 
         msg[0] = 0;
-        jmscott_strcat(msg, sizeof msg, msg1);
-        jmscott_strcat(msg, sizeof msg, colon);
-        jmscott_strcat(msg, sizeof msg, msg2);
-
+	jmscott_strcat3(msg, sizeof msg, msg1, colon, msg2);
         jmscott_die(status, msg);
 }
 
@@ -69,9 +64,7 @@ jmscott_die3(int status, char *msg1, char *msg2, char *msg3)
         char msg[JMSCOTT_ATOMIC_WRITE_SIZE];
 
         msg[0] = 0;
-        jmscott_strcat(msg, sizeof msg, msg1);
-        jmscott_strcat(msg, sizeof msg, colon);
-        jmscott_strcat(msg, sizeof msg, msg2);
+	jmscott_strcat3(msg, sizeof msg, msg1, colon, msg2);
 
         jmscott_die2(status, msg, msg3);
 }
@@ -83,9 +76,7 @@ jmscott_die4(int status, char *msg1, char *msg2, char *msg3, char *msg4)
         char msg[JMSCOTT_ATOMIC_WRITE_SIZE];
 
         msg[0] = 0;
-        jmscott_strcat(msg, sizeof msg, msg1);
-        jmscott_strcat(msg, sizeof msg, colon);
-        jmscott_strcat(msg, sizeof msg, msg2);
+	jmscott_strcat3(msg, sizeof msg, msg1, colon, msg2);
 
         jmscott_die3(status, msg, msg3, msg4);
 }
@@ -103,9 +94,7 @@ jmscott_die5(
         char msg[JMSCOTT_ATOMIC_WRITE_SIZE];
 
         msg[0] = 0;
-        jmscott_strcat(msg, sizeof msg, msg1);
-        jmscott_strcat(msg, sizeof msg, colon);
-        jmscott_strcat(msg, sizeof msg, msg2);
+	jmscott_strcat3(msg, sizeof msg, msg1, colon, msg2);
 
         jmscott_die4(status, msg, msg3, msg4, msg5);
 }
@@ -124,9 +113,7 @@ jmscott_die6(
         char msg[JMSCOTT_ATOMIC_WRITE_SIZE];
 
         msg[0] = 0;
-        jmscott_strcat(msg, sizeof msg, msg1);
-        jmscott_strcat(msg, sizeof msg, colon);
-        jmscott_strcat(msg, sizeof msg, msg2);
+	jmscott_strcat3(msg, sizeof msg, msg1, colon, msg2);
 
         jmscott_die5(status, msg, msg3, msg4, msg5, msg6);
 }
@@ -134,13 +121,20 @@ jmscott_die6(
 void
 jmscott_die_argc(int status, int got, int expect, char *usage)
 {
-	char msg[JMSCOTT_ATOMIC_WRITE_SIZE] = {0};
 	char suffix[54] = {0};
+	char msg[JMSCOTT_ATOMIC_WRITE_SIZE] = {0};
 
-	jmscott_strcat(msg, sizeof msg, "wrong number of cli args: got ");
+write(2, "WTF3\n", 5);
 	snprintf(suffix, sizeof suffix, "%d, expected %d: ", got, expect);
-	jmscott_strcat(msg, sizeof msg, suffix);
-	jmscott_strcat2(msg, sizeof msg, "\nusage: ", usage);
+write(2, "WTF4\n", 5);
 
+	msg[0] = 0;
+	jmscott_strcat4(msg, sizeof msg,
+			"wrong number of cli args: got ",
+			suffix,
+			"\nusage: ",
+			usage
+	);
+write(2, "WTF5\n", 5);
 	jmscott_die(status, msg);
 }
