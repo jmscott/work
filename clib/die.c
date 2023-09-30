@@ -34,11 +34,9 @@ jmscott_die(int status, char *msg1)
         static char colon[] = ": ";
         static char nl[] = "\n";
 
-write(2, "WTF6\n", 5);
         msg[0] = 0;
 	if (jmscott_progname)
 		jmscott_strcat2(msg, sizeof msg, jmscott_progname, colon);
-write(2, "WTF7\n", 5);
 	jmscott_strcat3(msg, sizeof msg, ERROR, msg1, nl);
 
         write(2, msg, strlen(msg));
@@ -124,9 +122,7 @@ jmscott_die_argc(int status, int got, int expect, char *usage)
 	char suffix[54] = {0};
 	char msg[JMSCOTT_ATOMIC_WRITE_SIZE] = {0};
 
-write(2, "WTF3\n", 5);
 	snprintf(suffix, sizeof suffix, "%d, expected %d: ", got, expect);
-write(2, "WTF4\n", 5);
 
 	msg[0] = 0;
 	jmscott_strcat4(msg, sizeof msg,
@@ -135,6 +131,5 @@ write(2, "WTF4\n", 5);
 			"\nusage: ",
 			usage
 	);
-write(2, "WTF5\n", 5);
 	jmscott_die(status, msg);
 }
