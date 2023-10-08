@@ -42,7 +42,6 @@ jmscott_write_all(int fd, void *p, ssize_t nbytes)
 	return 0;
 }
 
-#if defined(__APPLE__)
 static char *
 copyio(int in, int out, long long *send_size)
 {
@@ -61,6 +60,7 @@ copyio(int in, int out, long long *send_size)
 	return (char *)0;
 }
 
+#if defined(__APPLE__)
 static char *
 apple_sendfile(int in_fd, int out_fd, long long *send_size)
 {
@@ -122,6 +122,13 @@ AGAIN:
 	if (nw < 0) {
 		if (errno == EINTR || errno == EAGAIN)
 			goto AGAIN;
+
+		/*
+		 *  first EINVAL might imply the out_fd is not mmapable,
+		 *  so attemtp a read/write copy.
+		 */
+		if (errno == EINVAL && len == sz)
+			return copio(in_fd, out_fd, send_size);
 		return strerror(errno);
 	}
 	len -= nw;
