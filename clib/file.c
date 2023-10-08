@@ -129,9 +129,7 @@ AGAIN:
 	if (send_size)
 		*send_size = sz;
 	return (char *)0;
-	goto AGAIN;
 #endif
-
 }
 
 char *
