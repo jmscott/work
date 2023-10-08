@@ -2,7 +2,8 @@
  *  Synopsis:
  *	Helpful, common file manipulation functions.
  *  Note:
- *	Move sendfile.c to file.c, so other helper file funcs can be added.
+ *	sendfile() should in should interpret file EINVAL as a file descriptor
+ *	not capable of mmap and attempt a read/write copy.
  */
 #include <sys/errno.h>
 #include <string.h>
