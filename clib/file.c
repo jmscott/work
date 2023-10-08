@@ -128,7 +128,7 @@ AGAIN:
 		 *  so attemtp a read/write copy.
 		 */
 		if (errno == EINVAL && len == sz)
-			return copio(in_fd, out_fd, send_size);
+			return copyio(in_fd, out_fd, send_size);
 		return strerror(errno);
 	}
 	len -= nw;
