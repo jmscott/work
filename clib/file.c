@@ -105,13 +105,13 @@ jmscott_send_file(int in_fd, int out_fd, long long *send_size)
 #if defined(__APPLE__)
 	return apple_sendfile(in_fd, out_fd, send_size);
 #else
-	long long sz;
+	size_t sz;
 
 	struct stat st;
 
 	if (jmscott_fstat(in_fd, &st))
 		return strerror(errno);
-	sz = (long long)st.st_size;
+	sz = st.st_size;
 
 	//  probably linux sendfile() semantics.
 
@@ -135,7 +135,7 @@ AGAIN:
 	if (len > 0)
 		goto AGAIN;
 	if (send_size)
-		*send_size = sz;
+		*send_size = (long long)sz;
 	return (char *)0;
 #endif
 }
