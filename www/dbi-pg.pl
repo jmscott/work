@@ -4,6 +4,8 @@
 #  Return:
 #	Always implies success, die otherwise
 #  Note:
+#	Consider added option PGDUMP=help
+#
 #	Rewrite require statements to reference jmscott/httpd2.d/...'
 #	This confines env var PERL5 to $SERVER_ROOT/lib.
 #
@@ -11,10 +13,6 @@
 #
 #	Added example of query called from cgi-bin, similar to env.cgi and
 #	form.cgi.
-#
-#	On macports, perl -W generates complaints
-#
-#		Subroutine version::declare redefined at ...
 #
 
 require 'httpd2.d/common.pl';
@@ -27,7 +25,7 @@ require 'httpd2.d/common.pl';
 our %QUERY_ARG;
 our ($left_RE, $right_RE);
 
-our $PGDUMP_re = qr/^(STDOUT|STDERR|1|(?:[a-z][a-z_-]{1,32}))$/i;
+our $PGDUMP_re = qr/^(STDOUT|STDERR|1|(?:[a-zA-Z][a-zA-Z_-]{1,32}))$/i;
 
 if ($ENV{QUERY_STRING} =~ /${left_RE}PGDUMP$right_RE/) {
 	my $v = $1;
@@ -132,7 +130,7 @@ sub dbi_PGDUMP
 
 	return unless $PGDUMP;
 	die "dbi_PGDUMP: unexpected value: $PGDUMP"
-		unless $PGDUMP_re =~ $PGDUMP
+		unless $PGDUMP =~ $PGDUMP_re
 	;
 
 	print STDERR "dbi_PGDUMP: $tag: requested, PGDUMP=$PGDUMP\n";
