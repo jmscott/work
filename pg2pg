@@ -34,7 +34,8 @@
 #	"pg2pg upgrade" give an error message that is hard to undertand.
 #	the config file is missing and the error message ought to say so.
 #
-#	The 'dump' action should assume both database are not running.
+#	The 'dump' action should assume both database are not running or
+#	check uptime status of both databases before proceeding.
 #
 #	Added Usage: comment to preamble of template output.
 #
