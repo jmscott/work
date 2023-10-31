@@ -4,12 +4,16 @@
 #  Return:
 #	Always implies success, die otherwise
 #  Note:
+#	Carefully examine the PGDUMP=<tag> option.  I (jmscott) consistent;y
+#	see failed SQL dumps for particular queries.  May be realated to not
+#	testting for "tag" in dbi_pg_connect!
+#
 #	Consider added option PGDUMP=help
 #
 #	Rewrite require statements to reference jmscott/httpd2.d/...'
 #	This confines env var PERL5 to $SERVER_ROOT/lib.
 #
-#	existence of "tag" not tested in dbi_pg_connect!.
+#	existence of "tag" not tested in dbi_pg_connect!
 #
 #	Added example of query called from cgi-bin, similar to env.cgi and
 #	form.cgi.
@@ -25,7 +29,7 @@ require 'httpd2.d/common.pl';
 our %QUERY_ARG;
 our ($left_RE, $right_RE);
 
-our $PGDUMP_re = qr/^(STDOUT|STDERR|1|(?:[a-zA-Z][a-zA-Z_-]{1,32}))$/i;
+our $PGDUMP_re = qr/^(STDOUT|STDERR|1|0|(?:[a-zA-Z][a-zA-Z_-]{0,62}))$/i;
 
 if ($ENV{QUERY_STRING} =~ /${left_RE}PGDUMP$right_RE/) {
 	my $v = $1;
@@ -143,19 +147,20 @@ sub dbi_PGDUMP
 
 		my ($TMPDIR, $sql_path) = ($ENV{TMPDIR});
 
-		#  compare $tag to value of $PGDUMP for dumping a specific
-		#  script only.
+		#  "tag" may be "1" to dump all queries or "tag" may be the
+		#  name of a specific query to dump.
 
-		if ($PGDUMP =~ m/^[a-z]/ && $PGDUMP ne $tag) {
+		if ($PGDUMP =~ m/^[a-z]/i && $PGDUMP ne $tag) {
 			print STDERR
 				'dbi_PGDUMP: off (ok): ',
 				"$tag != $PGDUMP\n";
 			return;
 		}
+		print STDERR "dbi_PGDUMP: on: $tag\n";
 
 		$TMPDIR = '/tmp' unless $TMPDIR;
 		$sql_path = ">$TMPDIR/$tag.$$.sql";
-		print STDERR "dbi_PGDUMP: sql path: $sql_path\n";
+		print STDERR "dbi_PGDUMP: sql temp path: $sql_path\n";
 
 		my $T;
 		open($T, $sql_path) or die "$tag: open($sql_path) failed: $!";
@@ -166,7 +171,7 @@ sub dbi_PGDUMP
  *	$tag
  *  PGDUMP:
  *	$PGDUMP
- *  Argv:
+ *  ArgV:
 END
 		#  print the args in argv in a comment header
 		print $T " *	$_\n" foreach (@$argv);
