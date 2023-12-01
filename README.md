@@ -82,7 +82,7 @@
 
 ##  Standalone C Programs
 
-### stale-mtime.c
+### file-stale-mtime.c
 	Is a file "stale" based upon recent modifications?
 
 ###  idiff.c

@@ -113,14 +113,14 @@ istext: istext.c $(JMSLIB) $(JMSINC)
 fork-me: fork-me.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o fork-me fork-me.c $(CLINK)
 
-stale-mtime: stale-mtime.c $(JMSLIB) $(JMSINC)
-	$(CCOMPILE) -o stale-mtime stale-mtime.c $(CLINK)
-
-stat-mtime: stat-mtime.c $(JMSLIB) $(JMSINC)
-	$(CCOMPILE) -o stat-mtime stat-mtime.c $(CLINK)
+file-stale-mtime: file-stale-mtime.c $(JMSLIB) $(JMSINC)
+	$(CCOMPILE) -o file-stale-mtime file-stale-mtime.c $(CLINK)
 
 file-stat-size: file-stat-size.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o file-stat-size file-stat-size.c $(CLINK)
+
+file-stat-mtime: file-stat-mtime.c $(JMSLIB) $(JMSINC)
+	$(CCOMPILE) -o file-stat-mtime file-stat-mtime.c $(CLINK)
 
 flatx: flatx.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o flatx flatx.c -lexpat $(CLINK)

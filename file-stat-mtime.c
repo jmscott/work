@@ -2,7 +2,7 @@
  *  Synopsis:
  *	Extract the modify epoch of a file.
  *  Usage:
- *	stat-mtime <path/to/file>
+ *	file-stat-mtime <path/to/file>
  *  Exit Status:
  *	0	ok
  *	1	file does not exist
@@ -14,7 +14,7 @@
 #include "jmscott/libjmscott.h"
 
 extern int	errno;
-char *		jmscott_progname = "stat-mtime";
+char *		jmscott_progname = "file-stat-mtime";
 
 static void
 die(char *msg)

@@ -3,6 +3,8 @@ duration-english
 duration-mtime
 env2json
 escape-json-string
+file-stale-mtime
+file-stat-mtime
 file-stat-size
 flatx
 fork-me
@@ -17,8 +19,6 @@ send-file-slice
 slice-file
 slice-file-seek
 slice-stdin
-stale-mtime
-stat-mtime
 stdin2go-byte
 stdin2go-literal
 tas-lock-fs

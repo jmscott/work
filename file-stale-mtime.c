@@ -2,8 +2,8 @@
  *  Synopsis:
  *	Is the modify time of a file less than a certain number of seconds.
  *  Usage:
- *	stale-mtime 60 run/flowd.pid
- *	stale-mtime <seconds> <path-to-file>
+ *	file-stale-mtime 60 run/flowd.pid
+ *	file-stale-mtime <seconds> <path-to-file>
  *  Exit Status:
  *	0	file modify time is greater than or equal to now - <seconds>.
  *	1	file modify time is less than now - <seconds>.
@@ -23,7 +23,7 @@
 
 extern int	errno;
 
-char *jmscott_progname = "stale-mtime";
+char *jmscott_progname = "file-stale-mtime";
 
 static void
 die(char *msg, int exit_status)

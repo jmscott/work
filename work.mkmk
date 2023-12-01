@@ -23,6 +23,8 @@ COMPILEs="
 	duration-mtime
 	env2json
 	escape-json-string
+	file-stale-mtime
+	file-stat-mtime
 	file-stat-size
 	fork-me
 	idiff
@@ -30,8 +32,6 @@ COMPILEs="
 	is-utf8wf
 	pg_launchd
 	send-file-slice
-	stale-mtime
-	stat-mtime
 	stdin2go-byte
 	stdin2go-literal
 	tas-lock-fs
@@ -78,7 +78,7 @@ SBINs="
 	launchctl-kick
 	launchctl-load
 	launchctl-unload
-	launchd-log
+		launchd-log
 	pg_launchd
 "
 
@@ -101,6 +101,8 @@ SRCs="
 	duration-mtime.c
 	env2json.go
 	escape-json-string.c
+	file-stale-mtime.c
+	file-stat-mtime.c
 	file-stat-size.c
 	fork-me.c
 	idiff.c
@@ -109,8 +111,6 @@ SRCs="
 	istext.c
 	pg_launchd.c
 	send-file-slice.c
-	stale-mtime.c
-	stat-mtime.c
 	stdin2go-byte.go
 	stdin2go-literal.go
 	tas-lock-fs.c
