@@ -102,9 +102,12 @@ do_mail()
 
 Begin Process:
 
+           Date: $(date --rfc-3339=seconds)
+  Hostname FQDN: $(hostname --fqdn)
+           User: $USER
     Script Path: $0
      Start Time: $RSYNC_START_TIME
-       End Time: $(date)
+       End Time: $(date --rfc-3339=seconds)
        SSH Auth: $SSH_AUTH
     Source Path: $SOURCE_PATH
          Target: $TARGET
