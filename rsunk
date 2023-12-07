@@ -102,7 +102,7 @@ do_mail()
 
 Begin Process:
 
-            Now: $(date --rfc-3339=seconds)
+	Elapsed: $(elapsed-english $START_EPOCH)
   Hostname FQDN: $(hostname --fqdn)
            User: $USER
     Script Path: $0
@@ -306,4 +306,5 @@ log 'calculating disk usage'
 DU=$(ssh $SSH_AUTH du -sh $TARGET_PATH/$(basename $SOURCE_PATH))
 log "disk usage: $DU"
 
-echo 'Done. No Errors.' | do_mail "OK: $PROG: disk usage: $DU"
+echo 'Done. No Errors.'							|
+		do_mail "OK: $PROG: $DU in $(elapsed-english $START_EPOCH)"
