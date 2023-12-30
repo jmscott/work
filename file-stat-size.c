@@ -6,6 +6,8 @@
  *  Exit Status
  *	0	size written to standard out
  *	1	unexpected error
+ *  Note:
+ *	Why not use GNU "stat --format '%s'" instead of file-stat-size.
  */
 #include <sys/errno.h>
 #include <string.h>
