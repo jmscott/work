@@ -168,14 +168,15 @@ stdin2go-literal: stdin2go-literal.go
 	$(GOEXE) build stdin2go-literal.go
 
 world:
-	$(_MAKE) clean
-	$(_MAKE) all
-	$(_MAKE) distclean
-	$(_MAKE) install
 	cd make-dist && $(_MAKE) world
 	cd make-make && $(_MAKE) world
 	cd clib && $(_MAKE) world
 	cd pgsnap && $(_MAKE) pgsnap
 	cd www && $(_MAKE) world
+
+	$(_MAKE) clean
+	$(_MAKE) all
+	$(_MAKE) distclean
+	$(_MAKE) install
 tar:
 	make-make tar $(MKMK)

@@ -49,7 +49,6 @@ LIBs="
 BINs="
 	$COMPILEs
 
-	byte-size-english
 	cgi-inherit
 	cgi-inherit-merge
 	cgi-manifest
@@ -80,7 +79,7 @@ SBINs="
 	launchctl-kick
 	launchctl-load
 	launchctl-unload
-		launchd-log
+	launchd-log
 	pg_launchd
 "
 
