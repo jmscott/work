@@ -19,6 +19,7 @@
 #
 COMPILEs="
 	RFC3339Nano
+	byte-size-english
 	duration-english
 	duration-mtime
 	env2json
@@ -48,6 +49,7 @@ LIBs="
 BINs="
 	$COMPILEs
 
+	byte-size-english
 	cgi-inherit
 	cgi-inherit-merge
 	cgi-manifest
@@ -97,6 +99,7 @@ SBINs="
 #  create src/ directory
 SRCs="
 	RFC3339Nano.c
+	byte-size-english.c
 	duration-english.c
 	duration-mtime.c
 	env2json.go

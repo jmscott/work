@@ -119,6 +119,9 @@ file-stale-mtime: file-stale-mtime.c $(JMSLIB) $(JMSINC)
 file-stat-size: file-stat-size.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o file-stat-size file-stat-size.c $(CLINK)
 
+byte-size-english: byte-size-english.c $(JMSLIB) $(JMSINC)
+	$(CCOMPILE) -o byte-size-english byte-size-english.c $(CLINK)
+
 file-stat-mtime: file-stat-mtime.c $(JMSLIB) $(JMSINC)
 	$(CCOMPILE) -o file-stat-mtime file-stat-mtime.c $(CLINK)
 
