@@ -25,11 +25,7 @@ static char english[] = {
 	'Q'			//  quetta
 };
 
-#define ROUND(n, d) (							\
-		(((n) < 0) ^ ((d) < 0))					\
-			?						\
-			(((n) - (d)/2)/(d)) : (((n) + (d)/2)/(d))	\
-		)
+#define ROUND(n, d) (((n) + (d)/2)/(d))
 
 static char *usage = "usage: byte-size-english <byte size>";
 
