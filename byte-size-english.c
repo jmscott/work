@@ -4,6 +4,7 @@
  */
 #include <ctype.h>
 #include <string.h>
+#include <errno.h>
 
 #include "jmscott/libjmscott.h"
 
