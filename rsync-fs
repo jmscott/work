@@ -61,6 +61,9 @@
 #  See:
 #	https://github.com/jmscott/work/blob/master/rsync-fs
 #  Note:
+#	Verify that the source and target file system are not the same.
+#	rsync may already do this.
+#
 #	Add rync option "--checksum"
 #
 #	Robust tests on multiple level dirs like /var/lib have not been
