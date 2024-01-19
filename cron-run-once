@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 #  Synopsis:
 #	Chatty, conditional exec of a cron job monitored by file run/<proc>.pid

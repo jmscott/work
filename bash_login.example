@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 #  Synopsis:
 #	Overrideable .bash_login for jmscott interactive bash work environment.

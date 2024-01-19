@@ -18,6 +18,8 @@ endif
 #  Setting SHELL forces gmake to disable optimizing of single line productions,
 #  forcing make to honor $PATH.  Also, overrides ubuntu20 legacy /bin/sh
 #  (unlike fedora).
+#
+#  Note: anyway to set "/usr/bin/env bash" as SHELL?
 
 SHELL=/bin/bash
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 #  Synopsis:
 #	Simple frontend for OSX launchctl to load services not in LaunchDaemons/

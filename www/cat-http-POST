@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 #  Synopsis:
 #	Assemble a raw apache2 POST suitable for debugging or mime decoding

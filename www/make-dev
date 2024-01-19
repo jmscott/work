@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 #  Synopsis:
 #	Push site code to $HOME/opt/lct, called in Makefile recipe 'dev'.

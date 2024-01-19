@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 #  Synopsis:
 #	Upgrade a postgres cluster via either pg_upgrade or pg_dump

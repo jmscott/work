@@ -2,7 +2,7 @@
  *  Synopsis:
  *	Translate integer duration in seconds into english, similar to golang.
  *  Usage:
- *	#!/bin/bash
+ *	#!/usr/bin/env bash
  *
  *	#  on mac osx
  *	DURATION_SEC=$(expr $(date +%s) - $(date -v -1d +%s))

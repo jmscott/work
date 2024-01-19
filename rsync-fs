@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 #  Synopsis:
 #	rsync an entire file system to <sunk-root>/host/$(hostname)/root/<mount>

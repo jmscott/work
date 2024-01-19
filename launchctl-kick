@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 #
 #  Synopsis:
 #	Simple frontend for OSX launchctl to stop/unload/load/list services.

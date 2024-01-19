@@ -1,4 +1,4 @@
-#!/bin/bash
+#!usr/bin/env bash
 #
 #  Synopsis:
 #	Elapsed time since "now", written in english, suitable for scripts.
