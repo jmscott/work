@@ -3,6 +3,8 @@
 #	Convert elapsed seconds to terse english description
 #  Usage:
 #	$ago = elapsed_seconds2terse_english(time() - $mtime);
+#  Note:
+#	Need to pluralize "day" and "week" correctly.
 #
 
 sub elapsed_seconds2terse_english
