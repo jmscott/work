@@ -50,7 +50,12 @@ sub elapsed_seconds2terse_english
 	} else {
 		$units = 'sec';
 	}
-	return sprintf('%.f %s', $elapsed, $units);
+
+	my $el = sprintf('%.f', $elapsed);
+	my $plural = 's';
+	$plural = '' if $el eq '1';
+
+	return sprintf('%s %s%s', $el, $units, $plural);
 }
 
 1;
