@@ -49,7 +49,7 @@ sub set_QUERY_ARG
 		#  in /cgi/GET defaults.
 		#
 		unless ($ENV{QUERY_STRING} =~ /${left_RE}$a$right_RE/) {
-			next if $required eq 'no';
+			next if $required eq 'no' || length($QUERY_ARG{$a}) > 0;
 			die "$me: missing required query argument: $a"
 						if $required eq 'yes';
 		}
