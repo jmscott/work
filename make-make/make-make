@@ -12,6 +12,9 @@
 #	https://github.com/jmscott/work/blob/master/make-make
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
+#	Think about a new action "links" to replace typical recipes
+#	"dev-links" and "clean-links"
+#
 #	Create action "unpack" that removes various statis directories
 #	before unpack tar archive.  An automatic method for detecting static
 #	directories must exist and be smarter enough to detect dir alias/remaps.
