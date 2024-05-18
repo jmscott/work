@@ -42,7 +42,7 @@ $ENV{LD_LIBRARY_PATH} = "$ENV{PGHOME}:$ENV{LD_LIBRARY_PATH}" if $ENV{PGHOME};
 
 use DBD::Pg;
 
-my (@OPEN);
+my @OPEN;
 
 END
 {
