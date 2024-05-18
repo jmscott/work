@@ -3,7 +3,7 @@
 help() { cat <<'END'
 
 Synopsis:
-	Midnight dump of PG database into backup/<database>/<database>.Dow.d
+	Midnight dump of PG database into backup/<database>/<database>.<Dow>.d
 Description:
 	Typical butt save, daily pg_dump of a PostgreSQL database.
 	The backup format is pg_dump directory, named like:
