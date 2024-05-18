@@ -1,17 +1,19 @@
 /*
  *  Synopsis:
- *	Is a file all ascii text
+ *	Is a file all ascii text - deprecated by is-utf8wf.c
  *  Usage:
  *	istext [-vEl] [file1 [file2 ...]]
  *	find . -type f -print | istext
  *  See:
  *	https://github.com/jmscott/work/istext.c
  *  Note:
+ *	This program is no longer compilable and is replaced by is-utf8wf.c
+ *
  *	This program should have been named "isascii".
+ *	Another program called isutf8 should exist.
  *
  *	A true "istext" would consult the locale and use icu, rendering a quite
- *	complex piece of code.  Less ambitious would be to supporting only
- *	utf8 and utf16.
+ *	complex piece of code.
  */
 
 #include <sys/types.h>
