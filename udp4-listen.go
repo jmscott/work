@@ -1,17 +1,17 @@
 /*
  *  Synopsis:
- *	Listen on udp4 port and write packet readable packts to stderr.
+ *	Listen on udp4 port and write human readable packets to stderr.
  *  Usage:
  *	udp4-listen <listen-ip4> <port> <output-path>
  *	udp4-listen 192.168.1.175 10514 raspberry-pi.log
  *  Note:
- *	Consider replacing the default out put of msg+"\n" to a pipe to
+ *	Consider replacing the default output of msg+"\n" to a pipe to
  *	long running background process to further masage the udp4 message.
  *	By the way, this piping trick may actually be possible using socats
  *	ability to fork subprocesses.  not sure.
  *
  *	This program only exists since socat can not terminate udp4 packets
- *	with a newline.  various piping to a script were more cumbersone than
+ *	with a newline.  Various piping to a script were more cumbersone than
  *	than just writing this program.
  */
 package main
