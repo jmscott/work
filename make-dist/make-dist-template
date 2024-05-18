@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-#
-#  Synopsis:
-#	Write a template file for starting a new dist file
-#  Usage:
-#	make-dist template
-#
-exec cat $JMSCOTT_ROOT/lib/make-dist.dist.example
