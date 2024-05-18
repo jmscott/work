@@ -110,7 +110,6 @@ BINs="
 
 #  Uncomment to create directory libexec/
 LIBEXECs="
-	make-make-compat
 	make-make-help
 	make-make-tar
 	make-make-tars
