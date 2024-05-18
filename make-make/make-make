@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #  Synopsis:
-#	Build a tar or populate makefile recipies from configuration file.
+#	Build a tar or populate Makefile recipes from *.mkmk configuration file.
 #  Usage:
 #	export JMSCOTT_ROOT=/usr/local/jmscott
 #	make-make help
