@@ -50,9 +50,6 @@
 ###  pdf-merge
 	Merge pdf files calling java classes in Apache pdfbox.
 
-###  make-dist
-	Build a tar distribution using a simple config file.
-
 ###  ssh-host
 	SSH to host, where host name is derived from symbolic link to ssh-host.
 
