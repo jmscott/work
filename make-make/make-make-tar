@@ -64,7 +64,7 @@ WARN()
 
 leave()
 {
-	if [ -n "$WORK_TMP" -a -e $WORK_TMP ];  then
+	if [ -n "$WORK_TMP" -a -e "$WORK_TMP" ];  then
 		echo "--$WORK_TMP"
 		chmod -R +w $WORK_TMP					||
 			WARN "chmod +w tmp/work failed: exit status=$?"
