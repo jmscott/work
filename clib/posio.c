@@ -43,9 +43,9 @@ AGAIN:
  *	1	timeout, no readable data exists
  *	-1	unknown error, see errno.
  *  Note:
- *	POLLIN is set when at eof, whic is confusing.  see url
+ *	POLLIN is set when at eof, which is confusing.  see url
  *
- *		httpd://greenend.org.uk/rjk/tech/poll.html
+ *		https://greenend.org.uk/rjk/tech/poll.html
  *
  *	Not clear if signals in fds[0].revents interpreted correctly.
  */
