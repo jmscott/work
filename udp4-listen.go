@@ -2,8 +2,9 @@
  *  Synopsis:
  *	Listen on udp4 port and write human readable packets to stderr.
  *  Usage:
- *	udp4-listen <listen-ip4> <port> <output-path>
+ *	udp4-listen <listen-ip4> <port> <output-path|stdout|stderr>
  *	udp4-listen 192.168.1.175 10514 raspberry-pi.log
+ *	udp4-listen 192.168.1.175 10514 stderr
  *  Note:
  *	Consider replacing the default output of msg+"\n" to a pipe to
  *	long running background process to further masage the udp4 message.
@@ -27,6 +28,10 @@ import (
 func die(format string, args ...interface{}) {
 	
 	fmt.Fprintf(os.Stderr, "ERROR: " + format + "\n", args...)
+	fmt.Fprintf(
+		os.Stderr,
+		"usage: udp4-listen <host> <port> <out-path|stdout|stderr>",
+	)
 	os.Exit(1)
 }
 
