@@ -335,7 +335,7 @@ AGAIN:
  *	-1	error occured, consult errno
  *
  *  Note:
- *	so, mkdir -p recuses theough the path list, wheres mkdir_EEXIST()
+ *	so, mkdir -p recurses theough the path list, wheres mkdir_EEXIST()
  *	does not.  only the $(dirname <path>) is created. so, "flat" means
  *	not recursive and i (jmscott) can not find a constructuve term for
  *	"nor recusive".  "flat" is my attemtp.
