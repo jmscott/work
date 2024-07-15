@@ -89,10 +89,13 @@
 	Is a file ascii text?
 
 ###  halloc.c
-	Free a parent and you free the kids, a'la malloc().
+	Malloc front end where freeing a parent also frees the kids.
 
 ###  fork-me.c
 	Measure sequential fork/exec of a program
 
 ### Note:
+	Consider a tester script for gnu dependencies.  Also, setting
+	shell tracing via an environment variable might be nice.
+
 	Create script is-dir-empty
