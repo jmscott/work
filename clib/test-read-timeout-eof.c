@@ -1,6 +1,6 @@
 /*
  *  Synopsis:
- *	Simple test insure timed reads at EOF return 0.
+ *	Simple test to insure timed reads at EOF return 0.
  *  Usage:
  *	$ dd bs=512 if=/dev/zero of=x.dat count=1
  *	$ cc test-read-timeout-eof.c -L. -ljmscott && ./a.out x.dat; echo $?
