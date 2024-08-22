@@ -1,6 +1,6 @@
 /*
  *  Synopsis:
- *	Various utf8 C string manipulation functions.
+ *	Various utf8 C string manipulation functions, safe in signal handlers.
  *  Note:
  *	The BSD clib function strlcat() comes close to the behaviour of the
  *	jmscott_strcat*() functions.  However, strlcat() is not on linux.  
