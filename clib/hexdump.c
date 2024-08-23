@@ -6,8 +6,8 @@
  *	Hexdump a buffer to the file trace_fd stream.
  *
  *	Each 16 bytes of the source buffer is formated and written as 76 chars
- *	plus new line.	The characters '>' and '<' represent either read or
- *	write direction, respectively. 
+ *	plus new line.	The characters '>' and '<' represent either write
+ *	(shell output) or read (shell input), respectively.
  *
      0  >  67 65 74 20 70 69 6e 67 3a 61 62 63 64 65 66 0a  get ping:abcdef.   
     16  >  3a 35 34 20 43 44 54 09 31 32 37 2e 30 2e 30 2e  :54 CDT.127.0.0.
