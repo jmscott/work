@@ -1,5 +1,5 @@
 pgsnap is a simple script that dumps a source database
-and then destroy/creates a target database using the source dump file.
+and then destroy and creates a target database using the source dump file.
 After dumping, email is sent to the users specified in 
 $PGSNAP_NOTIFY.
 
