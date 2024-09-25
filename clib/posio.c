@@ -68,7 +68,15 @@ AGAIN:
 		return -1;
 	}
 
-	//  signals handled properly?
+	//  cheap sanity test for return events.
+
+	if (status != 1) {
+		char *msg = "\nPANIC: ERROR: poll_POLLIN: poll() != 1\n";
+		write(2, msg, sizeof msg);
+		_exit(126);
+	}
+
+	//  was the return event a POLLIN?
 	return (fds[0].revents & POLLIN) ? 0 : 1;
 }
 
