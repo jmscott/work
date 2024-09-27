@@ -45,7 +45,7 @@ AGAIN:
  *  Note:
  *	POLLIN is set when at eof, which is confusing.  see url
  *
- *		https://greenend.org.uk/rjk/tech/poll.html
+ *		https://www.greenend.org.uk/rjk/tech/poll.html
  *
  *	Not clear if signals in fds[0].revents interpreted correctly.
  */
@@ -57,6 +57,7 @@ jmscott_poll_POLLIN(int fd, int msec)
 	fds[0].fd = fd;
 	fds[0].events = POLLIN;
 	fds[0].revents = 0;
+
 	int status;
 AGAIN:
 	status = poll(fds, 1, msec);
@@ -70,14 +71,11 @@ AGAIN:
 
 	//  cheap sanity test for return events.
 
-	if (status != 1) {
-		char *msg = "\nPANIC: ERROR: poll_POLLIN: poll() != 1\n";
-		write(2, msg, sizeof msg);
-		_exit(126);
-	}
+	if (status != 1)
+		jmscott_panic("poll_POLLIN: poll() != 1");
 
 	//  was the return event a POLLIN?
-	return (fds[0].revents & POLLIN) ? 0 : 1;
+	return (fds[0].revents == POLLIN) ? 0 : 1;
 }
 
 /*
@@ -121,18 +119,12 @@ jmscott_read_timeout(int fd, void *p, ssize_t nbytes, int msec)
  *			jmscott_die2("read(exact) failed", strerror(errno));
  *		case -2:
  *			jmscott_die("unexpected end-of-file");
- *		case -3:
- *			jmscott_die("unread bytes > size");
  *		}
  *	}
  *  Returns:
  *	0	read exactly "size" bytes into "blob".
- *	
- *	Upon error byte values in *blob are undefined.
- *
  *	-1	read() error, consult errno
- *	-2	unexpected  end-of-file reading.
- *	-3	unread bytes remain on stream.
+ *	-2	unexpected end-of-file reading.
  */
 int
 jmscott_read_exact(int fd, void *blob, ssize_t size)
@@ -148,16 +140,8 @@ AGAIN:
 		nread += nr;
 		if (nread < size)
 			goto AGAIN;
-
-		//  prove no remaining bytes exist to read
-		nr = jmscott_poll_POLLIN(fd, 0);
-		if (nr == 1)
-			return 0;
-		if (nr == 0)
-			return -3;
-		return -1;
 	}
-	return -2;
+	return nread == size ? 0 : -2;
 }
 
 /*
