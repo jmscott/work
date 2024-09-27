@@ -43,6 +43,7 @@
 
 extern int	jmscott_ecpg_error_code;
 extern int	jmscott_ecpg_warn_code;
+extern int	jmscott_panic_exit_status;
 
 extern char *	jmscott_strcat(char *tgt, int tgtsize, const char *src);
 extern char *	jmscott_strcat2(char *tgt, int tgtsize,
@@ -117,6 +118,8 @@ extern void	jmscott_die6(
 			char *msg6
 		);
 extern void	jmscott_die_argc(int status, int got, int expect, char *usage);
+extern void	jmscott_panic(char *msg);
+extern void	jmscott_panic2(char *msg1, char *msg2);
 
 extern char *	jmscott_frisk_udig(char *udig);
 

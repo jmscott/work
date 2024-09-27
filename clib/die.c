@@ -25,6 +25,8 @@
 
 extern char	*jmscott_progname;
 
+int jmscott_panic_exit_status = 70;	//  EX_SOFTWARE;
+
 void
 jmscott_die(int status, char *msg1)
 {
@@ -132,4 +134,36 @@ jmscott_die_argc(int status, int got, int expect, char *usage)
 			usage
 	);
 	jmscott_die(status, msg);
+}
+
+void
+jmscott_panic(char *msg)
+{
+	char *preamble = "jmslib: ERROR: PANIC: ";
+
+	write(2, "\n", 1);
+	if (jmscott_progname) {
+		write(2, jmscott_progname, strlen(jmscott_progname));
+		write(2, ": ", 2);
+	}
+	write(2, preamble, strlen(preamble));
+	write(2, msg, strlen(msg));
+	write(2, "\n", 1);
+}
+
+void
+jmscott_panic2(char *msg1, char *msg2)
+{
+	char *preamble = "jmslib: ERROR: PANIC: ";
+
+	write(2, "\n", 1);
+	if (jmscott_progname) {
+		write(2, jmscott_progname, strlen(jmscott_progname));
+		write(2, ": ", 2);
+	}
+	write(2, preamble, strlen(preamble));
+	write(2, msg1, strlen(msg1));
+	write(2, ": ", 2);
+	write(2, msg2, strlen(msg2));
+	write(2, "\n", 1);
 }
