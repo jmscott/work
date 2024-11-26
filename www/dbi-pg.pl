@@ -6,7 +6,7 @@
 #  Note:
 #	Carefully examine the PGDUMP=<tag> option.  I (jmscott) consistent;y
 #	see failed SQL dumps for particular queries.  May be realated to not
-#	testting for "tag" in dbi_pg_connect!
+#	testing for "tag" in dbi_pg_connect!
 #
 #	Consider added option PGDUMP=help
 #
