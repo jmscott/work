@@ -77,12 +77,6 @@ static char *usage = "is-utf8wf <file";
 #define B11111000	0xF8
 
 static void
-die(char *msg)
-{
-	jmscott_die(EXIT_FAULT, msg);
-}
-
-static void
 die2(char *msg1, char *msg2)
 {
 	jmscott_die2(EXIT_FAULT, msg1, msg2);
@@ -99,7 +93,6 @@ main(int argc, char **argv)
 
 	if (--argc != 0)
 		jmscott_die_argc(EXIT_FAULT, 0, argc, usage);
-		die("wrong number of arguments");
 	(void)argv;
 
 	while ((nread = jmscott_read(0, buf, sizeof buf)) > 0) {
