@@ -39,9 +39,13 @@
  *		http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
  */
 
+#include <sys/errno.h>
+#include <string.h>
+
 #include "jmscott/libjmscott.h"
 
 char *jmscott_progname = "is-utf8wf";
+static char *usage = "is-utf8wf <file";
 
 #define EXIT_OK		0
 #define EXIT_EMPTY	1
@@ -51,7 +55,7 @@ char *jmscott_progname = "is-utf8wf";
 /*
  *  States of scanner.
  */
-#define STATE_START	0	/* goto new code sequence */
+#define STATE_0BYTE1	0	/* goto byte1 of char code sequence */
 
 #define STATE_2BYTE2	1	/* goto second byte of 2 byte sequence */
 
@@ -78,16 +82,23 @@ die(char *msg)
 	jmscott_die(EXIT_FAULT, msg);
 }
 
+static void
+die2(char *msg1, char *msg2)
+{
+	jmscott_die2(EXIT_FAULT, msg1, msg2);
+}
+
 int
 main(int argc, char **argv)
 {
 	unsigned char buf[4096];
 	int nread;
 	unsigned char *p_end = 0;
-	int state = STATE_START;
+	int state = STATE_0BYTE1;
 	unsigned int code_point = 0;
 
-	if (argc != 1)
+	if (--argc != 0)
+		jmscott_die_argc(EXIT_FAULT, 0, argc, usage);
 		die("wrong number of arguments");
 	(void)argv;
 
@@ -102,10 +113,10 @@ main(int argc, char **argv)
 		unsigned char c = *p++;
 
 		switch (state) {
-		case STATE_START:
+		case STATE_0BYTE1:
 			/*
 			 *  Single byte/7 bit ascii?
-			 *  Remain in START_START.
+			 *  Remain in STATE_0BYTE1.
 			 */
 			if ((c & B10000000) == B00000000)
 				break;
@@ -163,7 +174,7 @@ main(int argc, char **argv)
 			if (code_point < 128)
 				_exit(EXIT_BAD_U8);
 
-			state = STATE_START;
+			state = STATE_0BYTE1;
 			break;
 		/*
 		 *  Expect the second byte of a three byte sequence.
@@ -208,7 +219,7 @@ main(int argc, char **argv)
 			if (code_point < 2048 ||
 			    (0xD800 <= code_point&&code_point <= 0xDFFF))
 				_exit(EXIT_BAD_U8);
-			state = STATE_START;
+			state = STATE_0BYTE1;
 			break;
 		/*
 		 *  Expect the second byte of four byte/21 bit sequence
@@ -264,11 +275,15 @@ main(int argc, char **argv)
 			 */
 			if (code_point < 65536)
 				_exit(EXIT_BAD_U8);
-			state = STATE_START;
+			state = STATE_0BYTE1;
 			break;
 		}}
 	}
-	if (state == STATE_START)
-		_exit(p_end ? EXIT_OK : EXIT_EMPTY);
+	if (nread < 0)
+		die2("read(stdin) failed", strerror(errno));
+	if (p_end == 0)
+		_exit(EXIT_EMPTY);
+	if (state == STATE_0BYTE1)
+		_exit(EXIT_OK);
 	_exit(EXIT_BAD_U8);
 }
