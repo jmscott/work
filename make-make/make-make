@@ -76,7 +76,7 @@ can_read_mkmk()
 [ "${BASH_VERSINFO:-0}" -ge 4 ] 					||
 	die "bash version must be >= 4: ver ${BASH_VERSINFO:-0}" 
 
-test $# = 0 && die 'no command line arguments'
+test $# = 0 && die 'no action on command line'
 test -n "$JMSCOTT_ROOT" || die 'env not defined: JMSCOTT_ROOT'
 test -d $JMSCOTT_ROOT || die "dir does not exist: $JMSCOTT_ROOT"
 
