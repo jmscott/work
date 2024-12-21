@@ -79,7 +79,7 @@ AGAIN:
 	if (status < 0) {
 		if (errno == EINTR || errno == EAGAIN)
 			goto AGAIN;
-		if (errno == ENOTSOCK)
+		if (errno == ENOTSOCK || errno == ENOTSUP)
 			return copyio(in_fd, out_fd, send_size);
 		return strerror(errno);
 	}
