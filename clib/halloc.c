@@ -19,7 +19,7 @@
  *	
  *		halloc_free(parent);
  *
- *	will free all parent and all descendents invoking callbacks deepest
+ *	will free all parent and all descendents, invoking callbacks deepest
  *	child first.
  *
  *	This version of halloc is a clean room rewrite of a similar
