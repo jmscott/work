@@ -1,6 +1,6 @@
 /*
  *  Synopsis:
- *	Helpful routines for compile simple PostgreSQL *.ecpg programs.
+ *	Helpful routines for simple PostgreSQL *.ecpg programs.
  *  Note:
  *	Should struct jmscott_ecpg_state_fault{} contain the exit codes,
  *	instead of declaring vars jmscott_ecpg_{error,warn}_code global?
