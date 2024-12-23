@@ -12,25 +12,25 @@
 #  Depends:
 #	Perl modules XML::Parser
 #  Note:
-#	- Change to
+#	-  Stack <<HERE expressions into single print to improve readability.
+#	
+#	-  Change to
 #
 #		require 'jmscott/httpd2.d/common.pl'
 #
-#	otherwise, apache var PERL5LIB must add $JMSCOTT_ROOT/www/lib,
-#	instead of using a symlink to $JMSCOTT_ROOT/www/lib
+#	   otherwise, apache var PERL5LIB must add $JMSCOTT_ROOT/www/lib,
+#	   instead of using a symlink to $JMSCOTT_ROOT/www/lib
 #
-#	- Consider adding a CLI option "--namespace <prefix>" for simplifying
-#	the various directory prefixes added to cgi-bin/ and lib/ when the
-#	package lives in subdirectories of $SERVER_ROOT/{cgi-bin,lib}.
-#	Currently, various separate args server this purpose.  Also, the
-#	name space should be part of the apache environment:
+#	-  Consider adding a CLI option "--namespace <prefix>" for simplifying
+#	   the various directory prefixes added to cgi-bin/ and lib/ when the
+#	   package lives in subdirectories of $SERVER_ROOT/{cgi-bin,lib}.
+#	   Currently, various separate args server this purpose.  Also, the
+#	   name space should be part of the apache environment:
 #
-#		ENV{SERVER_JMSCOTT_NAMESPACE}
+#		$ENV{SERVER_JMSCOTT_NAMESPACE}
 #	
-#	-  Zap SHA1 code
-#
 #	-  The name of the required SERVER_ROOT environment variable ought to be
-#	overridden in the xml file or the apache environment.
+#	   overridden in the xml file or the apache environment.
 #
 
 use XML::Parser;
@@ -71,20 +71,20 @@ $SIG{__DIE__} = sub
 
 sub help
 {
-	print <<END;
+	print <<'END1', "\t$USAGE\n", <<'END2';
 Synopsis:
-	Generate cgi scripts from a canonical description in xml.
+	Generate cgi scripts from a canonical description in xml.cgi
 Usage:
-	$USAGE
+END1
 Options:
-	--source-path	location of xml.cgi file that describes the script
-	--source-sha1	SHA1 Digest of xml file that generated this script.
+	--source-path	path to xml.cgi file of cgi script (required option).
+	--source-sha1	SHA1 Digest of xml.cgi file that generates script.
 	--cgi-bin-dir	Dev directory where main cgi-bin script will be built.
 			  Defaults to .
-	--cgi-lib-dir	Dev directory for cgi-lib directory/files to 
-			  be built, like help.pl.  By default, the dev
-			  cgi files are built in ./<name>.d;  otherwise,
-			  scripts are built in <cgi-lib-dir>/<name>.d
+	--cgi-lib-dir	Dev directory for cgi-lib directory/files to be built,
+			  like help.pl.  By default, the dev cgi files are built
+			  in ./<name>.d;  otherwise, scripts are built in
+			  <cgi-lib-dir>/<name>.d
 
 	--cgi-help-alias
 			Prefix to cgi-bin in help examples.  Default is
@@ -112,17 +112,17 @@ Description:
 	that do the transformations into perl5 code.
 
 	source-path:	xml source file path that generated the script,
-	perl5-path:	the #!path-to-perl5 at header of script
-				default is '/usr/bin/env perl'
+	perl5-path:	the #!<path-to-perl5> at header of script.
+			  default is '/usr/bin/env perl'
 Depends:
 	XML::Parse
-Notes:
+Note:
 	Unfortunately, no DTD exists for the xml.cgi schema, so the
 	vocabulary is subject to sudden change.
 
-	Partially built files are left around after an error,
-	which confuses make and is not good.
-END
+	Partially built files are left around after an error, which confuses
+	make and is not good.
+END2
 }
 
 #
@@ -373,6 +373,7 @@ sub put_HELP_dl_item
 			));
 	return unless $dd;
 
+	#  Note:  where is $arg defined?!
 	print HELP <<END;
 <dt>$arg{dt}</dt>
 <dd>$dd</dd>
@@ -493,11 +494,11 @@ sub put_HELP_examples
 
 	my $name = $arg{name};
 
-	print HELP <<END;
+	print HELP q(
 <div class="examples">
  <h3>Examples</h3>
  <dl>
-END
+);
 
 	#
 	#  Write each example, with a link to the example.
@@ -566,15 +567,15 @@ END
     <li><code>$att:</code> $val</li>
 END
 		}
-		print HELP <<END
+		print HELP q(
    </ul>
   </dd>
-END
+);
 	}
-	print HELP <<END;
+	print HELP q(
   </dl>
 </div>
-END
+);
 }
 
 #
@@ -668,7 +669,17 @@ print MAIN <<END;
 #  Note:
 #	Do not make changes directly to this script.
 #
-die "SERVER_ROOT environment variable not defined"
+
+#  cgi-bin source code, stdint, stdout, stderr encoded as utf8
+
+use strict;
+use utf8;
+
+binmode STDIN, ':encoding(UTF-8)';
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
+
+die 'SERVER_ROOT environment variable not defined'
 				unless defined \$ENV{SERVER_ROOT}
 ;
 
@@ -680,7 +691,7 @@ unshift \@INC, ${INC_alias_path}"\$ENV{SERVER_ROOT}/lib";
 
 our \%CGI;
 
-#  Note:  ought to be "require jmscott/httpd2.d/common.pl" !
+#  Note: ought to be "require jmscott/httpd2.d/common.pl" !
 require 'httpd2.d/common.pl';
 END
 print MAIN <<END if defined $tree->[1]->[0]->{perl5_require};
