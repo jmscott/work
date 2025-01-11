@@ -2,6 +2,11 @@
 #  Synopsis:
 #	Makefile for populating $JMSCOTT_ROOT/lib/clang.
 #  Note:
+#	For gcc compiler consider option -fno-strict-aliasing.  See linus rants
+#
+#		https://lwn.net/Articles/316126/
+#		https://lkml.org/lkml/2003/2/26/158
+#
 #	Rename dir clib/ to libjmscott/
 # 
 #	Need to collapse c compiles into single recipe: *.o:*.c
