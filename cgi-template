@@ -124,7 +124,6 @@ while (my $arg = shift @ARGV) {
 #
 #  Open <cgi>
 #	  <synopsis>
-#	  <subversion>
 #	  <blame>
 #
 print <<END;
@@ -132,7 +131,6 @@ print <<END;
 <cgi name="$CGI->{_name}">
  <title>$CGI->{title}</title>
  <synopsis>$CGI->{synopsis}</synopsis>
- <subversion id="\$Id\$" />
  <blame>$CGI->{blame}</blame>
 END
 
