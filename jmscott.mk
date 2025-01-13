@@ -15,14 +15,6 @@ ifeq "$(UNAME)" "Linux"
 	CFLAGS+=-std=gnu99
 endif
 
-#  Setting SHELL forces gmake to disable optimizing of single line productions,
-#  forcing make to honor $PATH.  Also, overrides ubuntu20 legacy /bin/sh
-#  (unlike fedora).
-#
-#  Note: anyway to set "/usr/bin/env bash" as SHELL?
-
-SHELL=/bin/bash
-
 INSTALL_USER?=$(USER)
 ifeq "$(UNAME)" "Darwin"
 	INSTALL_GROUP?=staff
