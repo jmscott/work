@@ -2,6 +2,10 @@
 #  Synopsis:
 #	Static make rules for jmscott work tools.
 #
+
+#  Note: why set SHELL unbder linux?
+SHELL=/bin/bash
+
 UNAME=$(shell uname)
 
 #  Strict compilation flags
