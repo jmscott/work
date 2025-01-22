@@ -4,6 +4,8 @@
 #  Return:
 #	Always implies success, die otherwise
 #  Note:
+#	why is 'httpd2.d/common.pl' required?
+#
 #	Carefully examine the PGDUMP=<tag> option.  I (jmscott) consistent;y
 #	see failed SQL dumps for particular queries.  May be realated to not
 #	testing for "tag" in dbi_pg_connect!
