@@ -92,7 +92,7 @@ main(int argc, char **argv)
 	unsigned int code_point = 0;
 
 	if (--argc != 0)
-		jmscott_die_argc(EXIT_FAULT, 0, argc, usage);
+		jmscott_die_argc(EXIT_FAULT, argc, 0, usage);
 	(void)argv;
 
 	while ((nread = jmscott_read(0, buf, sizeof buf)) > 0) {

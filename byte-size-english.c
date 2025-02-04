@@ -45,16 +45,17 @@ die2(char *msg1, char *msg2)
 int
 main(int argc, char **argv)
 {
-	if (argc != 2)
-		jmscott_die_argc(1, 1, argc -1, usage);
+	if (--argc != 1)
+		jmscott_die_argc(1, argc, 1, usage);
 
-        if (*argv[1] == 0)
+	char *byte_size = argv[0];
+        if (*byte_size == 0)
                 die("empty byte size");
 
 	//  extract byte size
 
 	unsigned long long bs;
-	char *err = jmscott_a2ui63(argv[1], &bs);
+	char *err = jmscott_a2ui63(byte_size, &bs);
 	if (err)
 		die2("can not parse byte size", err);
 
@@ -76,6 +77,6 @@ main(int argc, char **argv)
 			die2("write(1) failed", strerror(errno));
 		_exit(0);
 	}
-	die2("byte size too big", argv[1]);
+	die2("byte size too big", byte_size);
 }
 
