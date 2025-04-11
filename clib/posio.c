@@ -460,10 +460,10 @@ AGAIN:
 }
 
 int
-jmscott_fstatat(int fd, const char *path, struct stat *st, int flag)
+jmscott_fstatat(int dir_fd, const char *path, struct stat *st, int flag)
 {
 AGAIN:
-	if (fstatat(fd, path, st, flag)) {
+	if (fstatat(dir_fd, path, st, flag)) {
 		if (errno == EINTR || errno == EAGAIN)
 			goto AGAIN;
                return -1;
