@@ -281,6 +281,12 @@ int				jmscott_renameat(
 DIR *				jmscott_fdopendir(int dir_fd);
 struct dirent *			jmscott_readdir(DIR *dp);
 int				jmscott_closedir(DIR *dp);
+char				*jmscott_split(
+					char *src,
+					char split,
+					int *offset,
+					int *noffset
+				);
 
 extern char			*jmscott_progname;
 #endif //  JMSCOTT_LIBJMSCOTT_H

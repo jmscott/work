@@ -241,3 +241,34 @@ jmscott_a2size_t(char *a, size_t *sz)
 		*sz = (size_t)ull;
 	return (char *)0;
 }
+
+char *
+jmscott_split(char *src, char split, int *offset, int *noffset)
+{
+	(void)split;
+	(void)noffset;
+
+	if (!src)
+		return "src is null";
+	if (!*src)
+		return "src string is zero length";
+	if (!offset)
+		return "offset list is null";
+	int size = *noffset;
+	if (size <= 0)
+		return "size <= 0";
+	*noffset = 0;
+
+	int i = 0;
+	char *s = src, c;
+	while ((c = *s++)) {
+		if (c != split)
+			continue;
+		if (i >= size)
+			return "too many split fields";
+		offset[i++] = (s - src) - 1;
+	}
+	*noffset = i;
+
+	return (char *)0;
+}
