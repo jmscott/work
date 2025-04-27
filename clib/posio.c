@@ -518,3 +518,27 @@ AGAIN:
 	}
 	return 0;
 }
+
+int
+jmscott_rename(char *old_path, char *new_path)
+{
+AGAIN:
+	if (rename(old_path, new_path)) {
+		if (errno == EINTR || errno == EAGAIN)
+			goto AGAIN;
+		return -1;
+	}
+	return 0;
+}
+
+int
+jmscott_fchmod(int fd, mode_t mode)
+{
+AGAIN:
+	if (fchmod(fd, mode)) {
+		if (errno == EINTR || errno == EAGAIN)
+			goto AGAIN;
+		return -1;
+	}
+	return 0;
+}

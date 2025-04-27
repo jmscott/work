@@ -278,6 +278,8 @@ int				jmscott_renameat(
 					int at_fd_new,
 					const char *new_path
 				);
+int				jmscott_rename(char *old_path, char *new_path);
+int				jmscott_fchmod(int fd, mode_t mode);
 DIR *				jmscott_fdopendir(int dir_fd);
 struct dirent *			jmscott_readdir(DIR *dp);
 int				jmscott_closedir(DIR *dp);
