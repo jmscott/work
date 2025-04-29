@@ -97,8 +97,7 @@ template)
 	;;
 tar)
 	#  make-make tar foobar.mkmk
-	test $# = 1							||
-		die "tar: wrong number of arguments: got $#, expected 1"
+	test $# = 1 || die "tar: wrong number of arguments: got $#, expected 1"
 	can_read_mkmk "$1"
 	exec $JMSCOTT_ROOT/libexec/make-make-tar "$1"
 	;;
