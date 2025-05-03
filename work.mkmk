@@ -18,8 +18,8 @@
 #  removed in "clean" recipes.
 #
 COMPILEs="
-	RFC3339Nano
 	byte-size-english
+	dedup
 	duration-english
 	duration-mtime
 	env2json
@@ -32,6 +32,7 @@ COMPILEs="
 	is-dir-empty
 	is-utf8wf
 	pg_launchd
+	RFC3339Nano
 	send-file-slice
 	stdin2go-byte
 	stdin2go-literal
@@ -96,8 +97,8 @@ SBINs="
 
 #  create src/ directory
 SRCs="
-	RFC3339Nano.c
 	byte-size-english.c
+	dedup.go
 	duration-english.c
 	duration-mtime.c
 	env2json.go
@@ -111,6 +112,7 @@ SRCs="
 	is-utf8wf.c
 	istext.c
 	pg_launchd.c
+	RFC3339Nano.c
 	send-file-slice.c
 	stdin2go-byte.go
 	stdin2go-literal.go

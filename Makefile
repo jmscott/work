@@ -153,6 +153,9 @@ is-dir-empty: is-dir-empty.c $(JMSLIB) $(JMSINC)
 udp4-listen: udp4-listen.go
 	$(GOEXE) build udp4-listen.go
 
+dedup: dedup.go
+	$(GOEXE) build dedup.go
+
 udp4-reflect: udp4-reflect.go
 	$(GOEXE) build udp4-reflect.go
 

@@ -1,5 +1,5 @@
-RFC3339Nano
 byte-size-english
+dedup
 duration-english
 duration-mtime
 env2json
@@ -16,6 +16,7 @@ is-utf8wf
 jmscott
 local.mk
 pg_launchd
+RFC3339Nano
 send-file-slice
 slice-file
 slice-file-seek
