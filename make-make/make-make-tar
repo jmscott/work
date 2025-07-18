@@ -116,8 +116,10 @@ declare -A dir2perm=(
 	[run]='u=wrx,go='
 	[sbin]='u=rwx,go='
 	[spool]='u=wrx,go='
+	[sync]='u=wrx,go='
 	[src]='u=rwx,g=rx,o='
 	[tmp]='ug=wrx,o='
+	[www]='ug=wrx,o='
 )
 
 #  map directory name to copy file permisions.
@@ -153,7 +155,9 @@ declare -A VAR2dir=(
 	[SBINs]='sbin'
 	[SPOOL]='spool'
 	[SRCs]='src'
+	[SYNCs]='sync'
 	[TMP]='tmp'
+	[WWW]='www'
 )
 
 #  user dist file can override the mapping from a vars, like LIBs,
