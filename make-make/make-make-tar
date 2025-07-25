@@ -11,6 +11,9 @@
 #	gnu sed
 #	jmscott elapsed-english
 #	gnu date
+#  Exit Status:
+#	0	make tar
+#	1	make failed, tar not made
 #  Note:
 #	Make *_local versions of ALL variables that can be remapped in *.mkmk
 #	file.  Currently only VAR2dir_local() can be remapped.  Need to also
@@ -191,9 +194,9 @@ make_SYMLINKs()
 					     "exit status=$?"
 			fi
 			ln -sf $B $A || die "ln -fs failed: exit status=$?"
-		)
-		done
-	done
+		) || exit 1
+		done || exit 1
+	done || exit 1
 }
 
 #
