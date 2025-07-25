@@ -15,38 +15,46 @@
 #	0	make tar
 #	1	make failed, tar not made
 #  Note:
-#	Make *_local versions of ALL variables that can be remapped in *.mkmk
-#	file.  Currently only VAR2dir_local() can be remapped.  Need to also
-#	remap dir2perm{} and file2perm{}.
+#	-  When making symlinks via the var SYMLINKs, the existence of the
+#	   associated VAR in the file product.mkmk is not checked, so the
+#	   source dir in temp file does not exist.  for example, 
 #
-#	Need option to keep temp work directory!
+#		ln: failed to create symbolic link 'cgi-bin/jmscott'
 #
-#	- VAR->dir remaps only for a single directory.  for example,
+#	   means the CGIBINs var is not defined in file product.mkmk.
+
+#	-  Make *_local versions of ALL variables that can be remapped in *.mkmk
+#	   file.  Currently only VAR2dir_local() can be remapped.  Need to also
+#	   remap dir2perm{} and file2perm{}.
+#
+#	-  Need option to keep temp work directory!
+#
+#	-  VAR->dir remaps only for a single directory.  for example,
 #
 #		LIBs->lib/schema
 #
-#	- The tar version insures that dynamic directories in foobar.conf
-#	exist but does NOT ever overwrite, lest precious data be lost.
-#	However, the Makefile version, does not insure, so make recipes
-#	must be hand coded.  Adding an option to generate the install
-#	recipes would be nice:
+#	-  The tar version insures that dynamic directories in foobar.conf
+#	   exist but does NOT ever overwrite, lest precious data be lost.
+#	   However, the Makefile version, does not insure, so make recipes
+#	   must be hand coded.  Adding an option to generate the install
+#	   recipes would be nice:
 #
 #		make-make dirs-recipe
 #
-#	Which could be manually spliced back into the Makefile.
+#	   Which could be manually spliced back into the Makefile.
 #	
-#	Why are the dirs/ for copy_file() hardwired for BINs, SBINs, etc?
-#	Should not that list be derived from the mkmk file?
+#	-  Why are the dirs/ for copy_file() hardwired for BINs, SBINs, etc?
+#	   Should not that list be derived from the mkmk file?
 #
-#	Add "unpack" action, which properly removes and unpacks *.tar.bz2
-#	directories.  Will need to make no assumptions about the root directory
-#	files.  In other words, if, say, dir sbin/ is not in the tar file,
-#	then "unpack" would NOT remove an existing /sbin/ on the target.
-#	This algorithm implies knowing the difference between static dirs
-#	like /sbin/, /lib/, etc versus dynatic dirs like /run/, /spool/.
-#	Perhaps if the directory is empty in the tar file, then we can
-#	safely assume the directory is dynamic and NOT to be removed on the
-#	target.
+#	-  Add "unpack" action, which properly removes and unpacks *.tar.bz2
+#	   directories.  Will need to make no assumptions about the root
+#	   directory files.  In other words, if, say, dir sbin/ is not in the
+#	   tar file, then "unpack" would NOT remove an existing /sbin/ on the
+#	   target.  This algorithm implies knowing the difference between
+#	   static dirs like /sbin/, /lib/, etc versus dynatic dirs like
+#	   /run/, /spool/.  Perhaps if the directory is empty in the tar
+#	   file, then we can safely assume the directory is dynamic and NOT
+#	   to be removed on the target.
 #
 
 PROG='make-make-tar'
