@@ -41,7 +41,6 @@ my (
 	$perl_path,
 	$cgi_bin_dir,
 	$cgi_lib_dir,
-	$source_sha1,
 	@CGI,
 	$source_path,
 	$SOURCE,
@@ -51,7 +50,6 @@ my (
 	'/usr/bin/env perl',
 	'.',
 	'.',
-	'No SHA1 Calculated',
 	'/cgi-bin',
 );
 
@@ -78,7 +76,6 @@ Usage:
 END1
 Options:
 	--source-path	path to xml.cgi file of cgi script (required option).
-	--source-sha1	SHA1 Digest of xml.cgi file that generates script.
 	--cgi-bin-dir	Dev directory where main cgi-bin script will be built.
 			  Defaults to .
 	--cgi-lib-dir	Dev directory for cgi-lib directory/files to be built,
@@ -594,11 +591,6 @@ while (my $arg = shift @ARGV) {
 	} elsif ($arg eq '--cgi-lib-dir') {
 		die "option --cgi-lib-dir missing path"
 					unless $cgi_lib_dir = shift @ARGV;
-	} elsif ($arg eq '--source-sha1') {
-		die "option --source-sha1 requires digest"
-					unless $source_sha1 = shift @ARGV;
-		die "--source-sha1: unexpected pattern: $source_sha1"
-				unless $source_sha1 =~ /^[0-9a-f]{40}$/;
 	} elsif ($arg eq '--source-path') {
 		die 'option --source-path: given more than once' if $SOURCE;
 		die "option --source-path requires path"
@@ -664,8 +656,6 @@ print MAIN <<END;
 #	Auto-made script /cgi-bin/$alias_path/$name, made by cgi2perl5.
 #  Source Path:
 #	$source_path
-#  Source SHA1 Digest:
-#	$source_sha1
 #  Note:
 #	Do not make changes directly to this script.
 #
@@ -744,8 +734,6 @@ print HELP <<EOT;
 #	Write <div> help page for script $name.
 #  Source Path:
 #	$source_path
-#  Source SHA1 Digest:
-#	$source_sha1
 #  Note:
 #	$name.d/help.pl was generated automatically by $PROG.
 #
