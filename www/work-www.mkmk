@@ -47,9 +47,6 @@ LIBs="
 	httpd2.d/system.pl
 	httpd2.d/www-form-urlencoded.pl
 
-	local-linux.mk.example
-	local-darwin.mk.example
-
 	property.pl
 "
 
