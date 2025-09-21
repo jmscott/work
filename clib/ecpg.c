@@ -1,6 +1,19 @@
 /*
  *  Synopsis:
- *	Helpful routines for simple PostgreSQL *.ecpg programs.
+ *	Helpful routines for simple PostgreSQL *.pgc programs.
+ *  Usage:
+ *	#include "jmscott/libjmscott.h"
+ *
+ *	static struct jmscott_ecpg_state_fault no_warn[] =
+ *	{
+ *		{"02000", 0},         //  no data for conflict on upsert/insert
+ *		{(char *)0, 0}
+ *	};
+ *	...
+ *	
+ *	EXEC SQL WHENEVER SQLWARNING CALL jmscott_ecpg_warning(
+ *		no_warn
+ *	);
  *  Note:
  *	Should struct jmscott_ecpg_state_fault{} contain the exit codes,
  *	instead of declaring vars jmscott_ecpg_{error,warn}_code global?
