@@ -45,11 +45,6 @@ GOEXE=/usr/local/go/bin/go
 export JMSCOTT_COMPILE_PG?=1
 PGINC=/usr/local/pgsql/include
 
-#  conditional build of various www tools.
-#  set JMSCOTT_COMPILE_WWW=1 to enable; JMSCOTT_COMPILE_WWW=0 to disable.
-#  depends on perl xml libraries.
-
-export JMSCOTT_COMPILE_WWW?=1
 #
 #  For fedora set to apache, debian set to www-data, mac ports root
 #  Defaults to INSTALL_{USER,GROUP}.
