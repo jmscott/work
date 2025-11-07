@@ -160,9 +160,10 @@ int i;
 int
 main(int argc, char **argv)
 {
-int count = 0, i;
-char file_name[BUFSIZ];
+	int count = 0, i;
+	char file_name[BUFSIZ];
 
+	errno = 0;
 	if ((program = strrchr(argv[0], '/')))
 		program++;
 	else

@@ -52,6 +52,7 @@ die2(char *msg1, char *msg2)
 int
 main(int argc, char **argv)
 {
+	errno = 0;
 	if (argc != 2)
 		die("wrong number of arguments");
 

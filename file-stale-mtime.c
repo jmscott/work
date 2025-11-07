@@ -42,6 +42,7 @@ main(int argc, char **argv)
 {
 	time_t now;
 
+	errno = 0;
 	time(&now);
 
 	if (argc != 3)

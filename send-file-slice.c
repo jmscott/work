@@ -33,10 +33,12 @@ die2(char *msg1, char *msg2)
 	jmscott_die2(5, msg1, msg2);
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 	size_t start, stop;
 	char *err;
+	errno = 0;
 
 	argc--;
 	if (argc != 3)

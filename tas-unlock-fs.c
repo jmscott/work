@@ -38,6 +38,7 @@ main(int argc, char **argv)
 {
 	char *lock_path;
 
+	errno = 0;
 	if (argc != 2)
 		die("wrong number of command arguments");
 

@@ -330,6 +330,7 @@ main(int argc, char **argv)
 {
 	int i;
 
+	errno = 0;
 	if (argc < 6)
 		die("wrong number of command line arguments");
 

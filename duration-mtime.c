@@ -52,6 +52,7 @@ main(int argc, char **argv)
 	struct stat st;
 	time_t now;
 
+	errno = 0;
 	time(&now);
 
 	if (argc != 2)

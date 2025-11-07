@@ -91,6 +91,7 @@ main(int argc, char **argv)
 	int state = STATE_0BYTE1;
 	unsigned int code_point = 0;
 
+	errno = 0;
 	if (--argc != 0)
 		jmscott_die_argc(EXIT_FAULT, argc, 0, usage);
 	(void)argv;

@@ -46,6 +46,7 @@ main(int argc, char **argv)
 {
 	char now[37], *err;
 
+	errno = 0;
 	if (argc != 1)
 		die("wrong number arguments");
 	(void)argv;

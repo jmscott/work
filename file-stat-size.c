@@ -53,6 +53,7 @@ main(int argc, char **argv)
 	struct stat st;
 	char digits[128], *p;
 
+	errno = 0;
 	if (argc != 2)
 		die("wrong number of arguments");
 	path = argv[1];

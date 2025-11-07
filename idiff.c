@@ -348,6 +348,7 @@ main(int argc, char **argv)
 	extern char *optarg;
 	extern int optind;
 
+	errno = 0;
 	if (argc <= 1 || strcmp(argv[1], "--help") == 0) {
 		usage(1);
 		exit(0);
