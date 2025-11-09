@@ -48,9 +48,9 @@ int
 main(int argc, char **argv)
 {
 	errno = 0;
-	(void)argv;
 	if (--argc != 1)
 		jmscott_die_argc(EXIT_ERROR, argc, 1, usage);
+	argv++;
 	char *path = argv[0];
 
 	struct stat st;
