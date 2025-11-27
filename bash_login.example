@@ -68,6 +68,9 @@ _prepend_PATH()
 #
 #  Add various directories to PATH
 #
+#  Note:
+#	various /sbin NOT added.
+#
 _prepend_PATH 								\
 	.								\
 	$HOME/bin							\
