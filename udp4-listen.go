@@ -7,7 +7,7 @@
  *	udp4-listen 192.168.1.175 10514 stderr
  *  Note:
  *	Consider replacing the default output of msg+"\n" to a pipe to
- *	long running background process to further masage the udp4 message.
+ *	long running background process to further message the udp4 message.
  *	By the way, this piping trick may actually be possible using socats
  *	ability to fork subprocesses.  not sure.
  *
