@@ -35,20 +35,23 @@
 #	rsunk --notify jmscott --source-path /home/jmscott/backup 	\
 #		--ssh-auth jmscott --itemize
 #  Options:
-#	--source-path <dir>	Path to root of source directory
-#	--ignore-24		Ignore rsnc exit status 24 (file disappeared)
-#	--notify <email>	Send summary report to <email>.  Multiple ok.
-#	--ssh-auth		Authorization at rsync.net
+#	--dry-run		#  Do a dry run (no transfer)
+#	--exclude <pattern>	#  rsync --exclude file patterns
+#	--ignore-24		#  Ignore rsnc exit status 24 (file disappeared)
+#	--itemize		#  Detailed itemization of file changes
+#	--notify <email>	#  Send summary report to <email>.  Multiple ok.
+#	--one-file-system	#  Only one file system
+#	--source-path <dir>	#  Path to root of source directory
+#	--ssh-auth		#  Authorization at rsync.net
 #  See:
 #	https://github.com/jmscott/work/rsunk
 #	https://rsync.net
 #  Note:
+#	Investigate why error log are not emailed.
+#
 #	Add option --template to generate reasonable /.rsunk-filter file.
 #
-#	Add option --rsync-filter-path.  Not sure if global /.rsunk-filter
-#	makes too many assumptions about access to root.  In principle
-#	extra merge rules can be added to /.rsunk-filter, but not total sure
-#	how all that works.
+#	rethink filter rules, in particule directory level rules.
 #
 
 START_EPOCH=$(date +%s)
@@ -168,7 +171,6 @@ In process $PROG#$$ the following error occured:
 For more details, see the output of standard error of this script log file,
 probably defined in a crontab for the user $USER.
 
--$USER
 END
 	exit 1
 }
