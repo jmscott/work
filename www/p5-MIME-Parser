@@ -19,7 +19,7 @@ my $argc = scalar(@ARGV);
 die "wrong cli args: got $argc, need 0" unless $argc == 0; 
 
 my $parser = new MIME::Parser;
-$parser->output_prefix('p5-MIME-Parser-wtf');
+$parser->output_prefix('p5-MIME-Parser');
 $parser->output_dir('.');
 
 $parser->parse(\*STDIN) || die "mime-parse(stdin) failed: $!";
