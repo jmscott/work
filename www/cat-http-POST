@@ -10,9 +10,6 @@
 #	On apache2 web server, to see raw post
 #
 #		cat /tmp/cat-http-POST.12345
-#  See:
-#	lib/cat-http-POST.out.example
-#	sbin/p5-MIME-Parser
 #
 
 RAW_PATH=${TMPDIR:=/tmp}/$(basename $0).$$
