@@ -288,16 +288,15 @@ test -n "$SOURCE_PATH" || die 'missing option: --source-path'
 
 log 'hello, world'
 log "host: $HOST"
+log "source path: $SOURCE_PATH"
 
 test "$EXCLUDE_PATH" && log "exclude path: $EXCLUDE_PATH"
-test "$EXCLUDE" && log "exclude: $EXCLUDE"
 log "notify: $NOTIFY"
 
 log "ssh auth: $SSH_AUTH"
 log "ignore exit status 24: $IGNORE_24"
 log "start epoch: $START_EPOCH"
 
-log "source path: $SOURCE_PATH"
 log "itemize: $ITEMIZE"
 
 log "target path: $TARGET_PATH"
