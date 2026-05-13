@@ -1,57 +1,48 @@
 #!/usr/bin/env bash
 #
 #  Synopsis:
-#	Push /d1/d2/... to user@rsync.net:sunk/host/$(hostname -f)/root/d1/d2
+#	Archive /d1/d2/... to rsync.net and notify the masses via email.
 #  Description:
-#  	Rsync a precious, stable directory to an rsync.net server and send
-#  	status email.  Files that change during the sync will generate
-#  	an error, unless given the option --ignore-24.
-# 
-#  	Files are sunk in archive mode to user@rsync.net:sunk/host/$(hostname).
-#	Directories are	created as needed.  Stale files on the remote server
-#	are deleted.  An itemized summary of all sunk files is mailed to those
-#	who want to know (see option --notify).
+#  	Rsync a precious directory (not fs) to an rsync.net server and send
+#  	status email.  Files are deleted on remote, as well as excluded files.
+#	dir /d1/d2/... sunk to
 #
-#  	Directory level filter rules in .rsunk-filter are observed.
-#	Remember, paths in .rsunk-filter are relative to directory
-#	containing the .rsunk-filter file .  In other words, absolute paths 
-#	are meaningless.
+#		<rsyc.net>:sunk/host/$(hostname -f)/root/d1/d2/...
 #
-#  	Obviously, the script assumes the remote server supports an rsync.net
-#  	like environment;  i.e, certain programs can be run on the remote
-#  	server,	like du, mkdir, find.
+#	Multiple exclude files and emails to notify can be specified.
 #
-#	For more pedestrian file-system level rsync backups, see
-#	https://github.com/jmscott/work/rsync-fs
+#	Email a summary report to addresses specified in --notify options.
 #  Usage:
 #	rsunk								\
 #		--ignore-24						\
 #		--notify jmscott@setspace.com				\
 #		--notify jmscott@rj2tech.com				\
 #		--ssh-auth 8008@usw-s008.rsync.net			\
-#		--source-path /						\
-#			>>/usr/local/log/rsunk-root.log
+#		--source-path /usr/local				\
+#			>>log/rsunk-root.log
 #	rsunk --notify jmscott --source-path /home/svn --ssh-auth jmscott
 #	rsunk --notify jmscott --source-path /home/jmscott/backup 	\
 #		--ssh-auth jmscott --itemize
 #  Options:
+#	--source-path <dir>	#  Path to root of source directory
+#	--ssh-auth		#  Authorization at rsync.net
 #	--dry-run		#  Do a dry run (no transfer)
-#	--exclude <pattern>	#  rsync --exclude file patterns
-#	--ignore-24		#  Ignore rsnc exit status 24 (file disappeared)
+#	--exclude-path		#  path to exclude file
+#	--ignore-24		#  Ignore rsync exit status 24 (file gone)
 #	--itemize		#  Detailed itemization of file changes
 #	--notify <email>	#  Send summary report to <email>.  Multiple ok.
 #	--one-file-system	#  Only one file system
-#	--source-path <dir>	#  Path to root of source directory
-#	--ssh-auth		#  Authorization at rsync.net
 #  See:
 #	https://github.com/jmscott/work/rsunk
+#	https://github.com/jmscott/work/rsync-fs
 #	https://rsync.net
 #  Note:
-#	Investigate why error log are not emailed.
+#	Add "Exclude Path: " to report.
 #
-#	Add option --template to generate reasonable /.rsunk-filter file.
+#	Add field "Elapsed Time: " to mailed report, maybe to subject line?
 #
-#	rethink filter rules, in particule directory level rules.
+#	Consider a --subject-tag option used in subject line of emailed report.
+#	"Subject: OK: rsunk: nightly" or "ERROR: rsunk: rj2imac-local"
 #
 
 START_EPOCH=$(date +%s)
@@ -59,30 +50,35 @@ PROG=$(basename $0)
 SOURCE_PATH=
 TARGET=
 SSH_AUTH=
-DU=
+COMPRESS=
+DU_OUT=
+DRY_RUN=
 
 #  ignore exit status 24 (some files changed)
 IGNORE_24=no
 
 RSYNC_ARGS="
-	--numeric-ids
-	--verbose
 	--archive
+	--compress
 	--delete
 	--delete-excluded
-	--itemize-changes
 	--human-readable
-	--compress
+	--itemize-changes
+	--numeric-ids
+	--prune-empty-dirs
+	--relative
+	--verbose
 "
 
-TARGET_PATH=sunk/host/$(hostname -f)/root/
+HOST=$(hostname -f)
+TARGET_PATH=sunk/host/$HOST/root/
 RSYNC_OUT=
 RSYNC_TEE=cat
 ITEMIZE=no
 
 log()
 {
-	echo "$(date +'%Y/%m/%d %H:%M:%S'): $@"
+	echo "$(date +'%Y/%m/%d %H:%M:%S'): $PROG: $@"
 }
 
 leave()
@@ -95,10 +91,6 @@ do_mail()
 {
 	SUBJECT="$1"
 
-	if [ -z "$NOTIFY" ];  then
-		log 'ERROR: do_mail: --option notify required' >&2
-		exit 1
-	fi
 	(
 		cat
 		cat <<END
@@ -106,7 +98,7 @@ do_mail()
 Begin Process:
 
 	Elapsed: $(elapsed-english $START_EPOCH)
-  Hostname FQDN: $(hostname --fqdn)
+  Hostname FQDN: $HOST
            User: $USER
     Script Path: $0
      Start Time: $RSYNC_START_TIME
@@ -115,11 +107,10 @@ Begin Process:
     Source Path: $SOURCE_PATH
          Target: $TARGET
      Rsync Args: $RSYNC_ARGS
+     Disk Usage: $DU_OUT
+Disk Usage Path: $DU_PATH
+  Du Error Path: $DU_ERR
 END
-	#
-	#  Tack on disk usage, start end times
-	#
-	test -n "$DU" && echo "	Disk Usage: $DU"
 	#
 	#  Concatenate rsync output. 
 	# 
@@ -152,6 +143,41 @@ END
 	) | tr -d '\r' | mail -s "$SUBJECT" $NOTIFY
 }
 
+#  die without mailing to users.
+croak()
+{
+	log "ERROR: $@" >&2
+	exit 1
+}
+
+#  die parsing command line options
+eopt()
+{
+	OPT=$1
+	shift
+	croak "option --$OPT: $@" 
+}
+
+eexclude()
+{
+	eopt exclude-path $@
+}
+
+etwice()
+{
+	eopt $1 'given more than one'
+}
+
+essh()
+{
+	eopt ssh-auth $@
+}
+
+esrc()
+{
+	eopt source-path $@
+}
+
 die()
 {
 	log "ERROR: $@" >&2
@@ -181,6 +207,14 @@ while [ "$1" ];  do
 	ARG="$1"
 	shift
 	case "$ARG" in
+	--exclude-path)
+		EP="$1"
+
+		test -z "$EP" && eexclude 'empty path to exclude list'
+		test -r $EP || eexclude "can not read path: $EP"
+		RSYNC_ARGS="$RSYNC_ARGS --exclude-from=$EP"
+		shift
+		;;
 	--notify)
 		N="$1"
 		test -n "$N" || die 'option --notify: missing user@host'
@@ -188,52 +222,57 @@ while [ "$1" ];  do
 		shift
 		;;
 	--ssh-auth)				# user@host
-		test -z "$SSH_AUTH" ||
-				die 'option --ssh-auth: given more than once'
-		test -n "$1" || die 'option --ssh-auth: missing auth'
+		test -z "$SSH_AUTH" || essh 'given more than once'
+		test -n "$1" || essh 'missing auth'
+
+		#  Note: how to test if ssh auth is valid in config?
 
 		SSH_AUTH="$1"
 		shift
 		;;
 	--source-path)		#  file path
-		test -z "$SOURCE_PATH" 					||
-				die 'option --source-path: given more than once'
-		case "$1" in
+		test -z "$SOURCE_PATH" || etwice source-path
+
+		SP="$1"
+
+		#  frisk the source path
+		case "$SP" in
 		'')
-			die 'option --source-path: missing /d1/d2/...'
+			esrc 'missing path to source: /d1/d2/d3...'
 			;;
 		/)
 			;;
-		/*/)
-			die 'option --source-path: path can not end in /'
-			;;
 		/*)
+			test -e || esrc "directory does not exist: $1" 
+			test -d || esrc "not a directory: $1"
 			;;
 		*)
-			die "option --source-path: not full path: $SOURCE_PATH"
+			esrc "not full path: $SP"
 			;;
 		esac
-		SOURCE_PATH="$1"
+		SOURCE_PATH="$SP"
 		shift
 		;;
 	--one-file-system)
+		test -z "$ONE_FS" || etwice one-file-system 
 		RSYNC_ARGS="$RSYNC_ARGS --one-file-system"
+		ONE_FS=seen
 		;;
 	--dry-run)
 		RSYNC_ARGS="$RSYNC_ARGS --dry-run"
+		DRY_RUN=yes
 		;;
 	--ignore-24)
+		test $IGNORE_24 = no || etwice ignore-24
 		IGNORE_24=yes
 		;;
 	--itemize)
+		# itemize defaults to "no"
+		test $ITEMIZE = yes && etwice itemize
+
 		ITEMIZE=yes
 		RSYNC_OUT=${TMPDIR:=/tmp}/$PROG.$$
 		RSYNC_TEE="tee $RSYNC_OUT"
-		;;
-	--exclude)
-		test -n "$1" || die 'option --exclude: missing pattern'
-		RSYNC_ARGS="$RSYNC_ARGS --exclude $1"
-		shift
 		;;
 	--*)
 		die "unknown option: $ARG"
@@ -243,19 +282,21 @@ while [ "$1" ];  do
 		;;
 	esac
 done
+test -n "$SSH_AUTH" || die 'missing option --ssh-auth'
+test -n "$NOTIFY" || die 'missing option --notify'
+test -n "$SOURCE_PATH" || die 'missing option: --source-path'
 
 log 'hello, world'
+log "host: $HOST"
 
-test -n "$NOTIFY" || die 'missing option --notify'
+test "$EXCLUDE_PATH" && log "exclude path: $EXCLUDE_PATH"
+test "$EXCLUDE" && log "exclude: $EXCLUDE"
 log "notify: $NOTIFY"
 
-test -n "$SSH_AUTH" || die 'missing option --ssh-auth'
 log "ssh auth: $SSH_AUTH"
-log "rsync args: $RSYNC_ARGS"
 log "ignore exit status 24: $IGNORE_24"
 log "start epoch: $START_EPOCH"
 
-test -n "$SOURCE_PATH" || die 'missing option: --source-path'
 log "source path: $SOURCE_PATH"
 log "itemize: $ITEMIZE"
 
@@ -266,26 +307,19 @@ log "rsync target: $TARGET"
 log 'starting rsync ...'
 
 RSYNC_START_TIME=$(date --rfc-3339=seconds)
-#
-#
-#
-log "make sure target path $TARGET_PATH exists on rsync.net"
-ssh $SSH_AUTH "mkdir -p $TARGET_PATH" ||
-			die "rsync.net mkdir -p failed: exit status=$?"
+log "mkdir target path @rsync.net: $TARGET_PATH"
+ssh -n $SSH_AUTH "mkdir -p $TARGET_PATH" ||
+			die "mkdir target path failed: exit status=$?"
 
 #
 #  Call rsync.
 #
-#  Note:
-#	Notice the explicit adding of the command line argument
-#
-#		--filter='dir-merge /.rsunk-filter'
-#
-#	See gripe at top of file.
-#
+log 'calling rsync ...'
 set -x
-time rsync --filter='dir-merge /.rsunk-filter'				\
-		$RSYNC_ARGS $SOURCE_PATH $TARGET 2>&1 | $RSYNC_TEE
+time rsync 								\
+	$RSYNC_ARGS							\
+	$SOURCE_PATH $TARGET 2>&1					|
+	$RSYNC_TEE
 STATUS="${PIPESTATUS[*]}"
 set +x
 case $STATUS in
@@ -294,7 +328,7 @@ case $STATUS in
 	;;
 '24 0')
 	if [ $IGNORE_24 = yes ];  then
-		log "WARN: some files changed during transfer (ok)"
+		log "WARN: (OK): some files changed during transfer"
 	else
 		die "rsync: some files changed during transfer"
 	fi
@@ -304,9 +338,34 @@ case $STATUS in
 	;;
 esac
 
-log 'calculating disk usage'
-DU=$(ssh $SSH_AUTH du -sh $TARGET_PATH/$(basename $SOURCE_PATH))
-log "disk usage: $DU"
+#  only probe rsync.net if not a dry run
+if [ "$DRY_RUN" != yes ];  then
+
+	#  strip /+ pattern from path do to clumsy path construction
+	DU_PATH=$(echo "$TARGET_PATH/$SOURCE_PATH" | tr --squeeze-repeats /)
+	log "remote du path: $DU_PATH"
+
+	DU_OUT=$(ssh -n $SSH_AUTH du -sh $DU_PATH 2>&1 </dev/null)
+	case "$DU_OUT" in
+	*[0-9]*[KMGT]*)
+		log "disk usage: $DU_OUT"
+		;;
+	'')
+		log 'empty du output'
+		DU_ERR=$(
+			realpath					\
+				--canonicalize-missing			\
+				--relative-base	sunk/host/$HOST/root	\
+				$DU_PATH
+		)
+		die "du failed path: $DU_ERR"
+		;;
+	*)
+		die "wierd du output: $DU_OUT"
+		;;
+	esac
+fi
 
 echo 'Done. No Errors.'							|
-		do_mail "OK: $PROG: $DU in $(elapsed-english $START_EPOCH)"
+		do_mail "OK: $PROG: $DU_OUT in $(elapsed-english $START_EPOCH)"
+exit 0
