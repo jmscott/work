@@ -38,6 +38,8 @@
 #	https://github.com/jmscott/work/rsync-fs
 #	https://rsync.net
 #  Note:
+#	Add to report rsunk path $(which rsunk)
+#
 #	Add option --help
 #
 #	Add "Exclude Path: " to report.
@@ -368,6 +370,9 @@ if [ "$DRY_RUN" != yes ];  then
 	esac
 fi
 
-echo 'Done. No Errors.'							|
-		do_mail "OK: $PROG: $DU_OUT in $(elapsed-english $START_EPOCH)"
+#  trim spaccs from subject
+SUBJECT="OK: $PROG: $DU_OUT in $(elapsed-english $START_EPOCH)"
+SUBJECT=$(echo "$SUBJECT" | sed 's/  */ /g' | sed 's/^ | $//g')
+
+echo 'Done. No Errors.'	| do_mail "$SUBJECT"
 exit 0
