@@ -24,6 +24,7 @@
 #	rsunk --notify jmscott --source-path /home/jmscott/backup 	\
 #		--ssh-auth jmscott --itemize
 #  Options:
+#	--subject-tag		#  tag desccribint
 #	--source-path <dir>	#  Path to root of source directory
 #	--ssh-auth		#  Authorization at rsync.net
 #	--dry-run		#  Do a dry run (no transfer)
@@ -37,6 +38,8 @@
 #	https://github.com/jmscott/work/rsync-fs
 #	https://rsync.net
 #  Note:
+#	Add option --help
+#
 #	Add "Exclude Path: " to report.
 #
 #	Add field "Elapsed Time: " to mailed report, maybe to subject line?
