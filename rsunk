@@ -38,6 +38,8 @@
 #	https://github.com/jmscott/work/rsync-fs
 #	https://rsync.net
 #  Note:
+#	Shorten the subject line in notify email.
+#
 #	Add to report rsunk path $(which rsunk)
 #
 #	Add option --help
@@ -370,9 +372,17 @@ if [ "$DRY_RUN" != yes ];  then
 	esac
 fi
 
-#  trim spaccs from subject
-SUBJECT="OK: $PROG: $DU_OUT in $(elapsed-english $START_EPOCH)"
-SUBJECT=$(echo "$SUBJECT" | sed 's/  */ /g' | sed 's/^ | $//g')
-
+#  Trim up the Subject: line
+SUBJECT=$(
+	echo OK: $PROG: $DU_OUT: $(elapsed-english $START_EPOCH)	|
+	sed								\
+		--expression '
+			s/^[[:space:]]*//;
+			s/[[:space:]]*$//;
+			s/[[:space:]]+/ /g
+		'							\
+		--regexp-extended
+)
+		
 echo 'Done. No Errors.'	| do_mail "$SUBJECT"
 exit 0
