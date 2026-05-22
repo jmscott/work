@@ -107,6 +107,6 @@
 #SYNC="
 #"
 
-Uncomment to create directory www/
+#  Uncomment to create directory www/
 #WWW="
 #"
