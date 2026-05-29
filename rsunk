@@ -349,17 +349,20 @@ case $STATUS in
 	;;
 esac
 
-#  only probe rsync.net if not a dry run
+#  only probe rsync.net for disk size if not a dry run
 if [ "$DRY_RUN" != yes ];  then
 
 	#  strip /+ pattern from path do to clumsy path construction
 	DU_PATH=$(echo "$TARGET_PATH/$SOURCE_PATH" | tr --squeeze-repeats /)
 	log "remote du path: $DU_PATH"
 
-	DU_OUT=$(ssh -n $SSH_AUTH du -sh $DU_PATH 2>&1 </dev/null)
+	DU_OUT=$(
+		ssh -n $SSH_AUTH du -sh $DU_PATH 2>&1 </dev/null	|
+		awk '{print $1, $2}'
+	)
 	case "$DU_OUT" in
 	*[0-9]*[KMGT]*)
-		log "disk usage: $(echo $DU_OUT | awk '{print $1, $2}')"
+		log "disk usage: $$DU_OUT"
 		;;
 	'')
 		log 'empty du output'
