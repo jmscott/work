@@ -304,6 +304,8 @@ log "source path: $SOURCE_PATH"
 
 EXCLUDE_PATHS=$(echo "$EXCLUDE_PATH" | sed 's/^  *//')
 log "exclude paths: $EXCLUDE_PATHS"
+
+NOTIFY=$(echo "$NOTIFY" | sed 's/^  *//')
 log "notify: $NOTIFY"
 
 log "start epoch: $START_EPOCH"
