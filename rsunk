@@ -56,7 +56,7 @@ SSH_AUTH=
 COMPRESS=
 DU_OUT=
 DRY_RUN=
-EXCLUDE_PATHS
+EXCLUDE_PATHS=
 
 #  ignore exit status 24 (some files changed)
 IGNORE_24=no
@@ -302,7 +302,7 @@ log "host: $HOST"
 log "PATH: $PATH"
 log "source path: $SOURCE_PATH"
 
-EXCLUDE_PATHS=$(echo "$EXCLUDE_PATH" | sed 's/^  *//')
+EXCLUDE_PATHS=$(echo "$EXCLUDE_PATHS" | sed 's/^  *//')
 log "exclude paths: $EXCLUDE_PATHS"
 
 NOTIFY=$(echo "$NOTIFY" | sed 's/^  *//')
