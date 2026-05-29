@@ -362,7 +362,7 @@ if [ "$DRY_RUN" != yes ];  then
 	)
 	case "$DU_OUT" in
 	*[0-9]*[KMGT]*)
-		log "disk usage: $$DU_OUT"
+		log "disk usage: $DU_OUT"
 		;;
 	'')
 		log 'empty du output'
