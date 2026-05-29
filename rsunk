@@ -28,7 +28,7 @@
 #	--source-path <dir>	#  Path to root of source directory
 #	--ssh-auth		#  Authorization at rsync.net
 #	--dry-run		#  Do a dry run (no transfer)
-#	--exclude-path		#  path to exclude file
+#	--exclude-path <path>	#  path to exclude file.  multiple ok
 #	--ignore-24		#  Ignore rsync exit status 24 (file gone)
 #	--itemize		#  Detailed itemization of file changes
 #	--notify <email>	#  Send summary report to <email>.  Multiple ok.
@@ -56,6 +56,7 @@ SSH_AUTH=
 COMPRESS=
 DU_OUT=
 DRY_RUN=
+EXCLUDE_PATHS
 
 #  ignore exit status 24 (some files changed)
 IGNORE_24=no
@@ -102,18 +103,18 @@ do_mail() {
 Begin Process:
 
 	Elapsed: $(elapsed-english $START_EPOCH)
+     Disk Usage: $DU_OUT
   Hostname FQDN: $HOST
         Itemize: $ITEMIZE
            User: $USER
     Script Path: $0
-   Exclude Path: $EXCLUDE_PATH
+  Exclude Paths: $EXCLUDE_PATHS
      Start Time: $RSYNC_START_TIME
        End Time: $(date --rfc-3339=seconds)
        SSH Auth: $SSH_AUTH
     Source Path: $SOURCE_PATH
          Target: $TARGET
      Rsync Args: $RSYNC_ARGS
-     Disk Usage: $DU_OUT
 Disk Usage Path: $DU_PATH
   Du Error Path: $DU_ERR
  Temp Rsync Out: $RSYNC_OUT
@@ -217,6 +218,7 @@ while [ "$1" ];  do
 		test -z "$EP" && eexclude 'empty path to exclude list'
 		test -r $EP || eexclude "can not read path: $EP"
 		RSYNC_ARGS="$RSYNC_ARGS --exclude-from=$EP"
+		EXCLUDE_PATHS="$EXCLUDE_PATHS $EP"
 		shift
 		;;
 	--notify)
@@ -300,7 +302,8 @@ log "host: $HOST"
 log "PATH: $PATH"
 log "source path: $SOURCE_PATH"
 
-log "exclude path: $EXCLUDE_PATH"
+EXCLUDE_PATHS=$(echo "$EXCLUDE_PATH" | sed 's/^  *//')
+log "exclude paths: $EXCLUDE_PATHS"
 log "notify: $NOTIFY"
 
 log "start epoch: $START_EPOCH"
