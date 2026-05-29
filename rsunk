@@ -121,6 +121,7 @@ Disk Usage Path: $DU_PATH
  Temp Rsync Out: $RSYNC_OUT
  Temp Rsync Tee: $RSYNC_TEE
  Ignore Exit 24: $IGNORE_24
+           PATH: $PATH
 END
 	#
 	#  Concatenate rsync output. 
@@ -298,6 +299,7 @@ trap 'catch QUIT' SIGQUIT
 
 log 'hello, world'
 log "host: $HOST"
+log "PATH: $PATH"
 log "source path: $SOURCE_PATH"
 
 log "exclude path: $EXCLUDE_PATH"
