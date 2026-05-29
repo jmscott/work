@@ -38,13 +38,11 @@
 #	https://github.com/jmscott/work/rsync-fs
 #	https://rsync.net
 #  Note:
-#	Shorten the subject line in notify email.
+#	Add --fault-path or --logger for recording or sending faults to syslog!
 #
 #	Add to report rsunk path $(which rsunk)
 #
 #	Add option --help
-#
-#	Add field "Elapsed Time: " to mailed report, maybe to subject line?
 #
 #	Consider a --subject-tag option used in subject line of emailed report.
 #	"Subject: OK: rsunk: nightly" or "ERROR: rsunk: rj2imac-local"
