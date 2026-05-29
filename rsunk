@@ -40,8 +40,6 @@
 #  Note:
 #	Add --fault-path or --logger for recording or sending faults to syslog!
 #
-#	Add to report rsunk path $(which rsunk)
-#
 #	Add option --help
 #
 #	Consider a --subject-tag option used in subject line of emailed report.
@@ -120,6 +118,7 @@ Disk Usage Path: $DU_PATH
  Temp Rsync Out: $RSYNC_OUT
  Temp Rsync Tee: $RSYNC_TEE
  Ignore Exit 24: $IGNORE_24
+    Which rsunk: $(which rsunk)
            PATH: $PATH
 END
 	#
