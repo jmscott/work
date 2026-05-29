@@ -44,8 +44,6 @@
 #
 #	Add option --help
 #
-#	Add "Exclude Path: " to report.
-#
 #	Add field "Elapsed Time: " to mailed report, maybe to subject line?
 #
 #	Consider a --subject-tag option used in subject line of emailed report.
@@ -83,19 +81,20 @@ RSYNC_OUT=
 RSYNC_TEE=cat
 ITEMIZE=no
 
-log()
-{
+log() {
 	echo "$(date +'%Y/%m/%d %H:%M:%S'): $PROG: $@"
 }
 
-leave()
-{
+leave() {
 	rm -f $RSYNC_OUT
 	log "good bye, cruel world: elapsed $(elapsed-english $START_EPOCH)"
 }
 
-do_mail()
-{
+catch() {
+	log "WARN: caught signal: $1"
+}
+
+do_mail() {
 	SUBJECT="$1"
 
 	(
@@ -106,8 +105,10 @@ Begin Process:
 
 	Elapsed: $(elapsed-english $START_EPOCH)
   Hostname FQDN: $HOST
+        Itemize: $ITEMIZE
            User: $USER
     Script Path: $0
+   Exclude Path: $EXCLUDE_PATH
      Start Time: $RSYNC_START_TIME
        End Time: $(date --rfc-3339=seconds)
        SSH Auth: $SSH_AUTH
@@ -117,20 +118,24 @@ Begin Process:
      Disk Usage: $DU_OUT
 Disk Usage Path: $DU_PATH
   Du Error Path: $DU_ERR
+ Temp Rsync Out: $RSYNC_OUT
+ Temp Rsync Tee: $RSYNC_TEE
+ Ignore Exit 24: $IGNORE_24
 END
 	#
 	#  Concatenate rsync output. 
 	# 
-	if [ -s $RSYNC_OUT ];  then
+	if [ -s "$RSYNC_OUT" ];  then
+log "WTF: '$RSYNC_OUT'"
 		cat <<END
 
-	Begin rsync stdout/err:
+	Begin rsync stdout/err: $RSYNC_OUT
 
 END
 		cat $RSYNC_OUT
 		cat <<END
 
-	  End rsync stdout/err:
+	  End rsync stdout/err: $RSYNC_OUT
 END
 	fi
 
@@ -141,7 +146,7 @@ END
 
 	Begin Environment:
 END
-		env
+		env | sort
 		cat <<END
 	  End Environment:
 
@@ -151,42 +156,35 @@ END
 }
 
 #  die without mailing to users.
-croak()
-{
-	log "ERROR: $@" >&2
+croak() {
+	echo "ERROR: $@" >&2
 	exit 1
 }
 
 #  die parsing command line options
-eopt()
-{
+eopt() {
 	OPT=$1
 	shift
 	croak "option --$OPT: $@" 
 }
 
-eexclude()
-{
+eexclude() {
 	eopt exclude-path $@
 }
 
-etwice()
-{
+etwice() {
 	eopt $1 'given more than one'
 }
 
-essh()
-{
+essh() {
 	eopt ssh-auth $@
 }
 
-esrc()
-{
+esrc() {
 	eopt source-path $@
 }
 
-die()
-{
+die() {
 	log "ERROR: $@" >&2
 
 	#
@@ -208,7 +206,7 @@ END
 	exit 1
 }
 
-trap leave EXIT
+#  parse command line args
 
 while [ "$1" ];  do
 	ARG="$1"
@@ -282,27 +280,32 @@ while [ "$1" ];  do
 		RSYNC_TEE="tee $RSYNC_OUT"
 		;;
 	--*)
-		die "unknown option: $ARG"
+		croak "unknown option: $ARG"
 		;;
 	*)
-		die "unknown argument: $ARG"
+		croak "unknown cli argument: $ARG"
 		;;
 	esac
 done
-test -n "$SSH_AUTH" || die 'missing option --ssh-auth'
-test -n "$NOTIFY" || die 'missing option --notify'
-test -n "$SOURCE_PATH" || die 'missing option: --source-path'
+test -n "$SSH_AUTH" || croak 'missing option --ssh-auth'
+test -n "$NOTIFY" || croak 'missing option --notify'
+test -n "$SOURCE_PATH" || croak 'missing option: --source-path'
+
+trap leave EXIT
+trap 'catch TERM' SIGTERM
+trap 'catch INT' SIGINT
+trap 'catch QUIT' SIGQUIT
 
 log 'hello, world'
 log "host: $HOST"
 log "source path: $SOURCE_PATH"
 
-test "$EXCLUDE_PATH" && log "exclude path: $EXCLUDE_PATH"
+log "exclude path: $EXCLUDE_PATH"
 log "notify: $NOTIFY"
 
+log "start epoch: $START_EPOCH"
 log "ssh auth: $SSH_AUTH"
 log "ignore exit status 24: $IGNORE_24"
-log "start epoch: $START_EPOCH"
 
 log "itemize: $ITEMIZE"
 
@@ -321,13 +324,11 @@ ssh -n $SSH_AUTH "mkdir -p $TARGET_PATH" ||
 #  Call rsync.
 #
 log 'calling rsync ...'
-set -x
 time rsync 								\
 	$RSYNC_ARGS							\
 	$SOURCE_PATH $TARGET 2>&1					|
 	$RSYNC_TEE
 STATUS="${PIPESTATUS[*]}"
-set +x
 case $STATUS in
 '0 0')
 	log 'done, no errors in rsync'
@@ -354,7 +355,7 @@ if [ "$DRY_RUN" != yes ];  then
 	DU_OUT=$(ssh -n $SSH_AUTH du -sh $DU_PATH 2>&1 </dev/null)
 	case "$DU_OUT" in
 	*[0-9]*[KMGT]*)
-		log "disk usage: $DU_OUT"
+		log "disk usage: $(echo $DU_OUT | awk '{print $1, $2}')"
 		;;
 	'')
 		log 'empty du output'
