@@ -358,7 +358,8 @@ if [ "$DRY_RUN" != yes ];  then
 
 	DU_OUT=$(
 		ssh -n $SSH_AUTH du -sh $DU_PATH 2>&1 </dev/null	|
-		awk '{print $1, $2}'
+		awk '{print $1, $2}'					|
+		sed "s@/sunk/host/$HOST/@@"
 	)
 	case "$DU_OUT" in
 	*[0-9]*[KMGT]*)
@@ -382,7 +383,7 @@ fi
 
 #  Trim up the Subject: line
 SUBJECT=$(
-	echo OK: $PROG: $DU_OUT: $(elapsed-english $START_EPOCH)	|
+	echo OK: $DU_OUT: $(elapsed-english $START_EPOCH)		|
 	sed								\
 		--expression '
 			s/^[[:space:]]*//;
