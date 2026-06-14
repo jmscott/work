@@ -41,7 +41,7 @@ Usage:
 	--GET			Generate /cgi/GET template twig
 	--POST			Generate /cgi/POST template twig
 	--content-type		Set content type for current twig
-	--putter name		Output <putter> element
+	--putter name		Output <putter> element  (only once)
 	--query-arg name	Output <query-arg> element
 	--help			This
 END
