@@ -54,7 +54,7 @@
       <h4>
        <code>
         <!--#include virtual=
-		"/cgi-bin/jmscott/env?out=text&name=SERVER_NAME&src=env"
+		"/cgi-bin/env?out=text&name=SERVER_NAME&src=env"
         -->
        </code>:$TMPDIR/cat-http-POST.$$
       </h4>
