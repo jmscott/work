@@ -13,7 +13,8 @@
 #	https://en.wikipedia.org/wiki/Unix_filesystem
 #  Note:
 #	-  Think about a new action "links" to replace typical recipes
-#	   "dev-links" and "clean-links"
+#	   "dev-links" and "clean-links".  also, the "make-make tar" DOES create
+#	   links with SYMLINKs.
 #
 #	-  Create action "unpack" that removes various statis directories
 #	   before unpack tar archive.  An automatic method for detecting static
