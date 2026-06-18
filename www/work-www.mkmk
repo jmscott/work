@@ -45,7 +45,7 @@ LIBs="
 	httpd2.d/make-work-dir.pl
 	httpd2.d/multipart-form-data.pl
 	httpd2.d/system.pl
-	httpd2.d/www-form-urlencoded.pl
+	httpd2.d/x-www-form-urlencoded.pl
 
 	property.pl
 "
