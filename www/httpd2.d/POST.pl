@@ -54,12 +54,15 @@ if ($CL > 0) {
 #
 #  Call the appropriate parser to map build the POST_* variables.
 #
+#
 
 if ($CT eq 'application/x-www-form-urlencoded') {
-	require 'httpd2.d/www-form-urlencoded.pl';
+	require 'httpd2.d/x-www-form-urlencoded.pl';
 } elsif ($CT =~ m/application\/multipart-form-data/ or
          $CT =~ m/multipart\/form-data/) {
 	require 'httpd2.d/multipart-form-data.pl';
+} elsif ($CT =~ m/application\/json/) {
+	require 'httpd2.d/application-json.pl';
 } else {
 	die "POST: unknown CONTENT_TYPE: $CT";
 }
