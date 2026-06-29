@@ -1,9 +1,18 @@
 /*
  *  Synopsis:
- *	Listen on udp4 port and reflect incoming packets to ip4s.
+ *	Listen on udp4 port and reflect incoming packets to other ip4s.
  *  Usage:
  *	udp4-reflect <in-ip4:port> <out1-ip4:port> <out2-ip4:port> ...
- *	udp4-reflect 192.168.1.175:10514 10.187.1.3:20001 10.187.1.5:20001
+ *	udp4-reflect 192.168.1.175:10514 10.47.1.3:20001 10.187.1.5:20001
+ *  Note:
+ *	Fast reflection is surprisingly tricky, hence this tool.  I (jmscott)
+ *	found no reasonable technique using famous "socat" command without a
+ *	lot of overhead from forking a sub process.  Also, firewall tricks too
+ *	risky and burdensome during development.
+ *
+ *	Nice writeup on trickyness here:
+ *
+ *		https://mattryall.net/blog/udp-port-forwarding-with-socat
  */
 package main
 
@@ -24,9 +33,13 @@ func die(format string, args ...interface{}) {
 }
 
 func put_stats() { 
-	fmt.Fprintf(os.Stdout, " in: %d pkts\n", in_count)
-	fmt.Fprintf(os.Stdout, "out: %d pkts\n", out_count)
-	fmt.Fprintf(os.Stdout, "err: %d pkts\n", err_count)
+	fmt.Fprintf(
+		os.Stdout,
+		"\n in: %d pkts\nout: %d pkts\nerr: %d pkts\n",
+		in_count,
+		out_count,
+		err_count,
+	)
 }
 
 func scatter(out []*net.UDPConn) (ref_c chan []byte) {
@@ -116,16 +129,15 @@ func main() {
 
 	for {
 		sig := <-sigc
+		put_stats()
 		if sig != syscall.SIGUSR1 {
 			fmt.Fprintf(
 				os.Stderr,
-				"\nudp4-reflect: %d pkts, caught signal: %s\n",
-				in_count,
+				"\nudp4-reflect: caught signal: %s\n",
 				sig,
 			)
 			os.Exit(1)
 		}
-		put_stats()
 	}
 	os.Exit(0)
 }
