@@ -31,8 +31,10 @@ END
 #	die "404 not sure what you mean";
 #  Note:
 #	Consider testing for stdin being a tty before issuing http status
-#	codes in __DIE__.  EMitting http status codes gets confusing when
-#	testing scripts from command line that do "require 'httpd2.d/common.pl'.
+#	codes in __DIE__.  Emitting http status codes gets confusing when
+#	testing scripts from command line that do
+#
+#		"require 'jmscott/httpd2.d/common.pl'.
 #
 #	If the mime headers have already been written, which is
 #	pretty common,  then, nothing is sent to the client,
