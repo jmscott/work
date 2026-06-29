@@ -11,7 +11,7 @@
 #
 use utf8;
 
-require 'httpd2.d/common.pl';
+require 'jmscott/httpd2.d/common.pl';
 
 our (
 	%QUERY_ARG,

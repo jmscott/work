@@ -57,12 +57,12 @@ if ($CL > 0) {
 #
 
 if ($CT eq 'application/x-www-form-urlencoded') {
-	require 'httpd2.d/x-www-form-urlencoded.pl';
+	require 'jmscott/httpd2.d/x-www-form-urlencoded.pl';
 } elsif ($CT =~ m/application\/multipart-form-data/ or
          $CT =~ m/multipart\/form-data/) {
-	require 'httpd2.d/multipart-form-data.pl';
+	require 'jmscott/httpd2.d/multipart-form-data.pl';
 } elsif ($CT =~ m/application\/json/) {
-	require 'httpd2.d/application-json.pl';
+	require 'jmscott/httpd2.d/application-json.pl';
 } else {
 	die "POST: unknown CONTENT_TYPE: $CT";
 }

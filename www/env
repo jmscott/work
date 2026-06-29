@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 #
 #  Synopsis:
-#	Auto-made script /cgi-bin//env, made by cgi2perl5.
+#	Auto-made script /cgi-bin/jmscott/env, made by cgi2perl5.
 #  Source Path:
 #	env.cgi
 #  Note:
@@ -25,12 +25,11 @@ die 'SERVER_ROOT environment variable not defined'
 #  Prepend the $SERVER_ROOT/lib directory
 #  to the load path.
 #
-unshift @INC, "$ENV{SERVER_ROOT}/lib";
+unshift @INC, "$ENV{SERVER_ROOT}/lib/jmscott", "$ENV{SERVER_ROOT}/lib";
 
 our %CGI;
 
-#  Note: ought to be "require jmscott/httpd2.d/common.pl" !
-require 'httpd2.d/common.pl';
+require 'jmscott/httpd2.d/common.pl';
 $CGI{name} = 'env';
 #
 #  Default content type for all elements.
@@ -126,4 +125,4 @@ $CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{src} = {
 $CGI{GET}->{out}->{putter}->{help}->{name} = 'help';
 $CGI{GET}->{out}->{putter}->{help}->{'content-type'} = 'text/html';
 
-require "httpd2.d/$ENV{REQUEST_METHOD}.pl";
+require "jmscott/httpd2.d/$ENV{REQUEST_METHOD}.pl";

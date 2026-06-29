@@ -12,15 +12,20 @@
 #  Depends:
 #	Perl modules XML::Parser
 #  Note:
+#	-- rethink how --alias-path works.  currently @INC_alias_path pushes
+#	   to alias_path to @INC instead of explcitly prefixing the
+#	  "require " statements.
+#
+#		cgi2perl --alias-path jmscott/
+#		require 'jmscott/lib/env.d'
+#
+#	  the current code always writes "require
+#
+#		require 'lib/env
+#
+#
 #	-  Stack <<HERE expressions into single print to improve readability.
 #	
-#	-  Change to
-#
-#		require 'jmscott/httpd2.d/common.pl'
-#
-#	   otherwise, apache var PERL5LIB must add $JMSCOTT_ROOT/www/lib,
-#	   instead of using a symlink to $JMSCOTT_ROOT/www/lib
-#
 #	-  Consider adding a CLI option "--namespace <prefix>" for simplifying
 #	   the various directory prefixes added to cgi-bin/ and lib/ when the
 #	   package lives in subdirectories of $SERVER_ROOT/{cgi-bin,lib}.
@@ -681,8 +686,7 @@ unshift \@INC, ${INC_alias_path}"\$ENV{SERVER_ROOT}/lib";
 
 our \%CGI;
 
-#  Note: ought to be "require jmscott/httpd2.d/common.pl" !
-require 'httpd2.d/common.pl';
+require 'jmscott/httpd2.d/common.pl';
 END
 print MAIN <<END if defined $tree->[1]->[0]->{perl5_require};
 require '$tree->[1]->[0]->{perl5_require}';
@@ -708,7 +712,7 @@ print MAIN <<'END';
 $CGI{GET}->{out}->{putter}->{help}->{name} = 'help';
 $CGI{GET}->{out}->{putter}->{help}->{'content-type'} = 'text/html';
 
-require "httpd2.d/$ENV{REQUEST_METHOD}.pl";
+require "jmscott/httpd2.d/$ENV{REQUEST_METHOD}.pl";
 END
 close(MAIN) or die "close(>$cgi_bin) failed: $!";
 chmod(0744, $cgi_bin) or die "chmod(0700, $cgi_bin) failed: $!";

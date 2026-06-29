@@ -21,7 +21,7 @@
 #	form.cgi.
 #
 
-require 'httpd2.d/common.pl';
+require 'jmscott/httpd2.d/common.pl';
 
 #
 #  Manually set LD_LIBRARY_PATH.  Redhat 6.2 apache has problem setting
