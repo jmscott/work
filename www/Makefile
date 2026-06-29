@@ -117,10 +117,10 @@ clean:
 #  Dump the process environment for debugging.
 #
 env env.d/help.pl: env.cgi
-	../cgi2perl5 --source-path env.cgi
+	../cgi2perl5 --alias-path jmscott --source-path env.cgi
 
 form form.d/help.pl: form.cgi
-	../cgi2perl5 --source-path form.cgi
+	../cgi2perl5 --alias-path jmscott --source-path form.cgi
 
 world: clean all distclean install
 
