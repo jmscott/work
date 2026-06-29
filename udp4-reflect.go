@@ -1,14 +1,14 @@
 /*
  *  Synopsis:
- *	Listen on udp4 port and reflect incoming packets to other ip4s.
+ *	Listen on udp4 port and reflect incoming udp packets to other ip4s.
  *  Usage:
  *	udp4-reflect <in-ip4:port> <out1-ip4:port> <out2-ip4:port> ...
  *	udp4-reflect 192.168.1.175:10514 10.47.1.3:20001 10.187.1.5:20001
  *  Note:
  *	Fast reflection is surprisingly tricky, hence this tool.  I (jmscott)
  *	found no reasonable technique using famous "socat" command without a
- *	lot of overhead from forking a sub process.  Also, firewall tricks too
- *	risky and burdensome during development.
+ *	lot of overhead from forking sub processes.  Also, firewall tricks too
+ *	risky and cumbersome during development.
  *
  *	Nice writeup on trickyness here:
  *
