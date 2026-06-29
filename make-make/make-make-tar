@@ -60,7 +60,7 @@
 PROG='make-make-tar'
 START_EPOCH=$(date +%s)
 MKMK=
-WORK_TMP=
+KEEP_WORK_DIR=${MAKE_MAKE_KEEP_WORK_DIR:=no}
 
 die()
 {
@@ -75,17 +75,18 @@ WARN()
 
 leave()
 {
-	if [ -n "$WORK_TMP" -a -e "$WORK_TMP" ];  then
-		echo "--$WORK_TMP"
-		chmod -R +w $WORK_TMP					||
+	if [ "$KEEP_WORK_DIR" = no -a -e "$WORK_DIR" ];  then
+		echo "--$WORK_DIR"
+		chmod -R +w $WORK_DIR					||
 			WARN "chmod +w tmp/work failed: exit status=$?"
-		find $WORK_TMP ! -type l -print | xargs chmod +w
-		rm -rf $WORK_TMP || WARN "rm work tmp failed: exit status=$?"
+		find $WORK_DIR ! -type l -print | xargs chmod +w
+		rm -rf $WORK_DIR || WARN "rm work tmp failed: exit status=$?"
 	fi
 	cat <<END
 #
 #  Date: $(date)
-#
+#  Work Dir: $WORK_DIR
+#  Keep Work Dir: $KEEP_WORK_DIR
 #  $PROG: good bye, cruel world: $(elapsed-english $START_EPOCH) elapsed
 #
 END
@@ -102,6 +103,7 @@ cat <<END
 #
 #  JMSCOTT_ROOT=$JMSCOTT_ROOT
 #  PATH=$PATH
+#  KEEP_WORK_DIR=$KEEP_WORK_DIR
 #
 #  bash version: $(bash --version | head -1)
 #  Date: $(date)
@@ -192,7 +194,7 @@ make_SYMLINKs()
 	for S in $SYMLINKs;  do
 		echo $S | fgrep -e '->' | sed 's/->/ /' | while read A B;  do
 		echo "+$A -> $B" && (
-			cd $WORK_TMP || die "cd symlink failed: exit status=$?"
+			cd $WORK_DIR || die "cd symlink failed: exit status=$?"
 			BD=$(dirname $B)
 			if [ ! -d $BD ];  then
 				echo "+>$BD"
@@ -232,7 +234,7 @@ copy_file()
 	#  Make the staging directory.
 	#
 	echo "+>$DIR"
-	mkdir -p $WORK_TMP/$DIR						||
+	mkdir -p $WORK_DIR/$DIR						||
 		die "copy_file: mkdir stage root failed: exit status=$?"
 	#
 	#  Copy the files and directories into the staging directory
@@ -244,7 +246,7 @@ copy_file()
 		#
 		if [ -d $F ];  then
 			echo "+>$DIR/$F/"
-			DN=$WORK_TMP/$DIR/$F
+			DN=$WORK_DIR/$DIR/$F
 			mkdir -p "$DN"					||
 				die "copy_file: mkdir config failed: "	\
 					"exit status=$?"
@@ -255,9 +257,9 @@ copy_file()
 		#  The file lives in an uncreated directory.
 		#
 		DN=$(dirname $F | sed "s:^$DIR\/::" | sed "s:^$DIR$::")
-		if [ -n "$DN" -a ! -d $WORK_TMP/$DIR/$DN ];  then
+		if [ -n "$DN" -a ! -d $WORK_DIR/$DIR/$DN ];  then
 			echo "+>$DIR/$DN/"
-			D=$WORK_TMP/$DIR/$DN
+			D=$WORK_DIR/$DIR/$DN
 			mkdir -p $D					||
 				die "copy_file: mkdir failed: exit status=$?"
 		fi
@@ -278,20 +280,20 @@ copy_file()
 		#  Ought to check fo existence of file before copy?
 		#
 		echo ">$D/$(basename $F)"
-		cp $F $WORK_TMP/$D					||
+		cp $F $WORK_DIR/$D					||
 			die "copy_file: cp failed: exit status=$?"
 	done
 
 	#  set the permissions in the work temp directory
 
-	find $WORK_TMP/$DIR -type d -print | xargs chmod $PERMD
+	find $WORK_DIR/$DIR -type d -print | xargs chmod $PERMD
 	STATUS=${PIPESTATUS[*]}
 	test "$STATUS" = '0 0'						||
 		die "copy_file: find work dir | chmod failed:"		\
 			"exit status=$STATUS"
 
 	if [ "$FILEs" ];  then
-		find $WORK_TMP/$DIR -type f -print | xargs chmod $PERMF
+		find $WORK_DIR/$DIR -type f -print | xargs chmod $PERMF
 		STATUS=${PIPESTATUS[*]}
 		test "$STATUS" = '0 0'					||
 			die "find copy work | chmod failed: exit status=$STATUS"
@@ -324,10 +326,10 @@ make_dir()
 	#
 	#  Make the staging directory.
 	#
-	echo "+>$WORK_TMP/$DIR"
-	mkdir -p $WORK_TMP/$DIR						||
+	echo "+>$WORK_DIR/$DIR"
+	mkdir -p $WORK_DIR/$DIR						||
 		die "make_dir: mkdir failed: exit status=$?"
-	find $WORK_TMP/$DIR -type d -print | xargs chmod $PERMD
+	find $WORK_DIR/$DIR -type d -print | xargs chmod $PERMD
 	STATUS=${PIPESTATUS[*]}
 	test "$STATUS" = '0 0' ||
 		die "make_dir: find dir | chmod failed: status=$STATUS"
@@ -388,10 +390,10 @@ is_readable SBINs
 #  Make temporary work directory.
 #
 TMPDIR=${TMPDIR:=/tmp}
-WORK_TMP=$TMPDIR/$PROG.$$.d
-test -d $WORK_TMP && die "tmp directory $WORK_TMP already exists"
-echo "+>$WORK_TMP"
-mkdir -p $WORK_TMP || die "mkdir -p $WORK_TMP failed"
+WORK_DIR=$TMPDIR/$PROG.$$.d
+test -d $WORK_DIR && die "tmp directory $WORK_DIR already exists"
+echo "+>$WORK_DIR"
+mkdir -p $WORK_DIR || die "mkdir -p $WORK_DIR failed"
 
 #  make directories, if variables defined in mkmk file
 
@@ -441,8 +443,8 @@ make_SYMLINKs
 TAR_FILE=$TAR_FILE-$(date +'%Y%m%d_%H%M').tar.bz2
 echo ">>$TAR_FILE"
 (
-	cd $WORK_TMP || die "cd $WORK_TMP failed"
-	tar cf - . || die "tar cf failed: exit status=$?"
+	cd $WORK_DIR || die "cd $WORK_DIR failed"
+	tar --create --file  - . || die "tar cf failed: exit status=$?"
 ) | bzip2 --best >$TAR_FILE
 STATUS=${PIPESTATUS[*]}
 test "$STATUS" = '0 0'							||
