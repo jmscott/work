@@ -38,7 +38,6 @@ COMPILEs="
 	stdin2go-literal
 	tas-lock-fs
 	tas-unlock-fs
-	udp4-listen
 	udp4-reflect
 "
 
@@ -118,7 +117,6 @@ SRCs="
 	stdin2go-literal.go
 	tas-lock-fs.c
 	tas-unlock-fs.c
-	udp4-listen.go
 	udp4-reflect.go
 "
 
