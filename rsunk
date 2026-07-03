@@ -101,20 +101,21 @@ do_mail() {
 Begin Process:
 
 	Elapsed: $(elapsed-english $START_EPOCH)
-     Disk Usage: $DU_OUT
   Hostname FQDN: $HOST
-        Itemize: $ITEMIZE
            User: $USER
+    Source Path: $SOURCE_PATH
+    Target Path: $TARGET_PATH
+         Target: $TARGET
+     Disk Usage: $DU_OUT
+Disk Usage Path: $DU_PATH
+  Du Error Path: $DU_ERR
+        Itemize: $ITEMIZE
     Script Path: $0
   Exclude Paths: $EXCLUDE_PATHS
      Start Time: $RSYNC_START_TIME
        End Time: $(date --rfc-3339=seconds)
        SSH Auth: $SSH_AUTH
-    Source Path: $SOURCE_PATH
-         Target: $TARGET
      Rsync Args: $RSYNC_ARGS
-Disk Usage Path: $DU_PATH
-  Du Error Path: $DU_ERR
  Temp Rsync Out: $RSYNC_OUT
  Temp Rsync Tee: $RSYNC_TEE
  Ignore Exit 24: $IGNORE_24
