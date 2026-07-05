@@ -224,12 +224,12 @@ sub dbi_pg_select
 	my $q = $db->prepare($sql) or die
 			'dbi_pg_select: prepare($tag) failed: ' . $db->errstr;
 	$q->execute(@{$argv}) or
-			die "dbi_pg_select: ($tag) failed: ". $q->errstr;
+			die "dbi_pg_select: $tag failed: ". $q->errstr;
 	#
 	#  Insure caller passed a true select statement.
 	#
 	$q->{NUM_OF_FIELDS} > 0 or
-			die 'dbi_pg_select: expected NUM_OF_FIELDS > 0';
+			die "dbi_pg_select: $tag: expected NUM_OF_FIELDS > 0";
 	return $q;
 }
 
