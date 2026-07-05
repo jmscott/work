@@ -229,7 +229,7 @@ sub dbi_pg_select
 	#  Insure caller passed a true select statement.
 	#
 	$q->{NUM_OF_FIELDS} > 0 or
-			die 'dbi_pg_select: expected NUM_OF_FIELDS > ';
+			die 'dbi_pg_select: expected NUM_OF_FIELDS > 0';
 	return $q;
 }
 
