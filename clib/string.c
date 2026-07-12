@@ -1,7 +1,13 @@
 /*
  *  Synopsis:
- *	Various utf8 C string manipulation functions, safe in signal handlers.
+ *	Various ascii C string manipulation functions, safe in signal handlers.
  *  Note:
+ *	Investigate in clang is a caller can be forced to use a return value.
+ *	In particular, see function jmscott_ulltoa().
+ *
+ *	Add func is_utf8() and merge with is-utf8wf.c.  see ctyoe isalnum_l.
+ *	Add func is_in_set() and merge with isdigit().
+ *
  *	The BSD clib function strlcat() comes close to the behaviour of the
  *	jmscott_strcat*() functions.  However, strlcat() is not on linux.  
  *	
@@ -242,6 +248,7 @@ jmscott_a2size_t(char *a, size_t *sz)
 	return (char *)0;
 }
 
+//  comment me!!
 char *
 jmscott_split(char *src, char split, int *offset, int *noffset)
 {
@@ -275,11 +282,11 @@ jmscott_split(char *src, char split, int *offset, int *noffset)
 
 /*
  *  Synopsis:
- *	Does a string contain all graphics chars?  If not then return position
- *	of first non graphics chars, starting at 1, not 0.
+ *	Does an ascii string contain all graphics chars?  If not then return
+ *	position of first non graphics chars, starting at 1, not 0.
  *
- *	A zero length string is considered to contain all, since we cannot point
- *	to a offset of an offending char.
+ *	A zero length string is considered to contain all graphics, since we
+ *	cannot point to a offset of an offending char.  not perfect.
  *  Usage:
  *	int pos = jmscott_isgraph(argv[2]);
  *	if (pos-- > 0)
@@ -298,6 +305,36 @@ jmscott_isgraph(char *str)
 
 		while ((c = *s++))
 			if (!isgraph(c))
+				return s - str;
+	}
+	return 0;
+}
+
+/*
+ *  Synopsis:
+ *	Does an ascii string contain all digits? if not then return position
+ *	of first enon digit char, starting at 1, not 0.
+ *
+ *	A zero length string is considered to contain all figits, since we
+ *	cannot point to a offset of an offending char.  not perfect.
+ *  Usage:
+ *	int pos = jmscott_isdigit(argv[2]);
+ *	if (pos-- > 0)
+ *		die("char not digit: 0x%x", argv[2][pos]);
+ *  Returns:
+ *	0	all digit chars
+ *	<pos>	position of first non-digital char, starting at 1
+ */
+int
+jmscott_isdigit(char *str)
+{
+	char *s = str;
+
+	if (*s) {
+		char c;
+
+		while ((c = *s++))
+			if (!isdigit(c))
 				return s - str;
 	}
 	return 0;
