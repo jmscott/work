@@ -291,4 +291,7 @@ char				*jmscott_split(
 				);
 
 extern char			*jmscott_progname;
+
+int				jmscott_isgraph(char *str);
+
 #endif //  JMSCOTT_LIBJMSCOTT_H

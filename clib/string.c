@@ -272,3 +272,33 @@ jmscott_split(char *src, char split, int *offset, int *noffset)
 
 	return (char *)0;
 }
+
+/*
+ *  Synopsis:
+ *	Does a string contain all graphics chars?  If not then return position
+ *	of first non graphics chars, starting at 1, not 0.
+ *
+ *	A zero length string is considered to contain all, since we cannot point
+ *	to a offset of an offending char.
+ *  Usage:
+ *	int pos = jmscott_isgraph(argv[2]);
+ *	if (pos-- > 0)
+ *		die("funny char: 0x%x", argv[2][pos]);
+ *  Returns:
+ *	0	all graphics chars
+ *	<pos>	position of first non-graphical char, starting at 1
+ */
+int
+jmscott_isgraph(char *str)
+{
+	char *s = str;
+
+	if (*s) {
+		char c;
+
+		while ((c = *s++))
+			if (!isgraph(c))
+				return s - str;
+	}
+	return 0;
+}
