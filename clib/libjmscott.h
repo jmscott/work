@@ -293,5 +293,6 @@ char				*jmscott_split(
 extern char			*jmscott_progname;
 
 int				jmscott_isgraph(char *str);
+int				jmscott_isdigit(char *str);
 
 #endif //  JMSCOTT_LIBJMSCOTT_H
