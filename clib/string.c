@@ -2,6 +2,8 @@
  *  Synopsis:
  *	Various ascii C string manipulation functions, safe in signal handlers.
  *  Note:
+ *	Rename string.c to ascii.c!
+ *
  *	Investigate in clang is a caller can be forced to use a return value.
  *	In particular, see function jmscott_ulltoa().
  *
