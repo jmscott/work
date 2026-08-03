@@ -2,6 +2,9 @@
  *  Synopsis:
  *	Remove duplicate lines on stdin and write to stdout.
  *  Note:
+ *	dedup seems to be about twice as fast as "sort -u", when
+ *	LANG=en_US.UTF-8;  otherwise, "sort -u" about 4 time fast.
+ *
  *	A clang version exists in setspace, which will eventually replace this
  *	golang version.  surprisingly, this golang version is only about %25
  *	slower.
