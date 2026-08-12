@@ -7,6 +7,8 @@
  *	0  -  lock exists and removed
  *	1  -  lock does not exist
  *	2  -  unexpected error
+ *  Note:
+ *	This code probably obsoleted by BSD/MacOS clone of GNU flock.
  */
 #include <sys/errno.h>
 #include <string.h>

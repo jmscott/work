@@ -1,6 +1,6 @@
 /*
  *  Synopsis
- *	Create a test and set lock in a posix file system.
+ *	Create a test and set advisory lock in a posix file system.
  *  Usage:
  *	tas-lock-fs <path/to/lock/file>
  *  Exit Status:
@@ -8,9 +8,13 @@
  *	1  -  lock already exists
  *	2  -  unexpected error
  *  See:
- *	https://github.com/jmscott/work/blob/master/fs-tas-unlock.c
- *	https://en.wikipedia.org/wiki/Test-and-set
+ *	To unlock file, see
+ *		https://github.com/jmscott/work/blob/master/tas-unlock-fs.c
+ *	Also see
+ *		https://en.wikipedia.org/wiki/Test-and-set
  *  Note:
+ *	This code probably obsoleted by BSD/MacOS clone of GNU flock.
+ *
  *	Should the lock file contain the process id of the creator?
  *	Having the process id means we can automate cleanup of stale lock
  *	files.  Perhaps the mtime is sufficent for cleanup of stale locks.
