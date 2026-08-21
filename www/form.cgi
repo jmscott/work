@@ -23,7 +23,7 @@
     <title>Simple Religion Test</title>
     <synopsis>
       This form demonstrates validation of posted values against the patterns
-      defined in perl5_re.
+      defined in perl5_re of cgi template.
     </synopsis>
     <vars>
      <var
