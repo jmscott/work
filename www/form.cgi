@@ -29,7 +29,7 @@
      <var
        name="religion"
        required="yes"
-       perl5_re="jewish|christian|muslim|hindu|buddhist|jain|agnostic|atheist"
+       perl5_re="[a-z]{1,16}"
      />
     </vars>
    </putter>
