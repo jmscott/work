@@ -80,27 +80,43 @@ Content-Type: text/plain;  charset=utf-8\r
 $error_text
 END
 		#
-		#  What is the following weirdness, you ask?
-		#  Well, turns out that MS exploder won't always
-		#  show the text of an error if
+		#  Note:
+		#	What is the following weirdness, you ask?
+		#	Well, turns out that MS exploder won't always
+		#	show the text of an error if
 		#
-		#	1)  running in "friendly" mode
-		#	2)  length(text) < 512.
+		#		1)  running in "friendly" mode
+		#		2)  length(text) < 512.
 		#
-		#  What the user sees is something like "Page Not Found",
-		#  instead of a description from the server.
-		#  Soo, we pad $error_text with space on the end when
-		#  chatting with Explorer.
+		#	What the user sees is something like "Page Not Found",
+		#	instead of a description from the server.
+		#	Soooo, we pad $error_text with space on the end when
+		#	chatting with Explorer.
 		#
 		if (($status <= 400 && $status < 600) &&
 		     length($error_text) < 512 &&
 		    $ENV{HTTP_USER_AGENT} =~ /\WMSIE\W/) {
 			print sprintf('% ' . (512 - length($error_text)) .'s');
 		}
-		my $port = ($ENV{SERVER_PORT} eq '80' ? '' : 
-							":$ENV{SERVER_PORT}");
+		my $port;
+
+		#  create tidy uri for help page on cgi-script.
+
+		if ($ENV{REQUEST_SCHEME} eq 'https') {
+			$port = ":$ENV{SERVER_PORT}"
+				unless $ENV{SERVER_PORT} eq '443'
+			;
+		} elsif ($ENV{REQUEST_SCHEME} eq 'http') {
+			$port = ":$ENV{SERVER_PORT}"
+				unless $ENV{SERVER_PORT} eq '80'
+			;
+		} else {
+			$port = $ENV{SERVER_PORT};
+		}
 		print "\n\nFor help, see " .
-			"http://$ENV{SERVER_NAME}$port$ENV{SCRIPT_NAME}?help\n";
+			"$ENV{REQUEST_SCHEME}:" .
+			"//$ENV{SERVER_NAME}$port$ENV{SCRIPT_NAME}?help\n"
+		;
 		#
 		#  Broadcast the location of the temporary work directory
 		#  to aid debugging.
