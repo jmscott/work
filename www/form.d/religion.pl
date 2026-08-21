@@ -9,5 +9,5 @@ our (
 print <<END;
 Content-Type: text/html
 
-The value of <form> $ENV{SCRIPT_NAME}.religion is '$POST_VAR{religion}'.
+The value of <form> $POST_VAR{in}.religion is '$POST_VAR{religion}'.
 END

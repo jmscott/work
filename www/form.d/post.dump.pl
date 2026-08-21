@@ -2,12 +2,13 @@
 #  Synopsis:
 #	Generate an html <div> element that is the dump of a http POST.
 #  Usage:
-#	<form action="/cgi-bin/env?out=post.dump" ...>
+#	<form action="/cgi-bin/jmscott/form" ...>
+#	 <input name="in" value="post.dump" type="hidden" />
 #  Description:
 #	Generate a <div> html element that dumps the contents of an http 
 #	POST command.  The output is suitable for debugging forms and not
 #	good for much else.
-#  HTML Outline:
+#  HTML Output:
 #	<div [id=..] [class=..]>
 #	  <h1>..
 #	  <div class="form">
@@ -16,6 +17,8 @@
 #	  <div class="env">
 #	    <h2>
 #	    <dl>
+#  Note:
+#	Rename to post.debug.
 #
 our (
 	%QUERY_ARG,
