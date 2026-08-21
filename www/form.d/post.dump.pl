@@ -17,9 +17,6 @@
 #	    <h2>
 #	    <dl>
 #
-#  Subversion Id:
-#	$Id$
-#
 our (
 	%QUERY_ARG,
 	%POST_VAR
