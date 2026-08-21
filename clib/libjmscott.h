@@ -85,6 +85,52 @@ extern char *	jmscott_strcat7(char *tgt, int tgtsize,
 			const char *src6,
 			const char *src7
 		);
+extern char *	jmscott_strcat8(char *tgt, int tgtsize,
+			const char *src1,
+			const char *src2,
+			const char *src3,
+			const char *src4,
+			const char *src5,
+			const char *src6,
+			const char *src7,
+			const char *src8
+		);
+extern char *	jmscott_strcat9(char *tgt, int tgtsize,
+			const char *src1,
+			const char *src2,
+			const char *src3,
+			const char *src4,
+			const char *src5,
+			const char *src6,
+			const char *src7,
+			const char *src8,
+			const char *src9
+		);
+extern char *	jmscott_strcat10(char *tgt, int tgtsize,
+			const char *src1,
+			const char *src2,
+			const char *src3,
+			const char *src4,
+			const char *src5,
+			const char *src6,
+			const char *src7,
+			const char *src8,
+			const char *src9,
+			const char *src10
+		);
+extern char *	jmscott_strcat11(char *tgt, int tgtsize,
+			const char *src1,
+			const char *src2,
+			const char *src3,
+			const char *src4,
+			const char *src5,
+			const char *src6,
+			const char *src7,
+			const char *src8,
+			const char *src9,
+			const char *src10,
+			const char *src11
+		);
 extern char 	*jmscott_ulltoa(unsigned long long ull, char *digits);
 extern char 	*jmscott_lltoa(long long ull, char *digits);
 extern char	*jmscott_a2ui63(char *a, unsigned long long *ull);

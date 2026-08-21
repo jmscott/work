@@ -158,6 +158,126 @@ jmscott_strcat7(
 	);
 }
 
+char *
+jmscott_strcat8(
+	char *tgt,
+	int tgtsize,
+	const char *src1,
+	const char *src2,
+	const char *src3,
+	const char *src4,
+	const char *src5,
+	const char *src6,
+	const char *src7,
+	const char *src8
+){
+	char *p = jmscott_strcat(tgt, tgtsize, src1);
+	return jmscott_strcat7(
+				p,
+				tgtsize - (p - tgt),
+				src2,
+				src3,
+				src4,
+				src5,
+				src6,
+				src7,
+				src8
+	);
+}
+
+char *
+jmscott_strcat9(
+	char *tgt,
+	int tgtsize,
+	const char *src1,
+	const char *src2,
+	const char *src3,
+	const char *src4,
+	const char *src5,
+	const char *src6,
+	const char *src7,
+	const char *src8,
+	const char *src9
+){
+	char *p = jmscott_strcat(tgt, tgtsize, src1);
+	return jmscott_strcat8(
+				p,
+				tgtsize - (p - tgt),
+				src2,
+				src3,
+				src4,
+				src5,
+				src6,
+				src7,
+				src8,
+				src9
+	);
+}
+
+char *
+jmscott_strcat10(
+	char *tgt,
+	int tgtsize,
+	const char *src1,
+	const char *src2,
+	const char *src3,
+	const char *src4,
+	const char *src5,
+	const char *src6,
+	const char *src7,
+	const char *src8,
+	const char *src9,
+	const char *src10
+){
+	char *p = jmscott_strcat(tgt, tgtsize, src1);
+	return jmscott_strcat9(
+				p,
+				tgtsize - (p - tgt),
+				src2,
+				src3,
+				src4,
+				src5,
+				src6,
+				src7,
+				src8,
+				src9,
+				src10
+	);
+}
+
+char *
+jmscott_strcat11(
+	char *tgt,
+	int tgtsize,
+	const char *src1,
+	const char *src2,
+	const char *src3,
+	const char *src4,
+	const char *src5,
+	const char *src6,
+	const char *src7,
+	const char *src8,
+	const char *src9,
+	const char *src10,
+	const char *src11
+){
+	char *p = jmscott_strcat(tgt, tgtsize, src1);
+	return jmscott_strcat10(
+				p,
+				tgtsize - (p - tgt),
+				src2,
+				src3,
+				src4,
+				src5,
+				src6,
+				src7,
+				src8,
+				src9,
+				src10,
+				src11
+	);
+}
+
 /*
  *  Convert unsigned long long to decimal ascii string.
  *  Return the pointer to byte after final digit:
