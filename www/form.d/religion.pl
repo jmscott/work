@@ -7,7 +7,7 @@ our (
 );
 
 print <<END;
-Content-Type: text/plain
+Content-Type: text/html
 
-The value of <code>religion</code> is '$POST_VAR{religion}'.
+The value of <form> $ENV{SCRIPT_NAME}.religion is '$POST_VAR{religion}'.
 END
