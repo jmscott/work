@@ -32,22 +32,12 @@ die "Content-Length too big: $CL > $MAX_CONTENT_LENGTH"
 ;
 if ($CL > 0) {
 	#
-	#  Insure the content is not too big.
-	#
-	#  Note:
-	#	is this test for CL redundant??!
-	#
-	die "CONTENT_LENGTH too large: " .  "$ENV{CL} > $MAX_CONTENT_LENGTH"
-						if $CL > $MAX_CONTENT_LENGTH
-	;
-	#
 	#  Read the posted content from stdin.
 	#  Ought to timeout read() call.
 	#
 	my ($buf, $nread);
 	while ($CL > 0 && ($nread = read(STDIN, $buf, $CL)) > 0) {
 		$CL -= $nread;
-/opt/local/bin/bash: line 1: :pwds: command not found
 	}
 	die "POST: read($CL) failed: $!" if $nread <= 0;
 } else {
