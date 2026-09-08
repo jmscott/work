@@ -3,7 +3,8 @@
  *	Remove duplicate lines on stdin and write to stdout.
  *  Note:
  *	dedup seems to be about twice as fast as "sort -u", when
- *	LANG=en_US.UTF-8;  otherwise, "sort -u" about 4 time fast.
+ *	LANG=en_US.UTF-8;  otherwise, for LANG=C, "sort -u" about 4 time
+ *	faster.
  *
  *	A clang version exists in setspace, which will eventually replace this
  *	golang version.  surprisingly, this golang version is only about %25
@@ -14,6 +15,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -30,7 +32,6 @@ func die(format string, args ...interface{}) {
 func main() {
 	
 	var seen map[string]bool
-	var buf[4096 * 4096]byte
 
 	put_count := false
 
@@ -45,21 +46,23 @@ func main() {
 		die("bad cli arg count: got %d, need 1 or 0", argc)
 	}
 
-	in := bufio.NewScanner(os.Stdin)
-	in.Buffer(buf[:], len(buf))
+	in := bufio.NewReaderSize(os.Stdin, 4096 * 4096)
 	seen = make(map[string]bool, 4096 * 4096)
-	for in.Scan() {
-		txt := in.Text()
-		if !seen[txt] {
-			seen[txt] = true
+	for {
+		line, err := in.ReadString('\n')
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			fmt.Fprintf(os.Stderr, "ERROR: %s\n", err)
+			os.Exit(1)
+		}
+		if !seen[line] {
+			seen[line] = true
 			if put_count == false {
-				fmt.Println(txt)
+				os.Stdout.Write([]byte(line))
 			}
 		}
-	}
-	if err := in.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "ERROR: %s\n", err)
-		os.Exit(1)
 	}
 	if put_count {
 		fmt.Printf("%d\n", len(seen))
