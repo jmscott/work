@@ -46,7 +46,7 @@ $CGI{POST}->{in}->{putter}->{'post.dump'}->{name} = 'post.dump';
 #
 $CGI{POST}->{in}->{putter}->{'religion'}->{name} = 'religion';
 $CGI{POST}->{in}->{putter}->{'religion'}->{vars}->{var}->{religion} = {
-	perl5_re	=>	'jewish|christian|muslim|hindu|buddhist|jain|agnostic|atheist',
+	perl5_re	=>	'[a-z]{1,8}',
 	required	=>	'yes',
 };
 #

@@ -30,21 +30,33 @@ my $MAX_CONTENT_LENGTH = 100 * 1024 * 1024;	#  100meg
 die "Content-Length too big: $CL > $MAX_CONTENT_LENGTH"
 	if $CL > $MAX_CONTENT_LENGTH
 ;
-die "http: POST: content length not > 0" if $CL == 0;
-#
-#  Read the posted content from stdin.
-#  Ought to timeout read() call.
-#
-my ($buf, $nread);
-while ($CL > 0 && ($nread = read(STDIN, $buf, $CL)) > 0) {
-	$CL -= $nread;
+
+if ($CL > 0) {
+	#
+	#  Insure the content is not too big.
+	#
+	die "CONTENT_LENGTH too large: " .  "$ENV{CL} > $MAX_CONTENT_LENGTH"
+						if $CL > $MAX_CONTENT_LENGTH
+	;
+	#
+	#  Read the posted content from stdin.
+	#  Ought to timeout read() call.
+	#
+	my ($buf, $nread);
+	while ($CL > 0 && ($nread = read(STDIN, $buf, $CL)) > 0) {
+		$CL -= $nread;
+		$POST_DATA .= $buf;
+	}
+	die "POST: read($CL) failed: $!" if $nread <= 0;
+} else {
+	die "http: POST: content length not > 0: length=$CL";
 }
-die "POST: read($CL) failed: $!" if $nread <= 0;
 
 #
 #  Call the appropriate parser to map build the POST_* variables.
 #
 #
+
 if ($CT eq 'application/x-www-form-urlencoded') {
 	require 'jmscott/httpd2.d/x-www-form-urlencoded.pl';
 } elsif ($CT =~ m/application\/multipart-form-data/ or
