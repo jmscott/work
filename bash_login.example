@@ -10,6 +10,11 @@
 #	echo '. etc/bash_login' >>$HOME/.bash_login
 #
 
+#  avoid loops if already dotted in.  uggh.  got to be a better way.
+
+test "$JMSCOTT_BASH_LOGIN_SOURCED" = yes && return
+export JMSCOTT_BASH_LOGIN_SOURCED=yes
+
 export BASH_SILENCE_DEPRECATION_WARNING=1	#  silence macos silliness
 
 case $USER in
