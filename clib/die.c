@@ -127,10 +127,20 @@ jmscott_die_argc(int status, int got, int expect, char *usage)
 	snprintf(suffix, sizeof suffix, "%d, expected %d: ", got, expect);
 
 	msg[0] = 0;
+
+	//  accept usage with and without prefix "usage: ...".
+	//  allows programs to have a single usage string.
+
+	char *u;
+	if (strncmp(usage, "usage: ", 7) == 0)
+		u = "\n";
+	else
+		u = "\nusage: ";
+
 	jmscott_strcat4(msg, sizeof msg,
 			"wrong number of cli args: got ",
 			suffix,
-			"\nusage: ",
+			u,
 			usage
 	);
 	jmscott_die(status, msg);

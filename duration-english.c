@@ -33,9 +33,9 @@ extern int	errno;
 
 #include "jmscott/libjmscott.h"
 
-#define ROUND(n, d) ((((n) < 0) ^ ((d) < 0)) ? (((n) - (d)/2)/(d)) : (((n) + (d)/2)/(d)))
-
 char *jmscott_progname = "duration-english";
+
+#define ROUND(n, d) ((((n) < 0) ^ ((d) < 0)) ? (((n) - (d)/2)/(d)) : (((n) + (d)/2)/(d)))
 
 static void
 die(char *msg)
@@ -53,8 +53,8 @@ int
 main(int argc, char **argv)
 {
 	errno = 0;
-	if (argc != 2)
-		die("wrong number of arguments");
+	if (--argc != 1)
+		jmscott_die_argc(1, argc, 1, "duration-english <seconds>");
 
 	char *d = argv[1], c;
 	char *p = d;
