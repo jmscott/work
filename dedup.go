@@ -24,7 +24,7 @@ func die(format string, args ...interface{}) {
 	fmt.Fprintf(os.Stderr, "dedup: ERROR: " + format + "\n", args...)
 	fmt.Fprintf(
 		os.Stderr,
-		"usage: dedup [--count]",
+		"usage: dedup [--count]\n",
 	)
 	os.Exit(1)
 }
@@ -38,10 +38,15 @@ func main() {
 	argv := os.Args[1:]
 	argc := len(argv)
 	if argc == 1 {
-		if argv[0] != "--count" {
-			die("unknown option: %s", argv[0])
+		arg := argv[0]
+		switch {
+		case arg == "--count":
+			put_count = true
+		case arg[0:min(len(arg), 2)] == "--":
+			die("unknown option: %s", arg)
+		default:
+			die("unknown cli arg: %s", arg)
 		}
-		put_count = true
 	} else if argc != 0 {
 		die("bad cli arg count: got %d, need 1 or 0", argc)
 	}
