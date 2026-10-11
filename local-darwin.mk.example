@@ -36,7 +36,7 @@ INSTALL_PREFIX?=/usr/local
 
 # location of go executable.
 
-GOEXE=/usr/local/go/bin/go
+GOEXE=/opt/local/bin/go
 
 #  conditional compilation of postgresql dependent code
 #  set JMSCOTT_COMPILE_PG=1; otherwise, JMSCOTT_COMPILE_PG=0
