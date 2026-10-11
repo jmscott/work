@@ -48,6 +48,7 @@ main(int argc, char **argv)
 	errno = 0;
 	if (--argc != 1)
 		jmscott_die_argc(1, argc, 1, usage);
+	argv++;
 
 	char *byte_size = argv[0];
         if (*byte_size == 0)
@@ -73,7 +74,7 @@ main(int argc, char **argv)
 			*p++ = 's';
 		else
 			*p++ = 'b';
-		*p = '\n';
+		*p++ = '\n';
 		if (jmscott_write(1, buf, p - buf) < 0)
 			die2("write(1) failed", strerror(errno));
 		_exit(0);
