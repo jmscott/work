@@ -46,8 +46,6 @@
 #
 #	The ${name} pattern is expanded immediately and so is not recursive,
 #	following the convention of the Bourne shell.
-#  Depends:
-#	nothing
 #
 
 #
