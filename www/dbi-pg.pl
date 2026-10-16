@@ -4,24 +4,11 @@
 #  Return:
 #	Always implies success, die otherwise
 #  Note:
-#	why is 'httpd2.d/common.pl' required?
-#
-#	Carefully examine the PGDUMP=<tag> option.  I (jmscott) consistent;y
-#	see failed SQL dumps for particular queries.  May be realated to not
-#	testing for "tag" in dbi_pg_connect!
-#
 #	Consider added option PGDUMP=help
 #
 #	Rewrite require statements to reference jmscott/httpd2.d/...'
 #	This confines env var PERL5 to $SERVER_ROOT/lib.
 #
-#	existence of "tag" not tested in dbi_pg_connect!
-#
-#	Added example of query called from cgi-bin, similar to env.cgi and
-#	form.cgi.
-#
-
-require 'jmscott/httpd2.d/common.pl';
 
 #
 #  Manually set LD_LIBRARY_PATH.  Redhat 6.2 apache has problem setting
