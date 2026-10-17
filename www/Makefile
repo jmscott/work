@@ -70,12 +70,13 @@ all:
 endif
 
 distclean:
-	rm -rf $(WWW_PREFIX)/src
-	rm -rf $(WWW_PREFIX)/htdocs
-	rm -rf $(WWW_PREFIX)/lib
-	rm -rf $(WWW_PREFIX)/bin
-	rm -rf $(WWW_PREFIX)/sbin
-	rm -rf $(WWW_PREFIX)/cgi-bin
+	rm --recursive --force $(WWW_PREFIX)/src
+	rm --recursive --force $(WWW_PREFIX)/htdocs
+	rm --recursive --force $(WWW_PREFIX)/lib
+	rm --recursive --force $(WWW_PREFIX)/bin
+	rm --recursive --force $(WWW_PREFIX)/sbin
+	rm --recursive --force $(WWW_PREFIX)/cgi-bin
+	rm --recursive --force $(WWW_PREFIX)/jmscott
 
 ifeq ($(JMSCOTT_COMPILE_WWW),1)
 install: all
@@ -98,6 +99,8 @@ install: all
 		-d $(WWW_PREFIX)/sbin
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=wrx,g=rx,o=		\
 		-d $(WWW_PREFIX)/htdocs
+	cd $(WWW_PREFIX) && 						\
+		(test -e jmscott || ln --verbose --symbolic . jmscott)
 
 	$(call RSYNC,LIBs,lib);  $(call CLEARX,lib)
 	$(call RSYNC,CGIBINs,cgi-bin)
