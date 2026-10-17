@@ -7,31 +7,13 @@
 #  See:
 #	https://github.com/jmscott/work/blob/master/make-make
 #	https://en.wikipedia.org/wiki/Unix_filesystem
-#  Requires:
-#	gnu sed
-#	jmscott elapsed-english
-#	gnu date
 #  Exit Status:
 #	0	make tar
 #	1	make failed, tar not made
 #  Note:
-#	-  When making symlinks via the var SYMLINKs, the existence of the
-#	   associated VAR in the file product.mkmk is not checked, so the
-#	   source dir in temp file does not exist.  for example, 
-#
-#		ln: failed to create symbolic link 'cgi-bin/jmscott'
-#
-#	   means the CGIBINs var is not defined in file product.mkmk.
-
 #	-  Make *_local versions of ALL variables that can be remapped in *.mkmk
 #	   file.  Currently only VAR2dir_local() can be remapped.  Need to also
 #	   remap dir2perm{} and file2perm{}.
-#
-#	-  Need option to keep temp work directory!
-#
-#	-  VAR->dir remaps only for a single directory.  for example,
-#
-#		LIBs->lib/schema
 #
 #	-  The tar version insures that dynamic directories in foobar.conf
 #	   exist but does NOT ever overwrite, lest precious data be lost.
@@ -77,10 +59,11 @@ leave()
 {
 	if [ "$KEEP_WORK_DIR" = no -a -e "$WORK_DIR" ];  then
 		echo "--$WORK_DIR"
-		chmod -R +w $WORK_DIR					||
+		chmod --recursive +w $WORK_DIR				||
 			WARN "chmod +w tmp/work failed: exit status=$?"
 		find $WORK_DIR ! -type l -print | xargs chmod +w
-		rm -rf $WORK_DIR || WARN "rm work tmp failed: exit status=$?"
+		rm --recursize --force $WORK_DIR			||
+			WARN "rm work tmp failed: exit status=$?"
 	fi
 	cat <<END
 #
@@ -192,20 +175,31 @@ make_SYMLINKs()
 {
 	test -n "$SYMLINKs" || return
 	for S in $SYMLINKs;  do
-		echo $S | fgrep -e '->' | sed 's/->/ /' | while read A B;  do
-		echo "+$A -> $B" && (
-			cd $WORK_DIR || die "cd symlink failed: exit status=$?"
-			BD=$(dirname $B)
-			if [ ! -d $BD ];  then
-				echo "+>$BD"
-				#  no permisions!!!
-				mkdir -p $BD				||
-					die 'make_SYMLINKs: mkdir failed: '\
-					     "exit status=$?"
-			fi
-			ln -sf $B $A || die "ln -fs failed: exit status=$?"
-		) || exit 1
-		done || exit 1
+
+		#  for each entry "tgt->src" in $SYMLINKs
+
+		echo $S | fgrep -e '->' | sed 's/->/ /'			|
+		  while read LINK DIR;  do
+		  	#
+			#  Target points to source directory.  Must be
+			#  a directory
+			#
+			echo "+$LINK -> $DIR"
+			(
+				cd $WORK_DIR				||
+					die "cd symlink failed: exit status=$?"
+				DN=$(dirname $DIR)
+				if [ ! -d $DN ];  then
+					echo "+>$DN"
+					#  Note: are permissions correct
+					mkdir --parents $DN		||
+					  die "mkdir symlink failed: "	\
+						     "exit status=$?"
+				fi
+				ln --symbolic --force $DIR $LINK		||
+					die "ln -fs failed: exit status=$?"
+			) || exit 1
+		  done || exit 1
 	done || exit 1
 }
 
@@ -234,7 +228,7 @@ copy_file()
 	#  Make the staging directory.
 	#
 	echo "+>$DIR"
-	mkdir -p $WORK_DIR/$DIR						||
+	mkdir --parents $WORK_DIR/$DIR					||
 		die "copy_file: mkdir stage root failed: exit status=$?"
 	#
 	#  Copy the files and directories into the staging directory
@@ -247,7 +241,7 @@ copy_file()
 		if [ -d $F ];  then
 			echo "+>$DIR/$F/"
 			DN=$WORK_DIR/$DIR/$F
-			mkdir -p "$DN"					||
+			mkdir --parents "$DN"				||
 				die "copy_file: mkdir config failed: "	\
 					"exit status=$?"
 			continue
@@ -260,7 +254,7 @@ copy_file()
 		if [ -n "$DN" -a ! -d $WORK_DIR/$DIR/$DN ];  then
 			echo "+>$DIR/$DN/"
 			D=$WORK_DIR/$DIR/$DN
-			mkdir -p $D					||
+			mkdir --parents $D				||
 				die "copy_file: mkdir failed: exit status=$?"
 		fi
 		#
@@ -327,7 +321,7 @@ make_dir()
 	#  Make the staging directory.
 	#
 	echo "+>$WORK_DIR/$DIR"
-	mkdir -p $WORK_DIR/$DIR						||
+	mkdir --parents $WORK_DIR/$DIR					||
 		die "make_dir: mkdir failed: exit status=$?"
 	find $WORK_DIR/$DIR -type d -print | xargs chmod $PERMD
 	STATUS=${PIPESTATUS[*]}
@@ -450,6 +444,6 @@ STATUS=${PIPESTATUS[*]}
 test "$STATUS" = '0 0'							||
 	die "tar | bzip2 failed: exist status=$STATUS"
 
-test -s $TAR_FILE || die "empty tar file $TAR_FILE"
+test -s $TAR_FILE || die 'unexpected empty tar file'
 
 exit 0
