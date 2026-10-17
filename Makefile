@@ -6,6 +6,8 @@
 #	local-darwin.mk.example
 #	https://github.com/jmscott/work
 #  Note:
+#	What does recipe "jmscott" do?
+#
 #	Makefile dependencies are still wrong!
 #
 #	Probably time to retire flatx.
@@ -40,8 +42,17 @@ all: $(COMPILEs)
 
 .PHONY: clean all distclean nstall install-dirs world
 
+#
+#  Note:
+#	Symbolic link helps cc compiles in clib for references
+#
+#		#include "jmscott/....h"
+#
+#	Ought to be a better method!  Perhaps link should be in dir clib/.
+#
 jmscott:
-	test -e jmscott || ln -s clib jmscott
+	test -e jmscott || ln --symbolic clib jmscott
+
 $(COMPILEs): jmscott
 
 install-dirs:
@@ -78,11 +89,13 @@ install: all
 	cd clib && $(_MAKE) install
 	cd pgsnap && $(_MAKE) install
 	cd www && $(_MAKE) install
+	cd $(JMSCOTT_PREFIX) &&						\
+		(test -e jmscott || ln --verbose --symbolic . jmscott)
 
 clean:
 	cd clib && $(_MAKE) clean
 	cd www && $(_MAKE) clean
-	rm -f $(COMPILEs) jmscott
+	rm --force $(COMPILEs) jmscott
 distclean:
 	cd clib && $(_MAKE) $(MFLAGS) distclean
 	cd www && $(_MAKE) distclean
@@ -92,6 +105,7 @@ distclean:
 	rm -rf $(JMSCOTT_PREFIX)/sbin
 	rm -rf $(JMSCOTT_PREFIX)/src
 	rm -rf $(JMSCOTT_PREFIX)/lib
+	rm -rf $(JMSCOTT_PREFIX)/jmscott
 
 $(JMSLIB): $(JMSINC)
 	cd clib && $(_MAKE) all
