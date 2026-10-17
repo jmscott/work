@@ -13,6 +13,10 @@
 #	[CGIBINs]='cgi-bin/schema'
 #)
 
+SYMLINKs="
+	jmscott->.
+"
+
 #
 #  Uncomment for compiled programs to be installed in bin/ or sbin/ and
 #  removed in "clean" recipes.
