@@ -5,9 +5,8 @@
 #	Be sure do a 'make all' before building a distribution.
 #	Otherwise, the automatically generated cgi scripts will be missing.
 #
-SYMLINKs="
-	jmscott->.
-"
+#SYMLINKs="
+#"
 
 CGIBINs="
 	cat-http-POST
