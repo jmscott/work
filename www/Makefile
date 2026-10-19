@@ -99,8 +99,6 @@ install: all
 		-d $(WWW_PREFIX)/sbin
 	install -g $(WWW_GROUP) -o $(WWW_USER) -m u=wrx,g=rx,o=		\
 		-d $(WWW_PREFIX)/htdocs
-	cd $(WWW_PREFIX) && 						\
-		(test -e jmscott || ln --verbose --symbolic . jmscott)
 
 	$(call RSYNC,LIBs,lib);  $(call CLEARX,lib)
 	$(call RSYNC,CGIBINs,cgi-bin)
