@@ -29,7 +29,7 @@ unshift @INC, "$ENV{SERVER_ROOT}/lib/jmscott", "$ENV{SERVER_ROOT}/lib";
 
 our %CGI;
 
-require 'jmscott/httpd2.d/common.pl';
+require 'jmscott/www/lib/httpd2.d/common.pl';
 $CGI{name} = 'form';
 
 #
@@ -60,4 +60,4 @@ $CGI{POST}->{in}->{putter}->{'religion'}->{vars}->{var}->{religion} = {
 $CGI{GET}->{out}->{putter}->{help}->{name} = 'help';
 $CGI{GET}->{out}->{putter}->{help}->{'content-type'} = 'text/html';
 
-require "jmscott/httpd2.d/$ENV{REQUEST_METHOD}.pl";
+require "jmscott/www/lib/httpd2.d/$ENV{REQUEST_METHOD}.pl";

@@ -29,7 +29,7 @@ unshift @INC, "$ENV{SERVER_ROOT}/lib/jmscott", "$ENV{SERVER_ROOT}/lib";
 
 our %CGI;
 
-require 'jmscott/httpd2.d/common.pl';
+require 'jmscott/www/lib/httpd2.d/common.pl';
 $CGI{name} = 'env';
 #
 #  Default content type for all elements.
@@ -125,4 +125,4 @@ $CGI{GET}->{out}->{putter}->{'input'}->{'query-args'}->{arg}->{src} = {
 $CGI{GET}->{out}->{putter}->{help}->{name} = 'help';
 $CGI{GET}->{out}->{putter}->{help}->{'content-type'} = 'text/html';
 
-require "jmscott/httpd2.d/$ENV{REQUEST_METHOD}.pl";
+require "jmscott/www/lib/httpd2.d/$ENV{REQUEST_METHOD}.pl";
